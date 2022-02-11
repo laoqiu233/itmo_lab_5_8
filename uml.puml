@@ -1,0 +1,77 @@
+@startuml uml
+package Models {
+    class Route {
+        - id : Long
+        - name : String
+        - coordinates : Coordinates
+        - creationDate : java.time.LocalDate
+        - from : Location
+        - to : Location
+        - distance : double
+    }
+
+    class Coordinates {
+        - x : long
+        - y : double
+    }
+
+    class Location {
+        - x : int
+        - y : int
+        - z : long
+        - name : String
+    }
+}
+
+package Modes {
+    interface Mode {
+        + void run()
+    }
+
+    class CLI {
+        + CLI()
+    }
+}
+
+package CollectionManagers {
+    interface CollectionManager {
+        + LinkedList<Route> getCollection()
+        + void add(route : Route)
+        + void update(id : int, route : Route)
+        + void remove(id : int)
+        + void clear()
+    }
+
+    class FileCollectionManager {
+        + FileCollection(fileName: String)
+    }
+
+    FileCollection --> CollectionManager
+}
+
+package UI {
+    interface AbstractUI {
+        + String getUserInput()
+        + void print(msg : String)
+        + void println(msg : String)
+    }
+
+    class ConsoleUserIO {
+        + ConsoleUserIO()
+    }
+
+    ConsoleUserIO --> AbstractUserIO
+}
+
+package Commands {
+    class CommandParser {
+
+    }
+
+    interface AbstractCommand {
+        + String getInfo()
+        + int getArgumentCount()
+        + void run(UserIO : AbstractUserIO, String args[])
+    }
+}
+@enduml
