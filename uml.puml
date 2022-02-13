@@ -3,7 +3,6 @@ package Models {
     class Route {
         - id : Long
         - name : String
-        - coordinates : Coordinates
         - creationDate : java.time.LocalDate
         - from : Location
         - to : Location
@@ -13,12 +12,11 @@ package Models {
     class Coordinates {
         - x : long
         - y : double
+        - z : long
     }
 
     class Location {
-        - x : int
-        - y : int
-        - z : long
+        - coordinates : Coordinates
         - name : String
     }
 }

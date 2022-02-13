@@ -1,0 +1,41 @@
+<routes>
+    <Route id="0">
+        <name>Trans-Siberian Railway</name>
+        <distance>9289</distance>
+        <creationDate>1904-06-21</creationDate>
+        <from>
+            <coordinates x="100" y="1000.5" z="20"/>
+            <name>Moscow</name>
+        </from>
+        <to>
+            <coordinates x="1000" y="700.35" z="20"/>
+            <name>Vladivostok</name>
+        </to>
+    </Route>
+    <Route id="1">
+        <name>Saint Petersburg - Moscow railway</name>
+        <distance>649.7</distance>
+        <creationDate>1904-06-21</creationDate>
+        <from>
+            <coordinates x="100" y="1000.5" z="20"/>
+            <name>Moscow</name>
+        </from>
+        <to>
+            <coordinates x="80" y="1200.35" z="20"/>
+            <name>Vladivostok</name>
+        </to>
+    </Route>
+    <Route id="2">
+        <name>Khabarovsk-Komsomolsk Railway</name>
+        <distance>400.5</distance>
+        <creationDate>2003-10-15</creationDate>
+        <from>
+            <coordinates x="100" y="1000.5" z="20"/>
+            <name>Khabarovsk</name>
+        </from>
+        <to>
+            <coordinates x="1000" y="700.35" z="20"/>
+            <name>Komsomolsk</name>
+        </to>
+    </Route>
+</routes>
