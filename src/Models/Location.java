@@ -1,4 +1,4 @@
-package src.Models;
+package Models;
 
 public class Location {
     private Coordinates coordinates;

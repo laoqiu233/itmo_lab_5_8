@@ -1,4 +1,4 @@
-package src.Exceptions;
+package Exceptions;
 
 public class ItemNotFoundException extends Exception {
     public ItemNotFoundException(String msg) {

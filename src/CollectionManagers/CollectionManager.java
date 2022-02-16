@@ -1,7 +1,7 @@
-package src.CollectionManagers;
+package CollectionManagers;
 
-import src.Exceptions.ItemNotFoundException;
-import src.Models.Route;
+import Exceptions.ItemNotFoundException;
+import Models.Route;
 import java.util.LinkedList;
 
 public interface CollectionManager {

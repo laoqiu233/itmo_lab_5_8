@@ -1,4 +1,4 @@
-package src.Exceptions;
+package Exceptions;
 
 public class IncorrectFileStructureException extends Exception {
     public IncorrectFileStructureException(String msg) {

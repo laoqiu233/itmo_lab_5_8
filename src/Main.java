@@ -1,5 +1,4 @@
-package src;
-import src.Modes.*;
+import Modes.*;
 
 class Main {
     public static void main(String[] args) {
