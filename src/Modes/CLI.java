@@ -3,43 +3,41 @@ package Modes;
 import java.io.IOException;
 
 import CollectionManagers.FileCollectionManager;
+import CommandUtils.CommandManager;
+import CommandUtils.Commands.InfoCommand;
+import CommandUtils.Commands.ShowCommand;
+import Exceptions.CommandNotFoundException;
+import Exceptions.TooManyArgumentsException;
 import UserIO.BasicUserIO;
-import Models.Route;
-
 public class CLI implements Mode {
     public void run() {
         String fileName = System.getenv("FILENAME");
-        BasicUserIO io;
+        FileCollectionManager col;
 
         try {
-            FileCollectionManager cm = new FileCollectionManager(fileName); 
-
-            io = new BasicUserIO();
-
-            for (Route c : cm.getCollection()) {
-                io.writeln(c);
-            }
-
-            while (true) {
-                try {
-                    String s = io.read();
-                    io.write("\"");
-                    for (int i=0; i<s.length();i ++) {
-                        if (i%2 == 1) io.write(Character.toUpperCase(s.charAt(i)));
-                        else io.write(Character.toLowerCase(s.charAt(i)));
-                    }
-                    io.writeln("\" ну ты и еблан хахахахаха");
-    
-                    if (s.equals("quit")) {
-                        System.out.println("ну и пошел ты нахуй гандон");
-                        break;
-                    }
-                } catch (IOException e) {
-                    System.out.println("сука соси хуй б");
-                }
-            }
+            col = new FileCollectionManager(fileName); 
         } catch (Exception e) {
             System.out.println(e);
+            return;
+        }
+        
+        BasicUserIO io = new BasicUserIO();
+        CommandManager handler = new CommandManager(io);
+        handler.addCommand(new InfoCommand(io, col));
+        handler.addCommand(new ShowCommand(io, col));
+
+        while (true) {
+            try {
+                io.write("> ");
+                String input = io.read();
+                handler.handle(input);
+            } catch (TooManyArgumentsException e) {
+                System.out.println(e.getMessage());
+            } catch (CommandNotFoundException e) {
+                System.out.println(e.getMessage());
+            } catch (IOException e) {
+                System.out.println("Something went wrong: " + e);
+            }
         }
     }
 }

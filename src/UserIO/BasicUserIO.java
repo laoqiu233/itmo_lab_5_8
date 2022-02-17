@@ -21,15 +21,23 @@ public class BasicUserIO {
         this.out = new BufferedWriter(new OutputStreamWriter(out));
     }
 
-    public void write(Object s) throws IOException {
-        out.write(s.toString());
-        out.flush();
+    public void write(Object s) {
+        try {
+            out.write(s.toString());
+            out.flush();
+        } catch (IOException e) {
+            System.out.println("Exception while writing to output stream: \n" + e);
+        }
     }
 
-    public void writeln(Object s) throws IOException {
-        out.write(s.toString());
-        out.newLine();
-        out.flush();
+    public void writeln(Object s) {
+        try {
+            out.write(s.toString());
+            out.newLine();
+            out.flush();
+        } catch (IOException e) {
+            System.out.println("Exception while writing to output stream: \n" + e);
+        }
     }
 
     public String read() throws IOException {
