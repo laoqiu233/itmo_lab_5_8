@@ -3,11 +3,13 @@ package CommandUtils;
 import java.util.HashMap;
 
 import CommandUtils.Commands.AbstractCommand;
+import UserIO.BasicUserIO;
+import CollectionManagers.CollectionManager;
 
 public class CommandParser {
     private HashMap<String, AbstractCommand> commands;
     
-    public void CommandParser() {
+    public void CommandParser(CollectionManager col, BasicUserIO io) {
 
     }
 

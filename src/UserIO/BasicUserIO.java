@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class BasicUserIO {
     BufferedReader in;
@@ -23,12 +21,15 @@ public class BasicUserIO {
         this.out = new BufferedWriter(new OutputStreamWriter(out));
     }
 
-    public void write(Object ...o) throws IOException {
-        out.write(Arrays.stream(o).map(x -> o.toString()).reduce((a,b) -> a+' '+b));
+    public void write(Object s) throws IOException {
+        out.write(s.toString());
+        out.flush();
     }
 
-    public void writeln(Object ...o) throws IOException {
-        write(o);
+    public void writeln(Object s) throws IOException {
+        out.write(s.toString());
+        out.newLine();
+        out.flush();
     }
 
     public String read() throws IOException {
