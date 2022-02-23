@@ -6,7 +6,8 @@ public abstract class AbstractModel {
     protected abstract void validate() throws InvalidFieldException;
 
     static void ensureNotNull(Object field, String message) throws InvalidFieldException {
-        if (field == null)
+        if (field == null) {
             throw new InvalidFieldException(message);
+        }
     }
 }

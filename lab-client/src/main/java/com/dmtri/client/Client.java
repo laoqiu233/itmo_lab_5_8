@@ -24,7 +24,7 @@ public final class Client {
         ch.addCommand(new HelpCommand(io, ch));
         ch.addCommand(new InfoCommand(io, cm));
         ch.addCommand(new ShowCommand(io, cm));
-        
+
         while (true) {
             io.write("> ");
             String input = io.read();

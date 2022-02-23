@@ -6,7 +6,7 @@ import com.dmtri.client.userio.BasicUserIO;
 public class InfoCommand extends AbstractCommand {
     private BasicUserIO io;
     private CollectionManager col;
-    
+
     public InfoCommand(BasicUserIO io, CollectionManager col) {
         super("info");
 

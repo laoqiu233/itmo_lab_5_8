@@ -9,8 +9,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class BasicUserIO {
-    BufferedReader in;
-    BufferedWriter out;
+    private BufferedReader in;
+    private BufferedWriter out;
 
     public BasicUserIO() {
         this(System.in, System.out);
@@ -42,5 +42,13 @@ public class BasicUserIO {
 
     public String read() throws IOException {
         return in.readLine();
+    }
+
+    public BufferedReader getIn() {
+        return in;
+    }
+
+    public BufferedWriter getOut() {
+        return out;
     }
 }

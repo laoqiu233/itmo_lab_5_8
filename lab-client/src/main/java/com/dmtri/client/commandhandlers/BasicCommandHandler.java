@@ -16,7 +16,9 @@ public class BasicCommandHandler implements CommandHandler {
 
         AbstractCommand command = commands.get(commandArgs[0]);
 
-        if (command == null) throw new CommandNotFoundException(commandArgs[0]);
+        if (command == null) {
+            throw new CommandNotFoundException(commandArgs[0]);
+        }
 
         command.execute(Arrays.copyOfRange(commandArgs, 1, commandArgs.length));
     }

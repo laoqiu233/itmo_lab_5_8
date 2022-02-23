@@ -1,7 +1,7 @@
 package com.dmtri.client.commands;
 
 public abstract class AbstractCommand {
-    final private String name;
+    private final String name;
 
     public AbstractCommand(String name) {
         this.name = name;

@@ -14,18 +14,17 @@ public class HelpCommand extends AbstractCommand {
         this.ch = ch;
     }
 
-    public void checkArgs(String args[]) {
-
+    public void checkArgs(String[] args) {
     }
 
     public String getUsage() {
-        return "help - displays usage of all available commands\n" + 
-               "help [command] - displays the usage of a single command";
+        return "help - displays usage of all available commands\n"
+             + "help [command] - displays the usage of a single command";
     }
 
     public void execute(String[] args) {
         checkArgs(args);
-        
+
         if (args.length == 1) {
             AbstractCommand command = ch.getCommands().get(args[0]);
             io.writeln("- " + command.getName());

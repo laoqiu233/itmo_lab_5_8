@@ -11,7 +11,7 @@ import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.models.Route;
 
 /**
- * Collection manager which uses an XML file for 
+ * Collection manager which uses an XML file for
  * data storage
  */
 public class FileCollectionManager implements CollectionManager {

@@ -30,13 +30,14 @@ public class Route extends AbstractModel {
 
     public void validate() throws InvalidFieldException {
         ensureNotNull(id, "id of routes can not be null");
-
-        if (id <= 0) 
+        if (id <= 0) {
             throw new InvalidFieldException("id of routes should be greater than 0");
-        
+        }
+
         ensureNotNull(name, "name of routes can not be null");
-        if (name.length() == 0)
+        if (name.length() == 0) {
             throw new InvalidFieldException("name of routes can not be an empty string");
+        }
 
         ensureNotNull(creationDate, "creation date of routes can not be null");
 
@@ -46,8 +47,9 @@ public class Route extends AbstractModel {
 
         ensureNotNull(distance, "distance of routes can not be null");
 
-        if (distance <= 1)
+        if (distance <= 1) {
             throw new InvalidFieldException("distance of routes should be greater than 1");
+        }
     }
 
     public String toString() {
