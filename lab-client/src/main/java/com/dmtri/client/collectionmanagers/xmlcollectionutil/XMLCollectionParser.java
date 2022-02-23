@@ -64,6 +64,27 @@ public final class XMLCollectionParser {
         return root;
     }
 
+    private static void handleRouteElement(Element el, LinkedList<Route> collection) throws TransformerException {
+        try {
+            Route route = XMLRouteParser.parseRoute(el);
+            // Check id uniqueness
+            if (collection.stream().anyMatch(x -> x.getId() == route.getId())) {
+                throw new InvalidFieldException("The id " + route.getId() + " is already used by another route");
+            }
+            collection.add(route);
+        } catch (
+            InvalidFieldException
+            | NullPointerException
+            | NumberFormatException
+            | DateTimeParseException  e
+        ) {
+            System.out.println("Caught exception while parsing route: ");
+            XMLCollectionWriter.writeElementToConsole(el);
+            System.out.println(e);
+            System.out.println("Skipping invalid route...");
+        }
+    }
+
     public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, TransformerException, SAXException  {
         // Open document and get root
         Element root = getDocumentRoot(openDocument(fileName));
@@ -81,24 +102,7 @@ public final class XMLCollectionParser {
 
         for (int i = 0; i < nodes.getLength(); i++) {
             Element el = (Element) nodes.item(i);
-            try {
-                Route route = XMLRouteParser.parseRoute(el);
-                // Check id uniqueness
-                if (collection.stream().anyMatch(x -> x.getId() == route.getId())) {
-                    throw new InvalidFieldException("The id " + route.getId() + " is already used by another route");
-                }
-                collection.add(route);
-            } catch (
-                InvalidFieldException
-                | NullPointerException
-                | NumberFormatException
-                | DateTimeParseException  e
-            ) {
-                System.out.println("Caught exception while parsing route: ");
-                XMLCollectionWriter.writeElementToConsole(el);
-                System.out.println(e);
-                System.out.println("Skipping invalid route...");
-            }
+            handleRouteElement(el, collection);
         }
 
         System.out.println("Parsing finished. Total routes retrieved from file: " + collection.size());

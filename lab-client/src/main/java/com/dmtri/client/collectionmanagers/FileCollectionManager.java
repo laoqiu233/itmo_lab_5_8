@@ -5,8 +5,11 @@ import java.util.LinkedList;
 import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.xml.sax.SAXException;
 
+import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.models.Route;
 
@@ -26,7 +29,7 @@ public class FileCollectionManager implements CollectionManager {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    public FileCollectionManager(String fileName) throws IncorrectFileStructureException, IOException, SAXException, ParserConfigurationException {
+    public FileCollectionManager(String fileName) throws IncorrectFileStructureException, IOException, SAXException, ParserConfigurationException, TransformerException {
         XMLCollectionParser.ParsedCollection parsed = XMLCollectionParser.parse(fileName);
 
         nextId = parsed.getNextId();
