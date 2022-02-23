@@ -28,6 +28,22 @@ public class Route extends AbstractModel {
         return name;
     }
 
+    public Double getDistance() {
+        return distance;
+    }
+
+    public java.time.LocalDate getCreationDate() {
+        return creationDate;
+    }
+
+    public Location getFrom() {
+        return from;
+    }
+
+    public Location getTo() {
+        return to;
+    }
+
     public void validate() throws InvalidFieldException {
         ensureNotNull(id, "id of routes can not be null");
         if (id <= 0) {

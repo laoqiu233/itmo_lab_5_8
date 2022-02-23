@@ -14,6 +14,18 @@ public class Coordinates extends AbstractModel {
         validate();
     }
 
+    public Long getX() {
+        return x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+
+    public Long getZ() {
+        return z;
+    }
+
     protected void validate() throws InvalidFieldException {
         AbstractModel.ensureNotNull(this.y, "Field y for objects of type coordinates can not be null");
     }

@@ -12,6 +12,14 @@ public class Location extends AbstractModel {
         validate();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
     protected void validate() throws InvalidFieldException {
         AbstractModel.ensureNotNull(coordinates, "Coordinates for location can not be null");
         AbstractModel.ensureNotNull(name, "Field name for object of type location can not be null");
