@@ -45,6 +45,24 @@ public final class XMLCollectionParser {
         return doc;
     }
 
+    private static Element getDocumentRoot(Document doc) throws IncorrectFileStructureException {
+        Element root = doc.getDocumentElement();
+
+        if (root.getTagName() != "routes") {
+            throw new IncorrectFileStructureException(
+                "Corrupted file: Root element should be \"routes\""
+            );
+        }
+
+        if (root.getAttribute("nextId").isEmpty()) {
+            throw new IncorrectFileStructureException(
+                "Root node should have a nextId attribute defiend"
+            );
+        }
+
+        return root;
+    }
+
     public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, SAXException  {
         // Create document and get root
         Document doc = createDocument(fileName);
@@ -84,24 +102,6 @@ public final class XMLCollectionParser {
         System.out.println("Parsing finished. Total routes retrieved from file: " + collection.size());
         parsed.setCollection(collection);
         return parsed;
-    }
-
-    private static Element getDocumentRoot(Document doc) throws IncorrectFileStructureException {
-        Element root = doc.getDocumentElement();
-
-        if (root.getTagName() != "routes") {
-            throw new IncorrectFileStructureException(
-                "Corrupted file: Root element should be \"routes\""
-            );
-        }
-
-        if (root.getAttribute("nextId").isEmpty()) {
-            throw new IncorrectFileStructureException(
-                "Root node should have a nextId attribute defiend"
-            );
-        }
-
-        return root;
     }
 
     public static class ParsedCollection {
