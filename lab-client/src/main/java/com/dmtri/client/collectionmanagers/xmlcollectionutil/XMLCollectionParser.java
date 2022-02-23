@@ -1,4 +1,4 @@
-package com.dmtri.client.collectionmanagers;
+package com.dmtri.client.collectionmanagers.xmlcollectionutil;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.exceptions.InvalidFieldException;
@@ -24,7 +25,7 @@ public final class XMLCollectionParser {
     private XMLCollectionParser() {
     }
 
-    private static Document createDocument(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, SAXException {
+    private static Document openDocument(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, SAXException {
         // Initialize XML parser
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -63,10 +64,9 @@ public final class XMLCollectionParser {
         return root;
     }
 
-    public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, SAXException  {
-        // Create document and get root
-        Document doc = createDocument(fileName);
-        Element root = getDocumentRoot(doc);
+    public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, TransformerException, SAXException  {
+        // Open document and get root
+        Element root = getDocumentRoot(openDocument(fileName));
 
         ParsedCollection parsed = new ParsedCollection();
         try {
@@ -87,6 +87,7 @@ public final class XMLCollectionParser {
                 if (collection.stream().anyMatch(x -> x.getId() == route.getId())) {
                     throw new InvalidFieldException("The id " + route.getId() + " is already used by another route");
                 }
+                collection.add(route);
             } catch (
                 InvalidFieldException
                 | NullPointerException
@@ -94,6 +95,7 @@ public final class XMLCollectionParser {
                 | DateTimeParseException  e
             ) {
                 System.out.println("Caught exception while parsing route: ");
+                XMLCollectionWriter.writeElementToConsole(el);
                 System.out.println(e);
                 System.out.println("Skipping invalid route...");
             }
