@@ -1,4 +1,4 @@
-package com.dmtri.client.collectionmanagers;
+package com.dmtri.client.collectionmanagers.xmlcollectionutil;
 
 import java.time.LocalDate;
 
