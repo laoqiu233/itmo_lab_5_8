@@ -1,5 +1,5 @@
-<routes>
-    <Route id="0">
+<routes nextId="3">
+    <Route id="1">
         <name>Trans-Siberian Railway</name>
         <distance>9289</distance>
         <creationDate>1904-06-21</creationDate>
@@ -12,7 +12,7 @@
             <name>Vladivostok</name>
         </to>
     </Route>
-    <Route id="1">
+    <Route id="2">
         <name>Saint Petersburg - Moscow railway</name>
         <distance>649.7</distance>
         <creationDate>1904-06-21</creationDate>
@@ -25,7 +25,7 @@
             <name>Vladivostok</name>
         </to>
     </Route>
-    <Route id="2">
+    <Route id="3">
         <name>Khabarovsk-Komsomolsk Railway</name>
         <distance>400.5</distance>
         <creationDate>2003-10-15</creationDate>

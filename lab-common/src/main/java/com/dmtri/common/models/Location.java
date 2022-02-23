@@ -1,12 +1,20 @@
 package com.dmtri.common.models;
 
-public class Location {
+import com.dmtri.common.exceptions.InvalidFieldException;
+
+public class Location extends AbstractModel {
     private Coordinates coordinates;
     private String name; //Поле не может быть null
 
-    public Location(String name, Coordinates coordinates) {
+    public Location(String name, Coordinates coordinates) throws InvalidFieldException {
         this.name = name;
         this.coordinates = coordinates;
+        validate();
+    }
+
+    protected void validate() throws InvalidFieldException {
+        AbstractModel.ensureNotNull(coordinates, "Coordinates for location can not be null");
+        AbstractModel.ensureNotNull(name, "Field name for object of type location can not be null");
     }
 
     public String toString() {
