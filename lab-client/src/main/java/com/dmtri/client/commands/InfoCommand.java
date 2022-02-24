@@ -26,5 +26,6 @@ public class InfoCommand extends AbstractCommand {
         //if (args.length > 0) throw new TooManyArgumentsException("info", 0);
 
         io.writeln("Item count: " + col.getCollection().size());
+        io.writeln("Next ID to be assigned: " + col.getNextId());
     }
 }
