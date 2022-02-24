@@ -2,6 +2,7 @@ package com.dmtri.client.commands;
 
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.util.TerminalColors;
 
 public class HelpCommand extends AbstractCommand {
     private BasicUserIO io;
@@ -18,8 +19,10 @@ public class HelpCommand extends AbstractCommand {
     }
 
     public String getUsage() {
-        return "help - displays usage of all available commands\n"
-             + "help [command] - displays the usage of a single command";
+        return TerminalColors.colorString("help", TerminalColors.GREEN) 
+             + " - displays usage of all available commands\n"
+             + TerminalColors.colorString("help [command]", TerminalColors.GREEN)
+             + " - displays the usage of a single command";
     }
 
     public void execute(String[] args) {
@@ -27,13 +30,13 @@ public class HelpCommand extends AbstractCommand {
 
         if (args.length == 1) {
             AbstractCommand command = ch.getCommands().get(args[0]);
-            io.writeln("- " + command.getName());
+            io.writeln("- " + TerminalColors.colorString(command.getName(), TerminalColors.GREEN));
             io.writeln(command.getUsage());
             return;
         }
 
         ch.getCommands().values().forEach(c -> {
-            io.writeln("- " + c.getName());
+            io.writeln("- " + TerminalColors.colorString(c.getName(), TerminalColors.GREEN));
             io.writeln(c.getUsage());
             io.writeln("");
         });
