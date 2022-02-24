@@ -1,7 +1,10 @@
 package com.dmtri.common.util;
 
+/**
+ * funni colors haha so flashy much wow rgb go brrrr
+ */
 public enum TerminalColors {
-    RESET("\u001b[0m"), GREEN("\u001b[32m");
+    RESET("\u001b[0m"), GREEN("\u001b[32m"), BLUE("\u001b[34m"), RED("\u001b[31m");
 
     private final String ansiCode;
 
