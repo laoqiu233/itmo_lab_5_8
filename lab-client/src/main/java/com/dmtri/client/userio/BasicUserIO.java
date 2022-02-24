@@ -50,7 +50,7 @@ public class BasicUserIO {
     }
 
     public String read(String msg) {
-        writeln(msg);
+        write(msg);
         return read();
     }
 

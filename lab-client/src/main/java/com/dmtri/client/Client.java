@@ -3,11 +3,13 @@ package com.dmtri.client;
 import com.dmtri.client.collectionmanagers.FileCollectionManager;
 import com.dmtri.client.commandhandlers.BasicCommandHandler;
 import com.dmtri.client.commandhandlers.CommandHandler;
+import com.dmtri.client.commands.AddCommand;
 import com.dmtri.client.commands.HelpCommand;
 import com.dmtri.client.commands.InfoCommand;
 import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandNotFoundException;
+import com.dmtri.common.util.TerminalColors;
 
 public final class Client {
     private Client() {
@@ -24,6 +26,7 @@ public final class Client {
         ch.addCommand(new HelpCommand(io, ch));
         ch.addCommand(new InfoCommand(io, cm));
         ch.addCommand(new ShowCommand(io, cm));
+        ch.addCommand(new AddCommand(io, cm));
 
         while (true) {
             io.write("> ");
@@ -32,7 +35,13 @@ public final class Client {
             try {
                 ch.handle(input);
             } catch (CommandNotFoundException e) {
-                io.writeln(e.getMessage());
+                io.writeln(TerminalColors.colorString(e.getMessage(), TerminalColors.RED));
+            } catch (IllegalArgumentException e) {
+                io.writeln(TerminalColors.colorString(e.getMessage(), TerminalColors.RED));
+                io.writeln( "Use " 
+                          + TerminalColors.colorString("help", TerminalColors.GREEN) 
+                          + " to get more information on usage of commands"
+                );
             }
         }
     }
