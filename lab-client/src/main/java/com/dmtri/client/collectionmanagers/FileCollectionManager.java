@@ -51,6 +51,10 @@ public class FileCollectionManager implements CollectionManager {
             throw new InvalidFieldException("Route with ID " + route.getId() + " already exists in collection.");
         }
 
+        if (route.getId() == nextId) {
+            nextId++;
+        }
+
         collection.add(route);
     }
 
