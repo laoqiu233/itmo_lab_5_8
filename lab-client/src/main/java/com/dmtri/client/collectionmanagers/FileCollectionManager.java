@@ -2,6 +2,7 @@ package com.dmtri.client.collectionmanagers;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,6 +12,7 @@ import org.xml.sax.SAXException;
 
 import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
+import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
 
 /**
@@ -44,12 +46,20 @@ public class FileCollectionManager implements CollectionManager {
         return collection.stream().filter(x -> x.getId() == id).findFirst().orElseThrow();
     }
 
-    public void add(Route route) {
+    public void add(Route route) throws InvalidFieldException {
+        if (collection.stream().anyMatch(x -> x.getId() == route.getId())) {
+            throw new InvalidFieldException("Route with ID " + route.getId() + " already exists in collection.");
+        }
+
         collection.add(route);
     }
 
     public void update(Route route) {
+        if (!collection.removeIf(x -> x.getId() == route.getId())) {
+            throw new NoSuchElementException("Can not find element with ID " + route.getId());
+        }
 
+        collection.add(route);
     }
 
     public void remove(long id) {
@@ -63,5 +73,9 @@ public class FileCollectionManager implements CollectionManager {
 
     public void clear() {
         collection.clear();
+    }
+
+    public long getNextId() {
+        return nextId;
     }
 }
