@@ -10,6 +10,16 @@ public class Route extends AbstractModel {
     private Location to; //Поле не может быть null
     private Double distance; //Значение поля должно быть больше 1
 
+    /**
+     * Creates a route object and validates data using the {@link #validate()} method.
+     * @param id
+     * @param name
+     * @param creationDate
+     * @param from
+     * @param to
+     * @param distance
+     * @throws InvalidFieldException if a field is invalid.
+     */
     public Route(Long id, String name, java.time.LocalDate creationDate, Location from, Location to, Double distance) throws InvalidFieldException {
         this.id = id;
         this.name = name;
@@ -44,6 +54,20 @@ public class Route extends AbstractModel {
         return to;
     }
 
+    /**
+     * Validates data in fields.
+     * Restrictions:
+     * <ul>
+     *  <li>id - Any Long value greater than 0, NOTNULL.</li>
+     *  <li>name - Any non-empty string, NOTNULL.</li>
+     *  <li>creationDate - Any {@link java.time.LocalDate} object, should be
+     *  generated automatically, NOTNULL.</li>
+     *  <li>from - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
+     *  <li>to - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
+     *  <li>distance - Any double value greater than 1, NOTNULL</li>
+     * </ul>
+     * @throws InvalidFieldException if a field is invalid.
+     */
     public void validate() throws InvalidFieldException {
         ensureNotNull(id, "id of routes can not be null");
         if (id <= 0) {
