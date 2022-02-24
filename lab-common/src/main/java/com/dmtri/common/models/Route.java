@@ -2,7 +2,7 @@ package com.dmtri.common.models;
 
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Route extends AbstractModel {
+public class Route {
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -27,7 +27,7 @@ public class Route extends AbstractModel {
         this.from = from;
         this.to = to;
         this.distance = distance;
-        validate();
+        validator.validate(this);
     }
 
     public long getId() {
@@ -54,44 +54,6 @@ public class Route extends AbstractModel {
         return to;
     }
 
-    /**
-     * Validates data in fields.
-     * Restrictions:
-     * <ul>
-     *  <li>id - Any Long value greater than 0, NOTNULL.</li>
-     *  <li>name - Any non-empty string, NOTNULL.</li>
-     *  <li>creationDate - Any {@link java.time.LocalDate} object, should be
-     *  generated automatically, NOTNULL.</li>
-     *  <li>from - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
-     *  <li>to - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
-     *  <li>distance - Any double value greater than 1, NOTNULL</li>
-     * </ul>
-     * @throws InvalidFieldException if a field is invalid.
-     */
-    public void validate() throws InvalidFieldException {
-        ensureNotNull(id, "id of routes can not be null");
-        if (id <= 0) {
-            throw new InvalidFieldException("id of routes should be greater than 0");
-        }
-
-        ensureNotNull(name, "name of routes can not be null");
-        if (name.length() == 0) {
-            throw new InvalidFieldException("name of routes can not be an empty string");
-        }
-
-        ensureNotNull(creationDate, "creation date of routes can not be null");
-
-        ensureNotNull(from, "starting point of routes can not be null");
-
-        ensureNotNull(to, "ending point of routes can not be null");
-
-        ensureNotNull(distance, "distance of routes can not be null");
-
-        if (distance <= 1) {
-            throw new InvalidFieldException("distance of routes should be greater than 1");
-        }
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -111,4 +73,64 @@ public class Route extends AbstractModel {
 
         return sb.toString();
     }
+
+    /**
+     * Validates data in fields.
+     * Restrictions:
+     * <ul>
+     *  <li>id - Any Long value greater than 0, NOTNULL.</li>
+     *  <li>name - Any non-empty string, NOTNULL.</li>
+     *  <li>creationDate - Any {@link java.time.LocalDate} object, should be
+     *  generated automatically, NOTNULL.</li>
+     *  <li>from - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
+     *  <li>to - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
+     *  <li>distance - Any double value greater than 1, NOTNULL</li>
+     * </ul>
+     * @throws InvalidFieldException if a field is invalid.
+     */
+    public static class Validator implements AbstractValidator<Route> {
+        public void validate(Route route) throws InvalidFieldException {
+            validateId(route.id);
+            validateName(route.name);
+            validateCreationDate(route.creationDate);
+            validateFrom(route.from);
+            validateTo(route.to);
+            validateDistance(route.distance);
+        }
+        
+        public void validateId(Long id) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(id, "id of routes can not be null");
+            if (id <= 0) {
+                throw new InvalidFieldException("id of routes should be greater than 0");
+            }
+        }
+
+        public void validateName(String name) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(name, "name of routes can not be null");
+            if (name.length() == 0) {
+                throw new InvalidFieldException("name of routes can not be an empty string");
+            }
+        }
+
+        public void validateFrom(Location from) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(from, "starting point of routes can not be null");
+        }
+
+        public void validateTo(Location to) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(to, "ending point of routes can not be null");
+        }
+
+        public void validateDistance(Double distance) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(distance, "distance of routes can not be null");
+            if (distance <= 1) {
+                throw new InvalidFieldException("distance of routes should be greater than 1");
+            }
+        }
+
+        public void validateCreationDate(java.time.LocalDate creationDate) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(creationDate, "creation date of routes can not be null");
+        }
+    }
+
+    public static Validator validator = new Validator();
 }

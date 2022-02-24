@@ -2,7 +2,7 @@ package com.dmtri.common.models;
 
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Coordinates extends AbstractModel {
+public class Coordinates {
     private Long x;
     private Double y; // Поле не может быть null
     private Long z;
@@ -18,7 +18,7 @@ public class Coordinates extends AbstractModel {
         this.x = x;
         this.y = y;
         this.z = z;
-        validate();
+        validator.validate(this);
     }
 
     public Long getX() {
@@ -33,6 +33,10 @@ public class Coordinates extends AbstractModel {
         return z;
     }
 
+    public String toString() {
+        return "Coordinates {\n\tx=" + x + ",\n\ty=" + y + ",\n\tz=" + z + "\n}";
+    }
+
     /**
      * Validates fields for model.
      * Restrictions:
@@ -41,13 +45,31 @@ public class Coordinates extends AbstractModel {
      *  <li>y - Any double value, NOTNULL</li>
      *  <li>z - Any long value</li>
      * </ul>
-     * @throws InvalidFieldException if a field does not satisfy the restrictions.
      */
-    protected void validate() throws InvalidFieldException {
-        AbstractModel.ensureNotNull(this.y, "Field y for objects of type coordinates can not be null");
-    }
+    public static class Validator implements AbstractValidator<Coordinates> {
+        /**
+         * Validates all fields
+         * @throws InvalidFieldException if a field does not satisfy the restrictions.
+         */
+        public void validate(Coordinates coordinates) throws InvalidFieldException {
+            validateX(coordinates.x);
+            validateY(coordinates.y);
+            validateZ(coordinates.z);
+        }
 
-    public String toString() {
-        return "Coordinates {\n\tx=" + x + ",\n\ty=" + y + ",\n\tz=" + z + "\n}";
-    }
+        public void validateX(Long x) throws InvalidFieldException {
+        }
+
+        public void validateY(Double y) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(y, "Field y for coordinate objects can not be null.");
+        }
+
+        public void validateZ(Long z) throws InvalidFieldException {
+        }
+    };
+
+    /**
+     * Default validator for coordinates
+     */
+    public final static Validator validator = new Validator();
 }

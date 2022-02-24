@@ -40,8 +40,18 @@ public class BasicUserIO {
         }
     }
 
-    public String read() throws IOException {
-        return in.readLine();
+    public String read() {
+        try {
+            return in.readLine();
+        } catch (IOException e) {
+            System.out.println("Exception while reading from input stream: \n" + e);
+            return null;
+        }
+    }
+
+    public String read(String msg) {
+        writeln(msg);
+        return read();
     }
 
     public BufferedReader getIn() {

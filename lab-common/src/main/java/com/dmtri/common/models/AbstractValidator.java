@@ -3,16 +3,17 @@ package com.dmtri.common.models;
 import com.dmtri.common.exceptions.InvalidFieldException;
 
 /**
- * A helper class with a few utility methods.
+ * Validator for models.
+ * Models should have a static validator object that extends this class.
  */
-public abstract class AbstractModel {
+public interface AbstractValidator<T> {
     /**
      * Validates all fields in a object.
      * Should be called in a models constructor after initializing
      * all fields.
      * @throws InvalidFieldException if a field contains invalid value
      */
-    protected abstract void validate() throws InvalidFieldException;
+    public void validate(T toValidate) throws InvalidFieldException;
 
     /**
      * Helper method that throws a {@link com.dmtri.common.exceptions.InvalidFieldException}

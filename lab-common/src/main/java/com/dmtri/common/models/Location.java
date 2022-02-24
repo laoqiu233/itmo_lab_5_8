@@ -2,7 +2,7 @@ package com.dmtri.common.models;
 
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Location extends AbstractModel {
+public class Location {
     private Coordinates coordinates;
     private String name; //Поле не может быть null
 
@@ -15,7 +15,7 @@ public class Location extends AbstractModel {
     public Location(String name, Coordinates coordinates) throws InvalidFieldException {
         this.name = name;
         this.coordinates = coordinates;
-        validate();
+        validator.validate(this);
     }
 
     public String getName() {
@@ -24,19 +24,6 @@ public class Location extends AbstractModel {
 
     public Coordinates getCoordinates() {
         return coordinates;
-    }
-
-    /**
-     * Validates data in fields.
-     * Restrictions:
-     * <ul>
-     *  <li>name - Any string, NOTNULL</li>
-     *  <li>coordinates - Any {@link com.dmtri.common.models.Coordinates} object</li>
-     * </ul>
-     */
-    protected void validate() throws InvalidFieldException {
-        AbstractModel.ensureNotNull(coordinates, "Coordinates for location can not be null");
-        AbstractModel.ensureNotNull(name, "Field name for object of type location can not be null");
     }
 
     public String toString() {
@@ -51,4 +38,29 @@ public class Location extends AbstractModel {
 
         return sb.toString();
     }
+
+    /**
+     * Validates data in fields.
+     * Restrictions:
+     * <ul>
+     *  <li>name - Any string, NOTNULL</li>
+     *  <li>coordinates - Any {@link com.dmtri.common.models.Coordinates} object</li>
+     * </ul>
+     */
+    public static class Validator implements AbstractValidator<Location> {
+        public void validate(Location location) throws InvalidFieldException {
+            validateCoordinates(location.coordinates);
+            validateName(location.name);
+        }
+
+        public void validateCoordinates(Coordinates coordinates) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(coordinates, "Coordinates for location can not be null");
+        }
+
+        public void validateName(String name) throws InvalidFieldException {
+            AbstractValidator.ensureNotNull(name, "Field name for object of type location can not be null");
+        }
+    }
+
+    public static Validator validator = new Validator();
 }
