@@ -20,7 +20,7 @@ public final class RouteMaker {
         return new Route(
             id, 
             name, 
-            BasicParsers.Repeater.doUntilGet(RouteMaker::parseCreationDate, io), 
+            LocalDate.now(), 
             BasicParsers.Repeater.doUntilGet(
                 io_ -> {
                     return parseLocation(
@@ -43,18 +43,6 @@ public final class RouteMaker {
             ), 
             distance
         );
-    }
-
-    public static LocalDate parseCreationDate(BasicUserIO io) throws InvalidFieldException {
-        LocalDate creationDate = BasicParsers.parseLocalDate(
-            io,
-            "Enter creation date of route: ",
-            "Invalid date entered."
-        );
-
-        Route.validator.validateCreationDate(creationDate);
-
-        return creationDate;
     }
 
     public static Location parseLocation(BasicUserIO io, String prompt, AbstractValidator<Location> validator) throws InvalidFieldException {
