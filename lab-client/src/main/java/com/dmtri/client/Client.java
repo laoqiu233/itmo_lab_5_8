@@ -6,6 +6,7 @@ import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.commands.AddCommand;
 import com.dmtri.client.commands.HelpCommand;
 import com.dmtri.client.commands.InfoCommand;
+import com.dmtri.client.commands.RemoveByIdCommand;
 import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandNotFoundException;
@@ -27,6 +28,7 @@ public final class Client {
         ch.addCommand(new InfoCommand(io, cm));
         ch.addCommand(new ShowCommand(io, cm));
         ch.addCommand(new AddCommand(io, cm));
+        ch.addCommand(new RemoveByIdCommand(cm));
 
         while (true) {
             io.write("> ");
@@ -37,7 +39,7 @@ public final class Client {
             } catch (CommandNotFoundException e) {
                 io.writeln(TerminalColors.colorString(e.getMessage(), TerminalColors.RED));
             } catch (IllegalArgumentException e) {
-                io.writeln(TerminalColors.colorString(e.getMessage(), TerminalColors.RED));
+                io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
                 io.writeln( "Use " 
                           + TerminalColors.colorString("help", TerminalColors.GREEN) 
                           + " to get more information on usage of commands"
