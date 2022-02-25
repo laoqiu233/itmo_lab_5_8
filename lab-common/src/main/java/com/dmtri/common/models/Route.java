@@ -2,7 +2,7 @@ package com.dmtri.common.models;
 
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Route {
+public class Route implements Comparable<Route> {
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -72,6 +72,11 @@ public class Route {
         sb.append("\n}");
 
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(Route o) {
+        return Double.compare(distance, o.distance);
     }
 
     /**
