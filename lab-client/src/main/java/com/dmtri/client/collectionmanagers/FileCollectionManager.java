@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;

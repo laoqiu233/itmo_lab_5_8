@@ -9,6 +9,7 @@ import com.dmtri.client.commands.InfoCommand;
 import com.dmtri.client.commands.RemoveByIdCommand;
 import com.dmtri.client.commands.SaveCommand;
 import com.dmtri.client.commands.ShowCommand;
+import com.dmtri.client.commands.UpdateCommand;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandNotFoundException;
 import com.dmtri.common.util.TerminalColors;
@@ -31,6 +32,7 @@ public final class Client {
         ch.addCommand(new AddCommand(io, cm));
         ch.addCommand(new RemoveByIdCommand(cm));
         ch.addCommand(new SaveCommand(io, cm));
+        ch.addCommand(new UpdateCommand(io, cm));
 
         while (true) {
             io.write("> ");
@@ -38,12 +40,21 @@ public final class Client {
 
             try {
                 ch.handle(input);
-            } catch (CommandNotFoundException e) {
-                io.writeln(TerminalColors.colorString(e.getMessage(), TerminalColors.RED));
-            } catch (IllegalArgumentException e) {
+            } catch (
+                CommandNotFoundException
+                | IllegalArgumentException e
+            ) {
                 io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
+
+                Throwable t = e.getCause();
+
+                while (t != null) {
+                    io.writeln(TerminalColors.colorString(t.toString(), TerminalColors.RED));
+                    t = t.getCause();
+                }
+
                 io.writeln( "Use " 
-                          + TerminalColors.colorString("help", TerminalColors.GREEN) 
+                          + TerminalColors.colorString("help [command name]", TerminalColors.GREEN) 
                           + " to get more information on usage of commands"
                 );
             }

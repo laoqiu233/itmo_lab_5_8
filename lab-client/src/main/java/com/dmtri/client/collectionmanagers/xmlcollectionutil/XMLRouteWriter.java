@@ -51,9 +51,13 @@ public final class XMLRouteWriter {
 
     public static Element coordinatesToXML(Document doc, Coordinates coordinates) {
         Element el = doc.createElement("coordinates");
-        el.setAttribute("x", Long.toString(coordinates.getX()));
+        if (coordinates.getX() != null) {
+            el.setAttribute("x", Long.toString(coordinates.getX()));
+        }
         el.setAttribute("y", Double.toString(coordinates.getY()));
-        el.setAttribute("z", Long.toString(coordinates.getZ()));
+        if (coordinates.getZ() != null) {
+            el.setAttribute("z", Long.toString(coordinates.getZ()));
+        }
 
         return el;
     }

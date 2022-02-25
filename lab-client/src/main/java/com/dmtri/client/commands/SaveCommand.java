@@ -2,7 +2,6 @@ package com.dmtri.client.commands;
 
 import java.io.FileNotFoundException;
 
-import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.collectionmanagers.SaveableCollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
@@ -26,7 +25,6 @@ public class SaveCommand extends AbstractCommand {
             throw new IllegalArgumentException("Save command takes no arguments, but " + args.length + " were given.");
         }
 
-        
         try {
             col.save();
         } catch (FileNotFoundException e) {
