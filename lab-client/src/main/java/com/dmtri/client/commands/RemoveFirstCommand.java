@@ -1,9 +1,6 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
-import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionWriter;
-import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLRouteWriter;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
