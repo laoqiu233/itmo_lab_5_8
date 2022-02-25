@@ -4,6 +4,7 @@ import com.dmtri.client.collectionmanagers.FileCollectionManager;
 import com.dmtri.client.commandhandlers.BasicCommandHandler;
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.commands.AddCommand;
+import com.dmtri.client.commands.ClearCommand;
 import com.dmtri.client.commands.ExitCommand;
 import com.dmtri.client.commands.HelpCommand;
 import com.dmtri.client.commands.InfoCommand;
@@ -35,6 +36,7 @@ public final class Client {
         ch.addCommand(new SaveCommand(io, cm));
         ch.addCommand(new UpdateCommand(io, cm));
         ch.addCommand(new ExitCommand(io));
+        ch.addCommand(new ClearCommand(cm));
 
         while (true) {
             io.write("> ");
