@@ -18,10 +18,6 @@ public class InfoCommand extends AbstractCommand {
         return "Displays information about the collection, types, item count, etc.";
     }
 
-    public void checkArgs(String[] args) {
-
-    }
-
     public void execute(String[] args) {
         //if (args.length > 0) throw new TooManyArgumentsException("info", 0);
 

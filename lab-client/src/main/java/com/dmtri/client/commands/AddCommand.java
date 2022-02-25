@@ -22,14 +22,10 @@ public class AddCommand extends AbstractCommand {
              + " - Starts route creation";
     }
 
-    public void checkArgs(String[] args) {
+    public void execute(String[] args) {
         if (args.length != 2) {
             throw new IllegalArgumentException("Add has exactly 2 positional arguments, recieved " + args.length);
         }
-    }
-
-    public void execute(String[] args) {
-        checkArgs(args);
 
         Double distance;
 

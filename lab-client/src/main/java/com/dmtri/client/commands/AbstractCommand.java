@@ -11,7 +11,6 @@ public abstract class AbstractCommand {
         return name;
     }
 
-    public abstract void checkArgs(String[] args);
     public abstract void execute(String[] args);
     public abstract String getUsage();
 }

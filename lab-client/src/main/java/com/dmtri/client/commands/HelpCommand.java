@@ -15,9 +15,6 @@ public class HelpCommand extends AbstractCommand {
         this.ch = ch;
     }
 
-    public void checkArgs(String[] args) {
-    }
-
     public String getUsage() {
         return TerminalColors.colorString("help", TerminalColors.GREEN) 
              + " - displays usage of all available commands\n"
@@ -26,8 +23,6 @@ public class HelpCommand extends AbstractCommand {
     }
 
     public void execute(String[] args) {
-        checkArgs(args);
-
         if (args.length == 1) {
             AbstractCommand command = ch.getCommands().get(args[0]);
             io.writeln("- " + TerminalColors.colorString(command.getName(), TerminalColors.GREEN));
