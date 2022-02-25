@@ -35,7 +35,7 @@ public final class XMLCollectionWriter {
         return doc;
     }
 
-    private static Transformer createTransformer() throws TransformerConfigurationException {
+    private static Transformer createTransformer() throws TransformerException {
         TransformerFactory tff = TransformerFactory.newInstance();
         Transformer tf = tff.newTransformer();
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -49,7 +49,7 @@ public final class XMLCollectionWriter {
         tf.transform(source, new StreamResult(System.out));
     }
 
-    public static void writeCollection(String fileName, LinkedList<Route> collection, long nextId) throws ParserConfigurationException, TransformerConfigurationException, TransformerException, FileNotFoundException {
+    public static void writeCollection(String fileName, LinkedList<Route> collection, long nextId) throws ParserConfigurationException, TransformerException, FileNotFoundException {
         Document doc = createDocument();
 
         Element root = doc.createElement("routes");

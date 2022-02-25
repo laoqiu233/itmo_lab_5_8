@@ -1,16 +1,19 @@
 package com.dmtri.client.collectionmanagers;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
 import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
+import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionWriter;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
@@ -19,9 +22,10 @@ import com.dmtri.common.models.Route;
  * Collection manager which uses an XML file for
  * data storage
  */
-public class FileCollectionManager implements CollectionManager {
+public class FileCollectionManager implements SaveableCollectionManager {
     private LinkedList<Route> collection;
     private long nextId;
+    private String fileName;
 
     /**
      * Parses the provided file and stores the generated objects in memory.
@@ -36,6 +40,7 @@ public class FileCollectionManager implements CollectionManager {
 
         nextId = parsed.getNextId();
         collection = parsed.getCollection();
+        this.fileName = fileName;
     }
 
     public LinkedList<Route> getCollection() {
@@ -81,5 +86,18 @@ public class FileCollectionManager implements CollectionManager {
 
     public long getNextId() {
         return nextId;
+    }
+
+    public void save() throws FileNotFoundException {
+        try {
+            XMLCollectionWriter.writeCollection(fileName, collection, nextId);
+        } catch (
+            ParserConfigurationException
+            | TransformerException e
+        ) {
+            // Just log error
+            System.out.println("Failed to write collection to file.");
+            System.out.println(e);
+        }
     }
 }

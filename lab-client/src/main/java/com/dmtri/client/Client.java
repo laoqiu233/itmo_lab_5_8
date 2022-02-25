@@ -7,6 +7,7 @@ import com.dmtri.client.commands.AddCommand;
 import com.dmtri.client.commands.HelpCommand;
 import com.dmtri.client.commands.InfoCommand;
 import com.dmtri.client.commands.RemoveByIdCommand;
+import com.dmtri.client.commands.SaveCommand;
 import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandNotFoundException;
@@ -29,6 +30,7 @@ public final class Client {
         ch.addCommand(new ShowCommand(io, cm));
         ch.addCommand(new AddCommand(io, cm));
         ch.addCommand(new RemoveByIdCommand(cm));
+        ch.addCommand(new SaveCommand(io, cm));
 
         while (true) {
             io.write("> ");

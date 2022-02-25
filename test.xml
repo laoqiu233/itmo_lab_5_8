@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <routes nextId="4">
     <Route id="1">
         <name>Trans-Siberian Railway</name>
-        <distance>9289</distance>
+        <distance>9289.0</distance>
         <creationDate>1904-06-21</creationDate>
         <from>
             <coordinates x="100" y="1000.5" z="20"/>
