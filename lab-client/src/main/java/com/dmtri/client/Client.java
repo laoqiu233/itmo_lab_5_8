@@ -9,6 +9,7 @@ import com.dmtri.client.commands.ExitCommand;
 import com.dmtri.client.commands.HeadCommand;
 import com.dmtri.client.commands.HelpCommand;
 import com.dmtri.client.commands.InfoCommand;
+import com.dmtri.client.commands.PrintUniqueDistance;
 import com.dmtri.client.commands.RemoveAllByDistanceCommand;
 import com.dmtri.client.commands.RemoveByIdCommand;
 import com.dmtri.client.commands.RemoveFirstCommand;
@@ -47,6 +48,7 @@ public final class Client {
         ch.addCommand(new RemoveFirstCommand(io, cm));
         ch.addCommand(new RemoveGreaterCommand(io, cm));
         ch.addCommand(new RemoveAllByDistanceCommand(io, cm));
+        ch.addCommand(new PrintUniqueDistance(io, cm));
 
         while (true) {
             io.write("> ");
