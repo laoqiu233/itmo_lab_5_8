@@ -1,5 +1,10 @@
 package com.dmtri.client;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import com.dmtri.client.collectionmanagers.FileCollectionManager;
 import com.dmtri.client.commandhandlers.BasicCommandHandler;
 import com.dmtri.client.commandhandlers.CommandHandler;
@@ -20,19 +25,37 @@ import com.dmtri.client.commands.SumOfDistanceCommand;
 import com.dmtri.client.commands.UpdateCommand;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandNotFoundException;
+import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.util.TerminalColors;
+
+import org.xml.sax.SAXException;
 
 public final class Client {
     private Client() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // Get file name from environment variable
         String fileName = System.getenv("FILENAME");
-        FileCollectionManager cm = new FileCollectionManager(fileName);
+        FileCollectionManager cm;
         CommandHandler ch = new BasicCommandHandler();
         BasicUserIO io = new BasicUserIO();
+
+        try {
+            cm = new FileCollectionManager(fileName);
+        } catch (
+            SAXException
+            | IOException
+            | IncorrectFileStructureException
+            | ParserConfigurationException
+            | TransformerException e 
+        ) {
+            System.out.println(TerminalColors.colorString("Failed to parse provided file \"" + fileName + "\"", TerminalColors.RED));
+            System.out.println(e);
+            System.exit(1);
+            return;
+        }
 
         ch.addCommand(new HelpCommand(io, ch));
         ch.addCommand(new InfoCommand(io, cm));
