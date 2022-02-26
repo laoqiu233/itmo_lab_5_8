@@ -18,7 +18,7 @@ public final class LocationMaker {
 
     public static String parseName(BasicUserIO io) throws InvalidFieldException {
         String name = BasicParsers.parseString(io, "Enter location name: ");
-        Location.validator.validateName(name);
+        Location.VALIDATOR.validateName(name);
         return name;
     }
 

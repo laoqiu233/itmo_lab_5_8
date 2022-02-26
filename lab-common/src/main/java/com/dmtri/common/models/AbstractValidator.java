@@ -13,7 +13,7 @@ public interface AbstractValidator<T> {
      * all fields.
      * @throws InvalidFieldException if a field contains invalid value
      */
-    public void validate(T toValidate) throws InvalidFieldException;
+    void validate(T toValidate) throws InvalidFieldException;
 
     /**
      * Helper method that throws a {@link com.dmtri.common.exceptions.InvalidFieldException}

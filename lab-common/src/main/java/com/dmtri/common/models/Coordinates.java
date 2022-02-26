@@ -3,6 +3,10 @@ package com.dmtri.common.models;
 import com.dmtri.common.exceptions.InvalidFieldException;
 
 public class Coordinates {
+    /**
+     * Default validator for coordinates
+     */
+    public static final Validator VALIDATOR = new Validator();
     private Long x;
     private Double y; // Поле не может быть null
     private Long z;
@@ -18,7 +22,7 @@ public class Coordinates {
         this.x = x;
         this.y = y;
         this.z = z;
-        validator.validate(this);
+        VALIDATOR.validate(this);
     }
 
     public Long getX() {
@@ -67,9 +71,4 @@ public class Coordinates {
         public void validateZ(Long z) throws InvalidFieldException {
         }
     };
-
-    /**
-     * Default validator for coordinates
-     */
-    public final static Validator validator = new Validator();
 }

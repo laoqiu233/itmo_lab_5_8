@@ -7,8 +7,8 @@ import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
 public class SaveCommand extends AbstractCommand {
-    SaveableCollectionManager col;
-    BasicUserIO io;
+    private SaveableCollectionManager col;
+    private BasicUserIO io;
 
     public SaveCommand(BasicUserIO io, SaveableCollectionManager col) {
         super("save");

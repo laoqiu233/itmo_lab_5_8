@@ -10,6 +10,7 @@ import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveGreaterCommand extends AbstractCommand {
+    private static final int ARGUMENTS_LENGTH = 3;
     private BasicUserIO io;
     private CollectionManager col;
 
@@ -27,8 +28,8 @@ public class RemoveGreaterCommand extends AbstractCommand {
 
     @Override
     public void execute(String[] args) {
-        if (args.length != 3) {
-            throw new IllegalArgumentException("remove_greater takes exactly 3 arguments, recieved " + args.length);
+        if (args.length != ARGUMENTS_LENGTH) {
+            throw new IllegalArgumentException("remove_greater takes exactly " + ARGUMENTS_LENGTH + " arguments, recieved " + args.length);
         }
 
         try {

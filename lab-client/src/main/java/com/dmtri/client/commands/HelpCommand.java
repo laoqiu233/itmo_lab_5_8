@@ -16,7 +16,7 @@ public class HelpCommand extends AbstractCommand {
     }
 
     public String getUsage() {
-        return TerminalColors.colorString("help", TerminalColors.GREEN) 
+        return TerminalColors.colorString("help", TerminalColors.GREEN)
              + " - displays usage of all available commands\n"
              + TerminalColors.colorString("help [command]", TerminalColors.GREEN)
              + " - displays the usage of a single command";

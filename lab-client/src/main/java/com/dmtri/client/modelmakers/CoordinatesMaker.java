@@ -19,10 +19,10 @@ public final class CoordinatesMaker {
     public static Long parseX(BasicUserIO io) throws InvalidFieldException {
         Long x = BasicParsers.parseLong(
             io,
-            "Enter X coordinate (Press enter to leave null): ", 
+            "Enter X coordinate (Press enter to leave null): ",
             "Invalid X coordinate entered"
         );
-        Coordinates.validator.validateX(x);
+        Coordinates.VALIDATOR.validateX(x);
         return x;
     }
 
@@ -32,17 +32,17 @@ public final class CoordinatesMaker {
             "Enter Y coordinate: ",
             "Invalid Y coordinate entered"
         );
-        Coordinates.validator.validateY(y);
+        Coordinates.VALIDATOR.validateY(y);
         return y;
     }
 
     public static Long parseZ(BasicUserIO io) throws InvalidFieldException {
         Long z = BasicParsers.parseLong(
             io,
-            "Enter Z coordinate (Press enter to leave null): ", 
+            "Enter Z coordinate (Press enter to leave null): ",
             "Invalid Z coordinate entered"
         );
-        Coordinates.validator.validateZ(z);
+        Coordinates.VALIDATOR.validateZ(z);
         return z;
     }
 }

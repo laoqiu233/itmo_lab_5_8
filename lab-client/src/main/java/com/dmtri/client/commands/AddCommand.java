@@ -37,9 +37,9 @@ public class AddCommand extends AbstractCommand {
 
         try {
             Route newRoute = RouteMaker.parseRoute(
-                io, 
-                col.getNextId(), 
-                args[0], 
+                io,
+                col.getNextId(),
+                args[0],
                 distance
             );
             col.add(newRoute);

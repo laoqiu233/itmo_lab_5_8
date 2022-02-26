@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import com.dmtri.client.collectionmanagers.FileCollectionManager;
+import com.dmtri.client.collectionmanagers.SaveableCollectionManager;
 import com.dmtri.client.commandhandlers.BasicCommandHandler;
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.commands.AddCommand;
@@ -35,28 +36,7 @@ public final class Client {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
-    public static void main(String[] args) {
-        // Get file name from environment variable
-        String fileName = System.getenv("FILENAME");
-        FileCollectionManager cm;
-        CommandHandler ch = new BasicCommandHandler();
-        BasicUserIO io = new BasicUserIO();
-
-        try {
-            cm = new FileCollectionManager(fileName);
-        } catch (
-            SAXException
-            | IOException
-            | IncorrectFileStructureException
-            | ParserConfigurationException
-            | TransformerException e 
-        ) {
-            System.out.println(TerminalColors.colorString("Failed to parse provided file \"" + fileName + "\"", TerminalColors.RED));
-            System.out.println(e);
-            System.exit(1);
-            return;
-        }
-
+    private static void addBasicCommands(CommandHandler ch, BasicUserIO io, SaveableCollectionManager cm) {
         ch.addCommand(new HelpCommand(io, ch));
         ch.addCommand(new InfoCommand(io, cm));
         ch.addCommand(new ShowCommand(io, cm));
@@ -72,31 +52,60 @@ public final class Client {
         ch.addCommand(new RemoveGreaterCommand(io, cm));
         ch.addCommand(new RemoveAllByDistanceCommand(io, cm));
         ch.addCommand(new PrintUniqueDistance(io, cm));
+    }
+
+    private static void inputCycle(BasicUserIO io, CommandHandler ch) {
+        io.write("> ");
+        String input = io.read();
+
+        try {
+            ch.handle(input);
+        } catch (
+            CommandNotFoundException
+            | IllegalArgumentException e
+        ) {
+            io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
+
+            Throwable t = e.getCause();
+
+            while (t != null) {
+                io.writeln(TerminalColors.colorString(t.toString(), TerminalColors.RED));
+                t = t.getCause();
+            }
+
+            io.writeln("Use "
+                      + TerminalColors.colorString("help [command name]", TerminalColors.GREEN)
+                      + " to get more information on usage of commands"
+            );
+        }
+    }
+
+    public static void main(String[] args) {
+        // Get file name from environment variable
+        String fileName = System.getenv("FILENAME");
+        FileCollectionManager cm;
+        CommandHandler ch = new BasicCommandHandler();
+        BasicUserIO io = new BasicUserIO();
+
+        try {
+            cm = new FileCollectionManager(fileName);
+        } catch (
+            SAXException
+            | IOException
+            | IncorrectFileStructureException
+            | ParserConfigurationException
+            | TransformerException e
+        ) {
+            System.out.println(TerminalColors.colorString("Failed to parse provided file \"" + fileName + "\"", TerminalColors.RED));
+            System.out.println(e);
+            System.exit(1);
+            return;
+        }
+
+        addBasicCommands(ch, io, cm);
 
         while (true) {
-            io.write("> ");
-            String input = io.read();
-
-            try {
-                ch.handle(input);
-            } catch (
-                CommandNotFoundException
-                | IllegalArgumentException e
-            ) {
-                io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
-
-                Throwable t = e.getCause();
-
-                while (t != null) {
-                    io.writeln(TerminalColors.colorString(t.toString(), TerminalColors.RED));
-                    t = t.getCause();
-                }
-
-                io.writeln( "Use " 
-                          + TerminalColors.colorString("help [command name]", TerminalColors.GREEN) 
-                          + " to get more information on usage of commands"
-                );
-            }
+            inputCycle(io, ch);
         }
     }
 }

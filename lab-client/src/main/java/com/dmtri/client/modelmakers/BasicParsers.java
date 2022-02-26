@@ -8,21 +8,7 @@ import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.util.TerminalColors;
 
 public final class BasicParsers {
-    public static class Repeater {
-        public static interface Parser<T> {
-            T parse(BasicUserIO io) throws InvalidFieldException;
-        }
-    
-        public static <T> T doUntilGet(Parser<T> parser, BasicUserIO io) {
-            do {
-                try {
-                    return parser.parse(io);
-                } catch (InvalidFieldException e) {
-                    io.writeln(e.getMessage());
-                    io.writeln("Please try again.");
-                }
-            } while (true);
-        }
+    private BasicParsers() {
     }
 
     public static Long parseLong(BasicUserIO io, String prompt, String errorMsg) throws InvalidFieldException {
@@ -31,7 +17,9 @@ public final class BasicParsers {
                 TerminalColors.colorString(prompt, TerminalColors.BLUE)
             );
 
-            if (input.trim().isEmpty()) return null;
+            if (input.trim().isEmpty()) {
+                return null;
+            }
 
             return Long.parseLong(input);
         } catch (NumberFormatException e) {
@@ -45,7 +33,9 @@ public final class BasicParsers {
                 TerminalColors.colorString(prompt, TerminalColors.BLUE)
             );
 
-            if (input.trim().isEmpty()) return null;
+            if (input.trim().isEmpty()) {
+                return null;
+            }
 
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
@@ -58,7 +48,9 @@ public final class BasicParsers {
             TerminalColors.colorString(prompt, TerminalColors.BLUE)
         );
 
-        if (input.trim().isEmpty()) return null;
+        if (input.trim().isEmpty()) {
+            return null;
+        }
 
         return input;
     }
@@ -69,7 +61,9 @@ public final class BasicParsers {
                 TerminalColors.colorString(prompt, TerminalColors.BLUE)
             );
 
-            if (input.trim().isEmpty()) return null;
+            if (input.trim().isEmpty()) {
+                return null;
+            }
 
             return LocalDate.parse(
                 input,
@@ -77,6 +71,23 @@ public final class BasicParsers {
             );
         } catch (DateTimeParseException e) {
             throw new InvalidFieldException(errorMsg, e);
+        }
+    }
+
+    public static class Repeater {
+        public static <T> T doUntilGet(Parser<T> parser, BasicUserIO io) {
+            do {
+                try {
+                    return parser.parse(io);
+                } catch (InvalidFieldException e) {
+                    io.writeln(e.getMessage());
+                    io.writeln("Please try again.");
+                }
+            } while (true);
+        }
+
+        public interface Parser<T> {
+            T parse(BasicUserIO io) throws InvalidFieldException;
         }
     }
 }

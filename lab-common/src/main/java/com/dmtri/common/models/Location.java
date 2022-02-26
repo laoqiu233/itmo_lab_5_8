@@ -3,6 +3,7 @@ package com.dmtri.common.models;
 import com.dmtri.common.exceptions.InvalidFieldException;
 
 public class Location {
+    public static final Validator VALIDATOR = new Validator();
     private Coordinates coordinates;
     private String name; //Поле не может быть null
 
@@ -15,7 +16,7 @@ public class Location {
     public Location(String name, Coordinates coordinates) throws InvalidFieldException {
         this.name = name;
         this.coordinates = coordinates;
-        validator.validate(this);
+        VALIDATOR.validate(this);
     }
 
     public String getName() {
@@ -61,6 +62,4 @@ public class Location {
             AbstractValidator.ensureNotNull(name, "Field name for object of type location can not be null");
         }
     }
-
-    public static Validator validator = new Validator();
 }

@@ -3,6 +3,7 @@ package com.dmtri.common.models;
 import com.dmtri.common.exceptions.InvalidFieldException;
 
 public class Route implements Comparable<Route> {
+    public static final Validator VALIDATOR = new Validator();
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -27,7 +28,7 @@ public class Route implements Comparable<Route> {
         this.from = from;
         this.to = to;
         this.distance = distance;
-        validator.validate(this);
+        VALIDATOR.validate(this);
     }
 
     public long getId() {
@@ -91,7 +92,6 @@ public class Route implements Comparable<Route> {
      *  <li>to - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
      *  <li>distance - Any double value greater than 1, NOTNULL</li>
      * </ul>
-     * @throws InvalidFieldException if a field is invalid.
      */
     public static class Validator implements AbstractValidator<Route> {
         public void validate(Route route) throws InvalidFieldException {
@@ -102,7 +102,7 @@ public class Route implements Comparable<Route> {
             validateTo(route.to);
             validateDistance(route.distance);
         }
-        
+
         public void validateId(Long id) throws InvalidFieldException {
             AbstractValidator.ensureNotNull(id, "id of routes can not be null");
             if (id <= 0) {
@@ -136,6 +136,4 @@ public class Route implements Comparable<Route> {
             AbstractValidator.ensureNotNull(creationDate, "creation date of routes can not be null");
         }
     }
-
-    public static Validator validator = new Validator();
 }

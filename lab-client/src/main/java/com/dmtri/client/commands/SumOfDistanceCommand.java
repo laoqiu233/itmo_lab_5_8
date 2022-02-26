@@ -5,8 +5,8 @@ import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
 public class SumOfDistanceCommand extends AbstractCommand {
-    BasicUserIO io;
-    CollectionManager col;
+    private BasicUserIO io;
+    private CollectionManager col;
 
     public SumOfDistanceCommand(BasicUserIO io, CollectionManager col) {
         super("sum_of_distance");

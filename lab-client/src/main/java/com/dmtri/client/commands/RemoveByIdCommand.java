@@ -6,7 +6,7 @@ import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveByIdCommand extends AbstractCommand {
-    CollectionManager col;
+    private CollectionManager col;
 
     public RemoveByIdCommand(CollectionManager col) {
         super("remove_by_id");
@@ -17,7 +17,7 @@ public class RemoveByIdCommand extends AbstractCommand {
         return TerminalColors.colorString("remove_by_id [id]", TerminalColors.GREEN)
              + " - removes an item with the specified id from collection.";
     }
-    
+
     public void execute(String[] args) {
         if (args.length != 1) {
             throw new IllegalArgumentException("remove_by_id takes exactly 1 positional argument, recieved " + args.length);

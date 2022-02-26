@@ -6,8 +6,8 @@ import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveFirstCommand extends AbstractCommand {
-    BasicUserIO io;
-    CollectionManager col;
+    private BasicUserIO io;
+    private CollectionManager col;
 
     public RemoveFirstCommand(BasicUserIO io, CollectionManager col) {
         super("remove_first");

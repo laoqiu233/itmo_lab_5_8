@@ -4,8 +4,8 @@ import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExitCommand extends AbstractCommand {
-    BasicUserIO io;
-    
+    private BasicUserIO io;
+
     public ExitCommand(BasicUserIO io) {
         super("exit");
 

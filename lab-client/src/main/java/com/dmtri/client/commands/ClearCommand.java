@@ -4,7 +4,7 @@ import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.common.util.TerminalColors;
 
 public class ClearCommand extends AbstractCommand {
-    CollectionManager col;
+    private CollectionManager col;
 
     public ClearCommand(CollectionManager col) {
         super("clear");

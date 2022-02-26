@@ -21,7 +21,7 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
         return TerminalColors.colorString("remove_all_by_distance [distance]", TerminalColors.GREEN)
              + " - removes all items with the specified distance.";
     }
-    
+
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {

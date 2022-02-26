@@ -13,34 +13,34 @@ public final class RouteMaker {
     }
 
     public static Route parseRoute(BasicUserIO io, Long id, String name, Double distance) throws InvalidFieldException {
-        Route.validator.validateId(id);
-        Route.validator.validateName(name);
-        Route.validator.validateDistance(distance);
-        
+        Route.VALIDATOR.validateId(id);
+        Route.VALIDATOR.validateName(name);
+        Route.VALIDATOR.validateDistance(distance);
+
         return new Route(
-            id, 
-            name, 
-            LocalDate.now(), 
+            id,
+            name,
+            LocalDate.now(),
             BasicParsers.Repeater.doUntilGet(
                 io_ -> {
                     return parseLocation(
                         io_,
                         "Creating start location",
-                        Route.validator::validateFrom
+                        Route.VALIDATOR::validateFrom
                     );
                 },
                 io
-            ), 
+            ),
             BasicParsers.Repeater.doUntilGet(
                 io_ -> {
                     return parseLocation(
                         io_,
                         "Creating end location",
-                        Route.validator::validateTo
+                        Route.VALIDATOR::validateTo
                     );
                 },
                 io
-            ), 
+            ),
             distance
         );
     }

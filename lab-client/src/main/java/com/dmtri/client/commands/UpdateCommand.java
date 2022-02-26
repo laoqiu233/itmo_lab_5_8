@@ -10,6 +10,7 @@ import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
 
 public class UpdateCommand extends AbstractCommand {
+    private static final int ARGUMENTS_LENGTH = 3;
     private BasicUserIO io;
     private CollectionManager col;
 
@@ -26,8 +27,8 @@ public class UpdateCommand extends AbstractCommand {
     }
 
     public void execute(String[] args) {
-        if (args.length != 3) {
-            throw new IllegalArgumentException("update command takes exactly 3 arguments, recieved " + args.length + ".");
+        if (args.length != ARGUMENTS_LENGTH) {
+            throw new IllegalArgumentException("update command takes exactly " + ARGUMENTS_LENGTH + " arguments, recieved " + args.length + ".");
         }
 
         try {
