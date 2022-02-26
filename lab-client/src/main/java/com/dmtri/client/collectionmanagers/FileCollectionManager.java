@@ -47,7 +47,10 @@ public class FileCollectionManager implements SaveableCollectionManager {
     }
 
     public Route getItemById(long id) {
-        return collection.stream().filter(x -> x.getId() == id).findFirst().orElseThrow();
+        return collection.stream()
+                         .filter(x -> x.getId() == id)
+                         .findFirst()
+                         .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
     }
 
     public void add(Route route) throws InvalidFieldException {
@@ -64,7 +67,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
 
     public void update(Route route) {
         if (!collection.removeIf(x -> x.getId() == route.getId())) {
-            throw new NoSuchElementException("Can not find element with ID " + route.getId());
+            throw new NoSuchElementException("Can not find item with id " + route.getId());
         }
 
         collection.add(route);
@@ -74,7 +77,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
         int toRemove = IntStream.range(0, collection.size())
                        .filter(i -> collection.get(i).getId() == id)
                        .findFirst()
-                       .orElseThrow();
+                       .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
 
         collection.remove(toRemove);
     }

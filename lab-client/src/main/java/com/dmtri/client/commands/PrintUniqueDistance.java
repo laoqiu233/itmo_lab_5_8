@@ -1,6 +1,7 @@
 package com.dmtri.client.commands;
 
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
@@ -29,7 +30,7 @@ public class PrintUniqueDistance extends AbstractCommand {
         }
 
         HashSet<Double> uniqueDistances = new HashSet<>(
-            col.getCollection().stream().map(x -> x.getDistance()).toList()
+            col.getCollection().stream().map(x -> x.getDistance()).collect(Collectors.toList())
         );
 
         uniqueDistances.forEach(io::writeln);
