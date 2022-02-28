@@ -57,10 +57,12 @@ public class Coordinates {
     }
 
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + x.hashCode();
-        hash = 31 * hash + y.hashCode();
-        hash = 31 * hash + z.hashCode();
+        final int k = 31;
+        final int a = 7;
+        int hash = a;
+        hash = k * hash + x.hashCode();
+        hash = k * hash + y.hashCode();
+        hash = k * hash + z.hashCode();
         return hash;
     }
 

@@ -41,8 +41,12 @@ public class Location {
     }
 
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Location)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Location)) {
+            return false;
+        }
         Location t = (Location) obj;
 
         return name.equals(t.name)
@@ -50,9 +54,11 @@ public class Location {
     }
 
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + name.hashCode();
-        hash = 31 * hash + coordinates.hashCode();
+        final int k = 31;
+        final int a = 7;
+        int hash = a;
+        hash = k * hash + name.hashCode();
+        hash = k * hash + coordinates.hashCode();
         return hash;
     }
 

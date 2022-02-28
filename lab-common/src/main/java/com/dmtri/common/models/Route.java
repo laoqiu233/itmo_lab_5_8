@@ -77,8 +77,12 @@ public class Route implements Comparable<Route> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Route)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Route)) {
+            return false;
+        }
         Route t = (Route) obj;
 
         return id.equals(t.id)
@@ -91,13 +95,15 @@ public class Route implements Comparable<Route> {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + id.hashCode();
-        hash = 31 * hash + distance.hashCode();
-        hash = 31 * hash + name.hashCode();
-        hash = 31 * hash + creationDate.hashCode();
-        hash = 31 * hash + from.hashCode();
-        hash = 31 * hash + to.hashCode();
+        final int k = 31;
+        final int a = 7;
+        int hash = a;
+        hash = k * hash + id.hashCode();
+        hash = k * hash + distance.hashCode();
+        hash = k * hash + name.hashCode();
+        hash = k * hash + creationDate.hashCode();
+        hash = k * hash + from.hashCode();
+        hash = k * hash + to.hashCode();
         return hash;
     }
 
