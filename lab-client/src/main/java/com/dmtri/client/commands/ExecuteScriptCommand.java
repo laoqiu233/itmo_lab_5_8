@@ -32,7 +32,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
     @Override
     public void execute(String[] args) {
         if (args.length != 1) {
-            throw new IllegalArgumentException("execute_script takes exactly 1 argument, recieved" + args.length);
+            throw new IllegalArgumentException("execute_script takes exactly 1 argument, recieved " + args.length);
         }
 
         File file = new File(args[0]);
@@ -67,9 +67,18 @@ public class ExecuteScriptCommand extends AbstractCommand {
                     sb.append((char) i);
                 }
                 if (i == -1 || (char) i == '\n') {
-                    io.writeln("$ " + sb.toString().trim());
-                    ch.handle(sb.toString());
+                    String inputString = sb.toString().trim();
+
+                    if (!inputString.isEmpty()) {
+                        io.writeln("$ " + inputString);
+                        ch.handle(inputString);
+                    }
+
                     sb = new StringBuilder();
+
+                    if (i == -1) {
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
