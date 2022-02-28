@@ -11,6 +11,7 @@ import com.dmtri.client.commandhandlers.BasicCommandHandler;
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.commands.AddCommand;
 import com.dmtri.client.commands.ClearCommand;
+import com.dmtri.client.commands.ExecuteScriptCommand;
 import com.dmtri.client.commands.ExitCommand;
 import com.dmtri.client.commands.HeadCommand;
 import com.dmtri.client.commands.HelpCommand;
@@ -52,6 +53,7 @@ public final class Client {
         ch.addCommand(new RemoveGreaterCommand(io, cm));
         ch.addCommand(new RemoveAllByDistanceCommand(io, cm));
         ch.addCommand(new PrintUniqueDistance(io, cm));
+        ch.addCommand(new ExecuteScriptCommand(io, ch));
     }
 
     private static void inputCycle(BasicUserIO io, CommandHandler ch) {
