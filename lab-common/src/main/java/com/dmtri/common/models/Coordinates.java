@@ -41,6 +41,29 @@ public class Coordinates {
         return "Coordinates {\n\tx=" + x + ",\n\ty=" + y + ",\n\tz=" + z + "\n}";
     }
 
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Coordinates)) {
+            return false;
+        }
+
+        Coordinates t = (Coordinates) obj;
+
+        return x.equals(t.x)
+            && y.equals(t.y)
+            && z.equals(t.z);
+    }
+
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + x.hashCode();
+        hash = 31 * hash + y.hashCode();
+        hash = 31 * hash + z.hashCode();
+        return hash;
+    }
+
     /**
      * Validates fields for model.
      * Restrictions:

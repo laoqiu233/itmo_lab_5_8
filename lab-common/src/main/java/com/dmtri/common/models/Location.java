@@ -40,6 +40,22 @@ public class Location {
         return sb.toString();
     }
 
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Location)) return false;
+        Location t = (Location) obj;
+
+        return name.equals(t.name)
+            && coordinates.equals(t.coordinates);
+    }
+
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + name.hashCode();
+        hash = 31 * hash + coordinates.hashCode();
+        return hash;
+    }
+
     /**
      * Validates data in fields.
      * Restrictions:

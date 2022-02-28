@@ -76,6 +76,32 @@ public class Route implements Comparable<Route> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Route)) return false;
+        Route t = (Route) obj;
+
+        return id.equals(t.id)
+            && name.equals(t.name)
+            && distance.equals(t.distance)
+            && creationDate.equals(t.creationDate)
+            && from.equals(t.from)
+            && to.equals(t.to);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + id.hashCode();
+        hash = 31 * hash + distance.hashCode();
+        hash = 31 * hash + name.hashCode();
+        hash = 31 * hash + creationDate.hashCode();
+        hash = 31 * hash + from.hashCode();
+        hash = 31 * hash + to.hashCode();
+        return hash;
+    }
+
+    @Override
     public int compareTo(Route o) {
         return Double.compare(distance, o.distance);
     }
