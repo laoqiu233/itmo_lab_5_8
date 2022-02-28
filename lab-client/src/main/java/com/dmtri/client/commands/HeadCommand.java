@@ -31,6 +31,6 @@ public class HeadCommand extends AbstractCommand {
             return;
         }
 
-        io.writeln(col.getCollection().getFirst());
+        io.writeln(col.getCollection().get(0));
     }
 }

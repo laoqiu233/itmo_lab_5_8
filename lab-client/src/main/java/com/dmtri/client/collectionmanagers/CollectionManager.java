@@ -2,10 +2,11 @@ package com.dmtri.client.collectionmanagers;
 
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
-import java.util.LinkedList;
+
+import java.util.List;
 
 public interface CollectionManager {
-    LinkedList<Route> getCollection();
+    List<Route> getCollection();
     Route getItemById(long id);
     void add(Route route) throws InvalidFieldException;
     void update(Route route);

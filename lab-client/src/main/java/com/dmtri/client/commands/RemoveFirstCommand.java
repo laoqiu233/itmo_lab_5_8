@@ -32,7 +32,7 @@ public class RemoveFirstCommand extends AbstractCommand {
             return;
         }
 
-        Route route = col.getCollection().getFirst();
+        Route route = col.getCollection().get(0);
         io.writeln("The following object will be removed:");
         io.writeln(route);
 

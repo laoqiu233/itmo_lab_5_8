@@ -2,9 +2,8 @@ package com.dmtri.client.collectionmanagers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.IntStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -22,7 +21,7 @@ import com.dmtri.common.models.Route;
  * data storage
  */
 public class FileCollectionManager implements SaveableCollectionManager {
-    private LinkedList<Route> collection;
+    private List<Route> collection;
     private long nextId;
     private String fileName;
 
@@ -42,7 +41,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
         this.fileName = fileName;
     }
 
-    public LinkedList<Route> getCollection() {
+    public List<Route> getCollection() {
         return collection;
     }
 
@@ -74,12 +73,11 @@ public class FileCollectionManager implements SaveableCollectionManager {
     }
 
     public void remove(long id) {
-        int toRemove = IntStream.range(0, collection.size())
-                       .filter(i -> collection.get(i).getId() == id)
-                       .findFirst()
-                       .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
+        boolean res = collection.removeIf(x -> x.getId() == id);
 
-        collection.remove(toRemove);
+        if (!res) {
+            throw new NoSuchElementException("Cannot find item with id " + id);
+        }
     }
 
     public void clear() {

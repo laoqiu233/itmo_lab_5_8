@@ -4,7 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,7 +48,7 @@ public final class XMLCollectionWriter {
         tf.transform(source, new StreamResult(System.out));
     }
 
-    public static void writeCollection(String fileName, LinkedList<Route> collection, long nextId) throws ParserConfigurationException, TransformerException, FileNotFoundException {
+    public static void writeCollection(String fileName, List<Route> collection, long nextId) throws ParserConfigurationException, TransformerException, FileNotFoundException {
         Document doc = createDocument();
 
         Element root = doc.createElement("routes");
