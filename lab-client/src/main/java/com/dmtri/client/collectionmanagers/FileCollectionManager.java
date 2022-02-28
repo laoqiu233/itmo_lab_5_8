@@ -82,6 +82,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
 
     public void clear() {
         collection.clear();
+        nextId = 1;
     }
 
     public long getNextId() {
