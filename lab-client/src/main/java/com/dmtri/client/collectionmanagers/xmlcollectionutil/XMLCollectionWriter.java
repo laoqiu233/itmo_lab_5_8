@@ -38,6 +38,7 @@ public final class XMLCollectionWriter {
         TransformerFactory tff = TransformerFactory.newInstance();
         Transformer tf = tff.newTransformer();
         tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         return tf;
     }
 
