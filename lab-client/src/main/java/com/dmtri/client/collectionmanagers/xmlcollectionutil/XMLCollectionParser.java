@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,19 +32,20 @@ public final class XMLCollectionParser {
         DocumentBuilder db = dbf.newDocumentBuilder();
 
         // Чтение данных из файла необходимо реализовать с помощью класса java.io.InputStreamReader
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName));
-        StringBuilder sb = new StringBuilder();
-        int c;
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName));) {
+            StringBuilder sb = new StringBuilder();
+            int c;
 
-        while ((c = reader.read()) != -1) {
-            sb.append((char) c);
+            while ((c = reader.read()) != -1) {
+                sb.append((char) c);
+            }
+
+            reader.close();
+
+            Document doc = db.parse(new ByteArrayInputStream(sb.toString().getBytes()));
+
+            return doc;
         }
-
-        reader.close();
-
-        Document doc = db.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-
-        return doc;
     }
 
     private static Element getDocumentRoot(Document doc) throws IncorrectFileStructureException {
@@ -64,7 +66,7 @@ public final class XMLCollectionParser {
         return root;
     }
 
-    private static void handleRouteElement(Element el, LinkedList<Route> collection) throws TransformerException {
+    private static void handleRouteElement(Element el, List<Route> collection) throws TransformerException {
         try {
             Route route = XMLRouteParser.parseRoute(el);
             // Check id uniqueness
@@ -98,7 +100,7 @@ public final class XMLCollectionParser {
 
         System.out.println("Parsing routes in file " + fileName);
         NodeList nodes = root.getElementsByTagName("Route");
-        LinkedList<Route> collection = new LinkedList<Route>();
+        List<Route> collection = new LinkedList<Route>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
             Element el = (Element) nodes.item(i);
@@ -112,13 +114,13 @@ public final class XMLCollectionParser {
 
     public static class ParsedCollection {
         private Long nextId;
-        private LinkedList<Route> collection;
+        private List<Route> collection;
 
         public void setNextId(Long nextId) {
             this.nextId = nextId;
         }
 
-        public void setCollection(LinkedList<Route> collection) {
+        public void setCollection(List<Route> collection) {
             this.collection = collection;
         }
 
@@ -126,7 +128,7 @@ public final class XMLCollectionParser {
             return nextId;
         }
 
-        public LinkedList<Route> getCollection() {
+        public List<Route> getCollection() {
             return collection;
         }
     }

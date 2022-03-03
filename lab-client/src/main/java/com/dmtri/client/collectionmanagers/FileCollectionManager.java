@@ -94,6 +94,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
             XMLCollectionWriter.writeCollection(fileName, collection, nextId);
         } catch (
             ParserConfigurationException
+            | IOException
             | TransformerException e
         ) {
             // Just log error

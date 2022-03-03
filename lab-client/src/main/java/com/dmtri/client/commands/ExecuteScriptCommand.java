@@ -43,10 +43,8 @@ public class ExecuteScriptCommand extends AbstractCommand {
 
         openedFiles.add(file);
 
-        try {
-            InputStreamReader input = new InputStreamReader(new FileInputStream(file));
+        try (InputStreamReader input = new InputStreamReader(new FileInputStream(file))) {
             handleInput(input);
-            input.close();
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Cannot locate file with the name " + args[0]);
         } catch (IOException e) {
