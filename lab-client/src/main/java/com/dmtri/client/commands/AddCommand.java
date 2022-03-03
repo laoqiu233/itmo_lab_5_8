@@ -18,30 +18,17 @@ public class AddCommand extends AbstractCommand {
     }
 
     public String getUsage() {
-        return TerminalColors.colorString("add [name] [distance]", TerminalColors.GREEN)
+        return TerminalColors.colorString("add", TerminalColors.GREEN)
              + " - Starts route creation";
     }
 
     public void execute(String[] args) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("Add has exactly 2 positional arguments, recieved " + args.length);
-        }
-
-        Double distance;
-
-        try {
-            distance = Double.parseDouble(args[1]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Failed to convert " + args[1] + " to a number", e);
+        if (args.length != 0) {
+            throw new IllegalArgumentException("Add takes no arguments, recieved " + args.length);
         }
 
         try {
-            Route newRoute = RouteMaker.parseRoute(
-                io,
-                col.getNextId(),
-                args[0],
-                distance
-            );
+            Route newRoute = RouteMaker.parseRoute(io, col.getNextId());
             col.add(newRoute);
         } catch (InvalidFieldException e) {
             io.writeln(TerminalColors.colorString("Failed to create new route", TerminalColors.RED));

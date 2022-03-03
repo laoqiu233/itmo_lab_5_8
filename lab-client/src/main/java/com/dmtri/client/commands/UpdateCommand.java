@@ -10,7 +10,6 @@ import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
 
 public class UpdateCommand extends AbstractCommand {
-    private static final int ARGUMENTS_LENGTH = 3;
     private BasicUserIO io;
     private CollectionManager col;
 
@@ -22,23 +21,22 @@ public class UpdateCommand extends AbstractCommand {
     }
 
     public String getUsage() {
-        return TerminalColors.colorString("update [id] [name] [distance]", TerminalColors.GREEN)
+        return TerminalColors.colorString("update [id]", TerminalColors.GREEN)
              + " - updates the element with the specified id.";
     }
 
     public void execute(String[] args) {
-        if (args.length != ARGUMENTS_LENGTH) {
-            throw new IllegalArgumentException("update command takes exactly " + ARGUMENTS_LENGTH + " arguments, recieved " + args.length + ".");
+        if (args.length != 1) {
+            throw new IllegalArgumentException("update command takes exactly 1 argument, recieved " + args.length + ".");
         }
 
         try {
             Long id = Long.parseLong(args[0]);
-            Double distance = Double.parseDouble(args[2]);
 
             // Test to see if there is an item to update
             col.getItemById(id);
 
-            Route route = RouteMaker.parseRoute(io, id, args[1], distance);
+            Route route = RouteMaker.parseRoute(io, id);
             col.update(route);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid arguments entered", e);

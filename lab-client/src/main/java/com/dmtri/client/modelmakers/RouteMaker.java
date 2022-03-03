@@ -12,14 +12,12 @@ public final class RouteMaker {
     private RouteMaker() {
     }
 
-    public static Route parseRoute(BasicUserIO io, Long id, String name, Double distance) throws InvalidFieldException {
+    public static Route parseRoute(BasicUserIO io, Long id) throws InvalidFieldException {
         Route.VALIDATOR.validateId(id);
-        Route.VALIDATOR.validateName(name);
-        Route.VALIDATOR.validateDistance(distance);
 
         return new Route(
             id,
-            name,
+            BasicParsers.Repeater.doUntilGet(RouteMaker::parseName, io),
             LocalDate.now(),
             BasicParsers.Repeater.doUntilGet(
                 io_ -> {
@@ -41,8 +39,20 @@ public final class RouteMaker {
                 },
                 io
             ),
-            distance
+            BasicParsers.Repeater.doUntilGet(RouteMaker::parseDistance, io)
         );
+    }
+
+    public static String parseName(BasicUserIO io) throws InvalidFieldException {
+        String res = BasicParsers.parseString(io, "Enter route name: ");
+        Route.VALIDATOR.validateName(res);
+        return res;
+    }
+
+    public static Double parseDistance(BasicUserIO io) throws InvalidFieldException {
+        Double res = BasicParsers.parseDouble(io, "Enter route distance: ", "Route distance must be greater than 1");
+        Route.VALIDATOR.validateDistance(res);
+        return res;
     }
 
     public static Location parseLocation(BasicUserIO io, String prompt, AbstractValidator<Location> validator) throws InvalidFieldException {
