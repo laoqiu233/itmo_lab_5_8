@@ -85,6 +85,12 @@ public final class Client {
     public static void main(String[] args) {
         // Get file name from environment variable
         String fileName = System.getenv("FILENAME");
+
+        if (fileName == null) {
+            System.out.println(TerminalColors.colorString("ERROR: The collection file should be specified in environment variables with the name FILENAME", TerminalColors.RED));
+            System.exit(1);
+        }
+
         FileCollectionManager cm;
         CommandHandler ch = new BasicCommandHandler();
         BasicUserIO io = new BasicUserIO();

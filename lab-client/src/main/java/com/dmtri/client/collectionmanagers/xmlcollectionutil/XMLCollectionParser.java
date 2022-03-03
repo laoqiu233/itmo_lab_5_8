@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -74,15 +73,13 @@ public final class XMLCollectionParser {
                 throw new InvalidFieldException("The id " + route.getId() + " is already used by another route");
             }
             collection.add(route);
-        } catch (
-            InvalidFieldException
-            | NullPointerException
-            | NumberFormatException
-            | DateTimeParseException  e
-        ) {
+        } catch (InvalidFieldException e) {
             System.out.println("Caught exception while parsing route: ");
             XMLCollectionWriter.writeElementToConsole(el);
             System.out.println(e);
+            if (e.getCause() != null) {
+                System.out.println(e.getCause());
+            }
             System.out.println("Skipping invalid route...");
         }
     }
