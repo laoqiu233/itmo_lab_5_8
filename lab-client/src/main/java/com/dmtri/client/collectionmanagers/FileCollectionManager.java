@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -42,6 +44,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
     }
 
     public List<Route> getCollection() {
+        // TODO: Make copy instead of the actual list
         return collection;
     }
 
@@ -78,6 +81,19 @@ public class FileCollectionManager implements SaveableCollectionManager {
         if (!res) {
             throw new NoSuchElementException("Cannot find item with id " + id);
         }
+    }
+
+    public int removeIf(Predicate<? super Route> predicate) {
+        // Using streams instead of collection.removeIf
+        // Because I want to return number of elements removed
+        List<Long> toRemove = collection.stream()
+            .filter(predicate)
+            .map(x -> x.getId())
+            .collect(Collectors.toList());
+
+        toRemove.forEach(this::remove);
+
+        return toRemove.size();
     }
 
     public void clear() {

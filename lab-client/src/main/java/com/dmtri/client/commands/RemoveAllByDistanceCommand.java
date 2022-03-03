@@ -1,7 +1,5 @@
 package com.dmtri.client.commands;
 
-import java.util.LinkedList;
-
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
@@ -30,15 +28,8 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
 
         try {
             Double distance = Double.parseDouble(args[0]);
-
-            LinkedList<Long> toRemove = new LinkedList<>();
-
-            col.getCollection().stream()
-                            .filter(x -> x.getDistance().equals(distance))
-                            .forEach(x -> toRemove.add(x.getId()));
-
-            toRemove.forEach(col::remove);
-            io.writeln("Removed " + toRemove.size() + " items");
+            int res = col.removeIf(x -> x.getDistance() == distance);
+            io.writeln("Removed " + res + " items");
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid distance entered.", e);
         }

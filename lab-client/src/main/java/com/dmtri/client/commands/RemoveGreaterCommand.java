@@ -1,7 +1,5 @@
 package com.dmtri.client.commands;
 
-import java.util.LinkedList;
-
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.modelmakers.RouteMaker;
 import com.dmtri.client.userio.BasicUserIO;
@@ -39,15 +37,9 @@ public class RemoveGreaterCommand extends AbstractCommand {
 
             Route temp = RouteMaker.parseRoute(io, id, name, distance);
 
-            LinkedList<Long> toRemove = new LinkedList<>();
+            int res = col.removeIf(x -> x.compareTo(temp) > 0);
 
-            col.getCollection().stream()
-                               .filter(x -> x.compareTo(temp) > 0)
-                               .forEach(x -> toRemove.add(x.getId()));
-
-            toRemove.forEach(col::remove);
-
-            io.writeln("Removed " + toRemove.size() + " items.");
+            io.writeln("Removed " + res + " items.");
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid arguments entered", e);
         } catch (InvalidFieldException e) {

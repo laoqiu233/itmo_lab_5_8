@@ -1,8 +1,5 @@
 package com.dmtri.client.commands;
 
-import java.util.HashSet;
-import java.util.stream.Collectors;
-
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
@@ -29,10 +26,9 @@ public class PrintUniqueDistance extends AbstractCommand {
             throw new IllegalArgumentException("print_unique_distance takes no arguments, recieved " + args.length);
         }
 
-        HashSet<Double> uniqueDistances = new HashSet<>(
-            col.getCollection().stream().map(x -> x.getDistance()).collect(Collectors.toList())
-        );
-
-        uniqueDistances.forEach(io::writeln);
+        col.getCollection().stream()
+        .map(x -> x.getDistance())
+        .distinct()
+        .forEach(io::writeln);
     }
 }
