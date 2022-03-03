@@ -2,6 +2,7 @@ package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 
 public class ShowCommand extends AbstractCommand {
     private BasicUserIO io;
@@ -22,8 +23,10 @@ public class ShowCommand extends AbstractCommand {
 
     }
 
-    public void execute(String[] args) {
-        //if (args.length > 0) throw new TooManyArgumentsException("show", 0);
+    public void execute(String[] args) throws CommandArgumentException {
+        if (args.length > 0) {
+            throw new CommandArgumentException(this.getName(), args.length);
+        }
 
         col.getCollection().stream().forEach(x -> io.writeln(x.toString() + '\n'));
     }

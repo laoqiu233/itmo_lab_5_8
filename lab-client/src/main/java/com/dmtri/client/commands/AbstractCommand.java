@@ -1,5 +1,7 @@
 package com.dmtri.client.commands;
 
+import com.dmtri.common.exceptions.CommandArgumentException;
+
 public abstract class AbstractCommand {
     private final String name;
 
@@ -11,6 +13,6 @@ public abstract class AbstractCommand {
         return name;
     }
 
-    public abstract void execute(String[] args);
+    public abstract void execute(String[] args) throws CommandArgumentException;
     public abstract String getUsage();
 }

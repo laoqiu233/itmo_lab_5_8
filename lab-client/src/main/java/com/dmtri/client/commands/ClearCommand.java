@@ -1,6 +1,7 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class ClearCommand extends AbstractCommand {
@@ -17,7 +18,11 @@ public class ClearCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
+        if (args.length != 0) {
+            throw new CommandArgumentException(this.getName(), args.length);
+        }
+
         col.clear();
     }
 }

@@ -44,7 +44,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
     }
 
     public List<Route> getCollection() {
-        // TODO: Make copy instead of the actual list
+        // T ODO: Make copy instead of the actual list
         return collection;
     }
 
@@ -67,12 +67,13 @@ public class FileCollectionManager implements SaveableCollectionManager {
         collection.add(route);
     }
 
-    public void update(Route route) {
+    public boolean update(Route route) {
         if (!collection.removeIf(x -> x.getId() == route.getId())) {
-            throw new NoSuchElementException("Can not find item with id " + route.getId());
+            return false;
         }
 
         collection.add(route);
+        return true;
     }
 
     public void remove(long id) {

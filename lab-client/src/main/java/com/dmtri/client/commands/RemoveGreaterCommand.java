@@ -3,6 +3,7 @@ package com.dmtri.client.commands;
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.modelmakers.RouteMaker;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
@@ -24,9 +25,9 @@ public class RemoveGreaterCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 1) {
-            throw new IllegalArgumentException("remove_greater takes exactly 1 arguments, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {
@@ -38,7 +39,7 @@ public class RemoveGreaterCommand extends AbstractCommand {
 
             io.writeln("Removed " + res + " items.");
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid arguments entered", e);
+            throw new CommandArgumentException("Invalid arguments entered", e);
         } catch (InvalidFieldException e) {
             io.writeln("Failed to create the temporary item.");
             io.writeln(e);

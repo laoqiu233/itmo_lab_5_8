@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.dmtri.client.commands.AbstractCommand;
-
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
 
 public class BasicCommandHandler implements CommandHandler {
     private HashMap<String, AbstractCommand> commands = new HashMap<>();
 
-    public void handle(String commandString) throws CommandNotFoundException {
+    public void handle(String commandString) throws CommandNotFoundException, CommandArgumentException {
         String[] commandArgs = commandString.trim().split("\\s+");
 
         AbstractCommand command = commands.get(commandArgs[0]);

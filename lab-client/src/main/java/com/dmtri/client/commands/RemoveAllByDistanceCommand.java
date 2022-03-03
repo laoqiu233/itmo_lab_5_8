@@ -2,6 +2,7 @@ package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveAllByDistanceCommand extends AbstractCommand {
@@ -21,9 +22,9 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 1) {
-            throw new IllegalArgumentException("remove_all_by_distance takes exactly 1 argument, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {
@@ -31,7 +32,7 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
             int res = col.removeIf(x -> x.getDistance() == distance);
             io.writeln("Removed " + res + " items");
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid distance entered.", e);
+            throw new CommandArgumentException("Invalid distance entered.", e);
         }
     }
 }

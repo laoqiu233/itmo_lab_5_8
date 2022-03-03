@@ -1,6 +1,7 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExitCommand extends AbstractCommand {
@@ -16,9 +17,9 @@ public class ExitCommand extends AbstractCommand {
         return TerminalColors.colorString("exit", TerminalColors.GREEN) + " - exits the program";
     }
 
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length > 0) {
-            throw new IllegalArgumentException("exit command takes not arguments, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         io.writeln("Thank you for using my program :)");

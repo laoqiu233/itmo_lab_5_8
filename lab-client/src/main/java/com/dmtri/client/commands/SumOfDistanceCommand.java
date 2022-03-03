@@ -2,6 +2,7 @@ package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class SumOfDistanceCommand extends AbstractCommand {
@@ -21,9 +22,9 @@ public class SumOfDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length > 0) {
-            throw new IllegalArgumentException("sum_of_distance takes no arguments, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         Double res = col.getCollection().stream()

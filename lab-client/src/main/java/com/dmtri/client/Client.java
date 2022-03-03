@@ -26,6 +26,7 @@ import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.commands.SumOfDistanceCommand;
 import com.dmtri.client.commands.UpdateCommand;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.util.TerminalColors;
@@ -64,7 +65,7 @@ public final class Client {
             ch.handle(input);
         } catch (
             CommandNotFoundException
-            | IllegalArgumentException e
+            | CommandArgumentException e
         ) {
             io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
 

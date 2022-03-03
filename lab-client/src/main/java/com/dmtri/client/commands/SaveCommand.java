@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import com.dmtri.client.collectionmanagers.SaveableCollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class SaveCommand extends AbstractCommand {
@@ -20,9 +21,9 @@ public class SaveCommand extends AbstractCommand {
         return TerminalColors.colorString("save", TerminalColors.GREEN) + " - saves the collection to XML file";
     }
 
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length > 0) {
-            throw new IllegalArgumentException("Save command takes no arguments, but " + args.length + " were given.");
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {

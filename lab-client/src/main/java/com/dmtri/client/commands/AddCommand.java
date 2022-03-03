@@ -3,6 +3,7 @@ package com.dmtri.client.commands;
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.modelmakers.RouteMaker;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
@@ -22,9 +23,9 @@ public class AddCommand extends AbstractCommand {
              + " - Starts route creation";
     }
 
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 0) {
-            throw new IllegalArgumentException("Add takes no arguments, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {

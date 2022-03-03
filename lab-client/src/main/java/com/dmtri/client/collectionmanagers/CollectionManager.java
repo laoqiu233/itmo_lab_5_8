@@ -10,7 +10,7 @@ public interface CollectionManager {
     List<Route> getCollection();
     Route getItemById(long id);
     void add(Route route) throws InvalidFieldException;
-    void update(Route route);
+    boolean update(Route route);
     void remove(long id);
     int removeIf(Predicate<? super Route> predicate);
     void clear();

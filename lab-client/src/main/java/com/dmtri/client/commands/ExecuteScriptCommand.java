@@ -10,6 +10,7 @@ import java.util.Set;
 
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExecuteScriptCommand extends AbstractCommand {
@@ -30,15 +31,15 @@ public class ExecuteScriptCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 1) {
-            throw new IllegalArgumentException("execute_script takes exactly 1 argument, recieved " + args.length);
+            throw new CommandArgumentException(this.getName(), 1, args.length);
         }
 
         File file = new File(args[0]);
 
         if (openedFiles.contains(file)) {
-            throw new IllegalArgumentException("Potential recursion with file \"" + args[0] + '"');
+            throw new CommandArgumentException("Potential recursion with file \"" + args[0] + '"');
         }
 
         openedFiles.add(file);
@@ -46,7 +47,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
         try (InputStreamReader input = new InputStreamReader(new FileInputStream(file))) {
             handleInput(input);
         } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Cannot locate file with the name " + args[0]);
+            throw new CommandArgumentException("Cannot locate file with the name " + args[0]);
         } catch (IOException e) {
             io.writeln("Error when trying to read from file:");
             io.writeln(e);

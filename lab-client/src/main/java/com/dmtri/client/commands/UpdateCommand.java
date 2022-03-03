@@ -1,10 +1,9 @@
 package com.dmtri.client.commands;
 
-import java.util.NoSuchElementException;
-
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.modelmakers.RouteMaker;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.util.TerminalColors;
@@ -25,9 +24,9 @@ public class UpdateCommand extends AbstractCommand {
              + " - updates the element with the specified id.";
     }
 
-    public void execute(String[] args) {
+    public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 1) {
-            throw new IllegalArgumentException("update command takes exactly 1 argument, recieved " + args.length + ".");
+            throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {
@@ -37,11 +36,11 @@ public class UpdateCommand extends AbstractCommand {
             col.getItemById(id);
 
             Route route = RouteMaker.parseRoute(io, id);
-            col.update(route);
+            if (col.update(route)) {
+                throw new CommandArgumentException("No item with specified id was found in collection");
+            }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid arguments entered", e);
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException("No item with specified id in collection", e);
+            throw new CommandArgumentException("id is not a valid number", e);
         } catch (InvalidFieldException e) {
             io.writeln(TerminalColors.colorString("Failed to update route", TerminalColors.RED));
             io.writeln(e);
