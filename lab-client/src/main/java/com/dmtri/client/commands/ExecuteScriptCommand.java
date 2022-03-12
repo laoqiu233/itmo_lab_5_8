@@ -11,6 +11,7 @@ import java.util.Set;
 import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.CommandNotFoundException;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExecuteScriptCommand extends AbstractCommand {
@@ -80,8 +81,11 @@ public class ExecuteScriptCommand extends AbstractCommand {
                     }
                 }
             }
-        } catch (Exception e) {
-            io.writeln("Failed to execute command");
+        } catch (CommandNotFoundException | CommandArgumentException e) {
+            io.writeln("Failed to execute script");
+            io.writeln(e);
+        } catch (IOException e) {
+            io.writeln("Caught exception while trying to read script.");
             io.writeln(e);
         }
     }
