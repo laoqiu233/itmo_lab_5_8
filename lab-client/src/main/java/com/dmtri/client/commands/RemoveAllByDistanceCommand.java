@@ -29,7 +29,7 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
 
         try {
             Double distance = Double.parseDouble(args[0]);
-            int res = col.removeIf(x -> x.getDistance() == distance);
+            int res = col.removeIf(x -> x.getDistance().equals(distance));
             io.writeln("Removed " + res + " items");
         } catch (NumberFormatException e) {
             throw new CommandArgumentException("Invalid distance entered.", e);

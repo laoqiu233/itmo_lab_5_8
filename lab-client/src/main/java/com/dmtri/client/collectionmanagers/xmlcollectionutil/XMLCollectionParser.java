@@ -50,7 +50,7 @@ public final class XMLCollectionParser {
     private static Element getDocumentRoot(Document doc) throws IncorrectFileStructureException {
         Element root = doc.getDocumentElement();
 
-        if (root.getTagName() != "routes") {
+        if (root.getTagName().equals("routes")) {
             throw new IncorrectFileStructureException(
                 "Corrupted file: Root element should be \"routes\""
             );
