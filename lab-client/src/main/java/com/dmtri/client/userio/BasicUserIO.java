@@ -42,7 +42,11 @@ public class BasicUserIO {
 
     public String read() {
         try {
-            return in.readLine();
+            String input = in.readLine();
+            if (input == null) {
+                System.exit(0);
+            }
+            return input;
         } catch (IOException e) {
             System.out.println("Exception while reading from input stream: \n" + e);
             return null;

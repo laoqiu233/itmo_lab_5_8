@@ -28,6 +28,7 @@ public class PrintUniqueDistance extends AbstractCommand {
         }
 
         col.getCollection().stream()
+        .filter(x -> x.getDistance() != null)
         .map(x -> x.getDistance())
         .distinct()
         .forEach(io::writeln);

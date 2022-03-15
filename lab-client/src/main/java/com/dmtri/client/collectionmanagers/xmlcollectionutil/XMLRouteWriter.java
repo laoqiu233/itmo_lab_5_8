@@ -18,9 +18,6 @@ public final class XMLRouteWriter {
         Element name = doc.createElement("name");
         name.setTextContent(route.getName());
 
-        Element distance = doc.createElement("distance");
-        distance.setTextContent(Double.toString(route.getDistance()));
-
         Element creationDate = doc.createElement("creationDate");
         creationDate.setTextContent(route.getCreationDate().toString());
 
@@ -28,10 +25,15 @@ public final class XMLRouteWriter {
         Element to = locationToXML(doc, route.getTo(), "to");
 
         el.appendChild(name);
-        el.appendChild(distance);
         el.appendChild(creationDate);
         el.appendChild(from);
         el.appendChild(to);
+
+        if (route.getDistance() != null) {
+            Element distance = doc.createElement("distance");
+            distance.setTextContent(Double.toString(route.getDistance()));
+            el.appendChild(distance);
+        }
 
         return el;
     }

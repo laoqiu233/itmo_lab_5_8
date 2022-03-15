@@ -28,6 +28,7 @@ public class SumOfDistanceCommand extends AbstractCommand {
         }
 
         Double res = col.getCollection().stream()
+                                        .filter(r -> r.getDistance() != null)
                                         .map(r -> r.getDistance())
                                         .reduce((a, b) -> a + b)
                                         .orElse(0d);

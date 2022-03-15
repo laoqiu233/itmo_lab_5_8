@@ -109,6 +109,9 @@ public class Route implements Comparable<Route> {
 
     @Override
     public int compareTo(Route o) {
+        if (this.distance == null || o.distance == null) {
+            return Long.compare(this.id, o.id);
+        }
         return Double.compare(distance, o.distance);
     }
 
@@ -158,8 +161,7 @@ public class Route implements Comparable<Route> {
         }
 
         public void validateDistance(Double distance) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(distance, "distance of routes can not be null");
-            if (distance <= 1) {
+            if (distance != null && distance <= 1) {
                 throw new InvalidFieldException("distance of routes should be greater than 1");
             }
         }
