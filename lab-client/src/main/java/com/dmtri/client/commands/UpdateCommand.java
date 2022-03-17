@@ -26,7 +26,7 @@ public class UpdateCommand extends AbstractCommand {
 
     public void execute(String[] args) throws CommandArgumentException {
         if (args.length != 1) {
-            throw new CommandArgumentException(this.getName(), args.length);
+            throw new CommandArgumentException(this.getName(), 1, args.length);
         }
 
         try {
