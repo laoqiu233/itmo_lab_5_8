@@ -64,11 +64,6 @@ public final class Client {
             return;
         }
 
-        if (fileName.startsWith("/dev")) {
-            System.err.println("idi v popu");
-            return;
-        }
-
         FileCollectionManager cm;
         CommandHandler ch = new BasicCommandHandler();
         BasicUserIO io = new BasicUserIO();
