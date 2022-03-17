@@ -14,7 +14,7 @@ public final class BasicParsers {
     public static Long parseLong(BasicUserIO io, String prompt, String errorMsg) throws InvalidFieldException {
         try {
             String input = io.read(
-                TerminalColors.colorString(prompt, TerminalColors.BLUE)
+                TerminalColors.colorString(prompt, TerminalColors.BLUE) + '\n'
             );
 
             if (input.trim().isEmpty()) {
@@ -30,7 +30,7 @@ public final class BasicParsers {
     public static Double parseDouble(BasicUserIO io, String prompt, String errorMsg) throws InvalidFieldException {
         try {
             String input = io.read(
-                TerminalColors.colorString(prompt, TerminalColors.BLUE)
+                TerminalColors.colorString(prompt, TerminalColors.BLUE) + '\n'
             );
 
             if (input.trim().isEmpty()) {
@@ -45,7 +45,7 @@ public final class BasicParsers {
 
     public static String parseString(BasicUserIO io, String prompt) {
         String input = io.read(
-            TerminalColors.colorString(prompt, TerminalColors.BLUE)
+            TerminalColors.colorString(prompt, TerminalColors.BLUE) + '\n'
         );
 
         if (input.trim().isEmpty()) {
@@ -58,7 +58,7 @@ public final class BasicParsers {
     public static LocalDate parseLocalDate(BasicUserIO io, String prompt, String errorMsg) throws InvalidFieldException {
         try {
             String input = io.read(
-                TerminalColors.colorString(prompt, TerminalColors.BLUE)
+                TerminalColors.colorString(prompt, TerminalColors.BLUE) + '\n'
             );
 
             if (input.trim().isEmpty()) {
@@ -85,9 +85,9 @@ public final class BasicParsers {
                 }
             } while (true);
         }
+    }
 
-        public interface Parser<T> {
-            T parse(BasicUserIO io) throws InvalidFieldException;
-        }
+    public interface Parser<T> {
+        T parse(BasicUserIO io) throws InvalidFieldException;
     }
 }

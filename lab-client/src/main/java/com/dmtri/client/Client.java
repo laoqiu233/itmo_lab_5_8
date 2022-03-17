@@ -26,8 +26,6 @@ import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.commands.SumOfDistanceCommand;
 import com.dmtri.client.commands.UpdateCommand;
 import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
-import com.dmtri.common.exceptions.CommandNotFoundException;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.util.TerminalColors;
 
@@ -54,33 +52,7 @@ public final class Client {
         ch.addCommand(new RemoveGreaterCommand(io, cm));
         ch.addCommand(new RemoveAllByDistanceCommand(io, cm));
         ch.addCommand(new PrintUniqueDistance(io, cm));
-        ch.addCommand(new ExecuteScriptCommand(io, ch));
-    }
-
-    private static void inputCycle(BasicUserIO io, CommandHandler ch) {
-        io.write("> ");
-        String input = io.read();
-
-        try {
-            ch.handle(input);
-        } catch (
-            CommandNotFoundException
-            | CommandArgumentException e
-        ) {
-            io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
-
-            Throwable t = e.getCause();
-
-            while (t != null) {
-                io.writeln(TerminalColors.colorString(t.toString(), TerminalColors.RED));
-                t = t.getCause();
-            }
-
-            io.writeln("Use "
-                      + TerminalColors.colorString("help [command name]", TerminalColors.GREEN)
-                      + " to get more information on usage of commands"
-            );
-        }
+        ch.addCommand(new ExecuteScriptCommand(io));
     }
 
     public static void main(String[] args) {
@@ -113,8 +85,7 @@ public final class Client {
 
         addBasicCommands(ch, io, cm);
 
-        while (true) {
-            inputCycle(io, ch);
-        }
+        ConsoleClient console = new ConsoleClient(io, ch);
+        console.run();
     }
 }
