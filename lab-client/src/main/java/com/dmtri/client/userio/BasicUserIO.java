@@ -8,10 +8,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
-import java.util.List;
 
 public class BasicUserIO {
-    private LinkedList<BufferedReader> in;
+    private LinkedList<BufferedReader> inStack;
     private BufferedWriter out;
 
     public BasicUserIO() {
@@ -19,8 +18,8 @@ public class BasicUserIO {
     }
 
     public BasicUserIO(InputStream in, OutputStream out) {
-        this.in = new LinkedList<>();
-        this.in.add(new BufferedReader(new InputStreamReader(in)));
+        this.inStack = new LinkedList<>();
+        this.inStack.add(new BufferedReader(new InputStreamReader(in)));
         this.out = new BufferedWriter(new OutputStreamWriter(out));
     }
 
@@ -47,7 +46,7 @@ public class BasicUserIO {
         try {
             String input;
             do {
-                input = in.getLast().readLine();
+                input = inStack.getLast().readLine();
                 if (input == null) {
                     // The current stream ended,
                     // move on to next stream.
@@ -55,7 +54,12 @@ public class BasicUserIO {
                     continue;
                 }
                 break;
-            } while (in.size() > 0);
+            } while (inStack.size() > 0);
+
+            if (inStack.size() == 0) {
+                System.exit(0);
+            }
+
             return input;
         } catch (IOException e) {
             System.err.println("Exception while reading from input stream: \n" + e);
@@ -68,16 +72,16 @@ public class BasicUserIO {
         return read();
     }
 
-    public List<BufferedReader> getIn() {
-        return in;
+    public BufferedReader getIn() {
+        return inStack.getLast();
     }
 
     public void addIn(BufferedReader in) {
-        this.in.add(in);
+        inStack.add(in);
     }
 
     public BufferedReader removeIn() {
-        return this.in.removeLast();
+        return inStack.removeLast();
     }
 
     public BufferedReader removeInAndClose() {

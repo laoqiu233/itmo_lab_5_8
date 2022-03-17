@@ -60,8 +60,13 @@ public final class Client {
         String fileName = System.getenv("FILENAME");
 
         if (fileName == null) {
-            System.out.println(TerminalColors.colorString("ERROR: The collection file should be specified in environment variables with the name FILENAME", TerminalColors.RED));
-            System.exit(1);
+            System.err.println(TerminalColors.colorString("ERROR: The collection file should be specified in environment variables with the name FILENAME", TerminalColors.RED));
+            return;
+        }
+
+        if (fileName.startsWith("/dev")) {
+            System.err.println("idi v popu");
+            return;
         }
 
         FileCollectionManager cm;
