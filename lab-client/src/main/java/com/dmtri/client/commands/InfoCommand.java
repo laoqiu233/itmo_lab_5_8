@@ -24,6 +24,7 @@ public class InfoCommand extends AbstractCommand {
             throw new CommandArgumentException(this.getName(), args.length);
         }
 
+        io.writeln("Collection type: " + col.getCollection().getClass().getSimpleName());
         io.writeln("Item count: " + col.getCollection().size());
         io.writeln("Next ID to be assigned: " + col.getNextId());
     }
