@@ -36,7 +36,7 @@ public class UpdateCommand extends AbstractCommand {
             col.getItemById(id);
 
             Route route = RouteMaker.parseRoute(io, id);
-            if (col.update(route)) {
+            if (!col.update(route)) {
                 throw new CommandArgumentException("No item with specified id was found in collection");
             }
         } catch (NumberFormatException e) {
