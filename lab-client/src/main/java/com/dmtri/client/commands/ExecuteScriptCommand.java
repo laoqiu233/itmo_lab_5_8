@@ -50,7 +50,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
                 }
             };
             // File will be closed by IO manager
-            io.addIn(fileReader);
+            io.attachIn(fileReader);
         } catch (FileNotFoundException e) {
             throw new CommandArgumentException("Cannot locate file with the name " + args[0]);
         }

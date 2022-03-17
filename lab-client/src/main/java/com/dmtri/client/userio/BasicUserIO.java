@@ -50,7 +50,7 @@ public class BasicUserIO {
                 if (input == null) {
                     // The current stream ended,
                     // move on to next stream.
-                    removeInAndClose();
+                    detachInAndClose();
                     continue;
                 }
                 break;
@@ -76,16 +76,16 @@ public class BasicUserIO {
         return inStack.getLast();
     }
 
-    public void addIn(BufferedReader in) {
+    public void attachIn(BufferedReader in) {
         inStack.add(in);
     }
 
-    public BufferedReader removeIn() {
+    public BufferedReader detachIn() {
         return inStack.removeLast();
     }
 
-    public BufferedReader removeInAndClose() {
-        BufferedReader t = this.removeIn();
+    public BufferedReader detachInAndClose() {
+        BufferedReader t = this.detachIn();
         try {
             t.close();
         } catch (IOException e) {
