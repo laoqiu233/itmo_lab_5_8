@@ -43,11 +43,15 @@ public final class XMLCollectionWriter {
         return tf;
     }
 
-    public static void writeElementToConsole(Element el) throws TransformerException {
-        Transformer tf = createTransformer();
-        DOMSource source = new DOMSource(el);
-
-        tf.transform(source, new StreamResult(System.out));
+    public static void writeElementToConsole(Element el) {
+        try {
+            Transformer tf = createTransformer();
+            DOMSource source = new DOMSource(el);
+            tf.transform(source, new StreamResult(System.out));
+        } catch (TransformerException e) {
+            System.err.println("Failed to transform element:");
+            System.err.println(e.getMessage());
+        }
     }
 
     public static void writeCollection(String fileName, List<Route> collection, long nextId) throws ParserConfigurationException, TransformerException, FileNotFoundException, IOException {

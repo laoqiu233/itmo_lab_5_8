@@ -2,6 +2,7 @@ package com.dmtri.client.collectionmanagers.xmlcollectionutil;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
@@ -25,13 +26,13 @@ public final class XMLCollectionParser {
     private XMLCollectionParser() {
     }
 
-    private static Document openDocument(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, SAXException {
+    private static Document openDocument(String fileName) throws IOException, ParserConfigurationException {
         // Initialize XML parser
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
 
         // Чтение данных из файла необходимо реализовать с помощью класса java.io.InputStreamReader
-        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName));) {
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName))) {
             StringBuilder sb = new StringBuilder();
             int c;
 
@@ -44,11 +45,18 @@ public final class XMLCollectionParser {
             Document doc = db.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
             return doc;
+        } catch (SAXException | FileNotFoundException e) {
+            System.out.println("The file is in a invalid format or does not exist, original file will be rewritten when saved.");
+            return db.newDocument();
         }
     }
 
     private static Element getDocumentRoot(Document doc) throws IncorrectFileStructureException {
         Element root = doc.getDocumentElement();
+        if (root == null) {
+            root = doc.createElement("routes");
+            root.setAttribute("nextId", "1");
+        }
 
         if (!root.getTagName().equals("routes")) {
             throw new IncorrectFileStructureException(
@@ -65,7 +73,7 @@ public final class XMLCollectionParser {
         return root;
     }
 
-    private static void handleRouteElement(Element el, List<Route> collection) throws TransformerException {
+    private static void handleRouteElement(Element el, List<Route> collection) {
         try {
             Route route = XMLRouteParser.parseRoute(el);
             // Check id uniqueness
