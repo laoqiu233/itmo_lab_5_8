@@ -1,17 +1,16 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.models.Route;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithRoutes;
 
 public class ShowCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public ShowCommand(BasicUserIO io, CollectionManager col) {
+    public ShowCommand(CollectionManager col) {
         super("show");
-
-        this.io = io;
         this.col = col;
     }
 
@@ -19,15 +18,9 @@ public class ShowCommand extends AbstractCommand {
         return "Outputs every item in the collection.";
     }
 
-    public void checkArgs(String[] args) {
-
-    }
-
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
-
-        col.getCollection().stream().forEach(x -> io.writeln(x.toString() + '\n'));
+    @Override
+    public Response execute(Request request) {
+        Route[] a = new Route[col.getCollection().size()];
+        return new ResponseWithRoutes(col.getCollection().toArray(a));
     }
 }

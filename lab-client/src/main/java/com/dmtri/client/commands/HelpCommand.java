@@ -1,18 +1,20 @@
 package com.dmtri.client.commands;
 
-import com.dmtri.client.commandhandlers.CommandHandler;
+import com.dmtri.client.CommandHandler;
 import com.dmtri.client.userio.BasicUserIO;
+import com.dmtri.common.exceptions.ClientSideCommandException;
 import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class HelpCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CommandHandler ch;
 
-    public HelpCommand(BasicUserIO io, CommandHandler ch) {
+    public HelpCommand(CommandHandler ch) {
         super("help");
-
-        this.io = io;
         this.ch = ch;
     }
 
@@ -23,23 +25,30 @@ public class HelpCommand extends AbstractCommand {
              + " - displays the usage of a single command";
     }
 
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length == 1) {
+    @Override
+    public RequestBody packageBody(String[] args, BasicUserIO io) throws CommandArgumentException {
+        if (args.length > 1) {
+            throw new CommandArgumentException("help command takes 1 or no arguments. Recieved " + args.length);
+        } else if (args.length == 1) {
             AbstractCommand command = ch.getCommands().get(args[0]);
             if (command == null) {
                 io.writeln(TerminalColors.colorString("No command with name " + args[0] + " was found.", TerminalColors.RED));
             }
             io.writeln("- " + TerminalColors.colorString(command.getName(), TerminalColors.GREEN));
             io.writeln(command.getUsage());
-            return;
-        } else if (args.length > 1) {
-            throw new CommandArgumentException("help command takes 1 or no arguments. Recieved " + args.length);
+        } else {
+            ch.getCommands().values().forEach(c -> {
+                io.writeln("- " + TerminalColors.colorString(c.getName(), TerminalColors.GREEN));
+                io.writeln(c.getUsage());
+                io.writeln("");
+            });
         }
 
-        ch.getCommands().values().forEach(c -> {
-            io.writeln("- " + TerminalColors.colorString(c.getName(), TerminalColors.GREEN));
-            io.writeln(c.getUsage());
-            io.writeln("");
-        });
+        return null;
+    }
+
+    @Override
+    public Response execute(Request request) throws InvalidRequestException {
+        throw new ClientSideCommandException();
     }
 }

@@ -10,15 +10,16 @@ import java.util.Set;
 
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExecuteScriptCommand extends AbstractCommand {
-    private BasicUserIO io;
     private Set<File> openedFiles = new HashSet<>();
 
-    public ExecuteScriptCommand(BasicUserIO io) {
+    public ExecuteScriptCommand() {
         super("execute_script");
-        this.io = io;
     }
 
     @Override
@@ -27,8 +28,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
              + " - reads and executes the content in file as user input";
     }
 
-    @Override
-    public void execute(String[] args) throws CommandArgumentException {
+    public RequestBody packageBody(String[] args, BasicUserIO io) throws CommandArgumentException {
         if (args.length != 1) {
             throw new CommandArgumentException(this.getName(), 1, args.length);
         }
@@ -54,5 +54,12 @@ public class ExecuteScriptCommand extends AbstractCommand {
         } catch (FileNotFoundException e) {
             throw new CommandArgumentException("Cannot locate file with the name " + args[0]);
         }
+
+        // This command does not send anything to the server
+        return null;
+    }
+
+    public Response execute(Request request) {
+        throw new UnsupportedOperationException();
     }
 }

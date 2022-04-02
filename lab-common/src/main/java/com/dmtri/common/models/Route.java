@@ -1,9 +1,12 @@
 package com.dmtri.common.models;
 
+import java.io.Serializable;
+
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Route implements Comparable<Route> {
+public class Route implements Comparable<Route>, Serializable {
     public static final Validator VALIDATOR = new Validator();
+    private static final long serialVersionUID = -1284965260632671008L;
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -33,6 +36,10 @@ public class Route implements Comparable<Route> {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {

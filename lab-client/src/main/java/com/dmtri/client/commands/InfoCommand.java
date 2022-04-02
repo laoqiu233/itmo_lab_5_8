@@ -1,17 +1,16 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
 
 public class InfoCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public InfoCommand(BasicUserIO io, CollectionManager col) {
+    public InfoCommand(CollectionManager col) {
         super("info");
 
-        this.io = io;
         this.col = col;
     }
 
@@ -19,13 +18,12 @@ public class InfoCommand extends AbstractCommand {
         return "Displays information about the collection, types, item count, etc.";
     }
 
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
+    @Override
+    public Response execute(Request request) throws InvalidRequestException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Collection type: " + col.getCollection().getClass().getSimpleName() + '\n');
+        sb.append("Item count: " + col.getCollection().size() + '\n');
 
-        io.writeln("Collection type: " + col.getCollection().getClass().getSimpleName());
-        io.writeln("Item count: " + col.getCollection().size());
-        io.writeln("Next ID to be assigned: " + col.getNextId());
+        return new Response(sb.toString());
     }
 }

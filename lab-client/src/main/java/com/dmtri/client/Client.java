@@ -7,8 +7,6 @@ import javax.xml.transform.TransformerException;
 
 import com.dmtri.client.collectionmanagers.FileCollectionManager;
 import com.dmtri.client.collectionmanagers.SaveableCollectionManager;
-import com.dmtri.client.commandhandlers.BasicCommandHandler;
-import com.dmtri.client.commandhandlers.CommandHandler;
 import com.dmtri.client.commands.AddCommand;
 import com.dmtri.client.commands.ClearCommand;
 import com.dmtri.client.commands.ExecuteScriptCommand;
@@ -21,7 +19,6 @@ import com.dmtri.client.commands.RemoveAllByDistanceCommand;
 import com.dmtri.client.commands.RemoveByIdCommand;
 import com.dmtri.client.commands.RemoveFirstCommand;
 import com.dmtri.client.commands.RemoveGreaterCommand;
-import com.dmtri.client.commands.SaveCommand;
 import com.dmtri.client.commands.ShowCommand;
 import com.dmtri.client.commands.SumOfDistanceCommand;
 import com.dmtri.client.commands.UpdateCommand;
@@ -36,23 +33,22 @@ public final class Client {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
-    private static void addBasicCommands(CommandHandler ch, BasicUserIO io, SaveableCollectionManager cm) {
-        ch.addCommand(new HelpCommand(io, ch));
-        ch.addCommand(new InfoCommand(io, cm));
-        ch.addCommand(new ShowCommand(io, cm));
-        ch.addCommand(new AddCommand(io, cm));
+    private static void addBasicCommands(CommandHandler ch, SaveableCollectionManager cm) {
+        ch.addCommand(new HelpCommand(ch));
+        ch.addCommand(new InfoCommand(cm));
+        ch.addCommand(new ShowCommand(cm));
+        ch.addCommand(new AddCommand(cm));
         ch.addCommand(new RemoveByIdCommand(cm));
-        ch.addCommand(new SaveCommand(io, cm));
-        ch.addCommand(new UpdateCommand(io, cm));
-        ch.addCommand(new ExitCommand(io));
+        ch.addCommand(new UpdateCommand(cm));
+        ch.addCommand(new ExitCommand());
         ch.addCommand(new ClearCommand(cm));
-        ch.addCommand(new SumOfDistanceCommand(io, cm));
-        ch.addCommand(new HeadCommand(io, cm));
-        ch.addCommand(new RemoveFirstCommand(io, cm));
-        ch.addCommand(new RemoveGreaterCommand(io, cm));
-        ch.addCommand(new RemoveAllByDistanceCommand(io, cm));
-        ch.addCommand(new PrintUniqueDistance(io, cm));
-        ch.addCommand(new ExecuteScriptCommand(io));
+        ch.addCommand(new SumOfDistanceCommand(cm));
+        ch.addCommand(new HeadCommand(cm));
+        ch.addCommand(new RemoveFirstCommand(cm));
+        ch.addCommand(new RemoveGreaterCommand(cm));
+        ch.addCommand(new RemoveAllByDistanceCommand(cm));
+        ch.addCommand(new PrintUniqueDistance(cm));
+        ch.addCommand(new ExecuteScriptCommand());
     }
 
     public static void main(String[] args) {
@@ -65,7 +61,7 @@ public final class Client {
         }
 
         FileCollectionManager cm;
-        CommandHandler ch = new BasicCommandHandler();
+        CommandHandler ch = new CommandHandler();
         BasicUserIO io = new BasicUserIO();
 
         try {
@@ -83,7 +79,7 @@ public final class Client {
             return;
         }
 
-        addBasicCommands(ch, io, cm);
+        addBasicCommands(ch, cm);
 
         ConsoleClient console = new ConsoleClient(io, ch);
         console.run();

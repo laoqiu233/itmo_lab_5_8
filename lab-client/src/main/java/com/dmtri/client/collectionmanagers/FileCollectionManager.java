@@ -15,7 +15,6 @@ import org.xml.sax.SAXException;
 import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
 import com.dmtri.client.collectionmanagers.xmlcollectionutil.XMLCollectionWriter;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
-import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.Route;
 
 /**
@@ -55,16 +54,10 @@ public class FileCollectionManager implements SaveableCollectionManager {
                          .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
     }
 
-    public void add(Route route) throws InvalidFieldException {
-        if (collection.stream().anyMatch(x -> x.getId() == route.getId())) {
-            throw new InvalidFieldException("Route with ID " + route.getId() + " already exists in collection.");
-        }
-
-        if (route.getId() == nextId) {
-            nextId++;
-        }
-
+    public long add(Route route) {
+        route.setId(nextId++);
         collection.add(route);
+        return route.getId();
     }
 
     public boolean update(Route route) {
@@ -100,10 +93,6 @@ public class FileCollectionManager implements SaveableCollectionManager {
     public void clear() {
         collection.clear();
         nextId = 1;
-    }
-
-    public long getNextId() {
-        return nextId;
     }
 
     public void save() throws FileNotFoundException {

@@ -3,15 +3,17 @@ package com.dmtri.client.commands;
 import com.dmtri.client.collectionmanagers.CollectionManager;
 import com.dmtri.client.userio.BasicUserIO;
 import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveAllByDistanceCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public RemoveAllByDistanceCommand(BasicUserIO io, CollectionManager col) {
+    public RemoveAllByDistanceCommand(CollectionManager col) {
         super("remove_all_by_distance");
-        this.io = io;
         this.col = col;
     }
 
@@ -22,17 +24,28 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) throws CommandArgumentException {
+    public RequestBody packageBody(String[] args, BasicUserIO io) throws CommandArgumentException {
         if (args.length != 1) {
             throw new CommandArgumentException(this.getName(), args.length);
         }
 
         try {
-            Double distance = Double.parseDouble(args[0]);
-            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance)));
-            io.writeln("Removed " + res + " items");
+            Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
             throw new CommandArgumentException("Invalid distance entered.", e);
+        }
+
+        return new RequestBody(args);
+    }
+
+    @Override
+    public Response execute(Request request) throws InvalidRequestException {
+        try {
+            Double distance = Double.parseDouble(request.getBody().getArg(0));
+            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance)));
+            return new Response("Removed " + res + " items");
+        } catch (NumberFormatException e) {
+            throw new InvalidRequestException(new CommandArgumentException("Invalid distance entered.", e));
         }
     }
 }

@@ -1,17 +1,15 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class SumOfDistanceCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public SumOfDistanceCommand(BasicUserIO io, CollectionManager col) {
+    public SumOfDistanceCommand(CollectionManager col) {
         super("sum_of_distance");
-        this.io = io;
         this.col = col;
     }
 
@@ -22,17 +20,13 @@ public class SumOfDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
-
+    public Response execute(Request request) {
         Double res = col.getCollection().stream()
                                         .filter(r -> r.getDistance() != null)
                                         .map(r -> r.getDistance())
                                         .reduce((a, b) -> a + b)
                                         .orElse(0d);
 
-        io.writeln("Sum of distances: " + res);
+        return new Response("Sum of distances: " + res);
     }
 }

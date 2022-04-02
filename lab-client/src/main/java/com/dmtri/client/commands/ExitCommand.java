@@ -1,29 +1,31 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class ExitCommand extends AbstractCommand {
-    private BasicUserIO io;
-
-    public ExitCommand(BasicUserIO io) {
+    public ExitCommand() {
         super("exit");
-
-        this.io = io;
     }
 
+    @Override
     public String getUsage() {
         return TerminalColors.colorString("exit", TerminalColors.GREEN) + " - exits the program";
     }
 
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
-
-        io.writeln("Thank you for using my program :)");
-
+    @Override
+    public RequestBody packageBody(String[] args, BasicUserIO io) {
+        io.writeln("Thanks for using my program :)");
         System.exit(0);
+
+        return null;
+    }
+
+    @Override
+    public Response execute(Request request) {
+        throw new UnsupportedOperationException();
     }
 }

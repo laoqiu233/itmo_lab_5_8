@@ -1,17 +1,18 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.models.Route;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithRoutes;
 import com.dmtri.common.util.TerminalColors;
 
 public class HeadCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public HeadCommand(BasicUserIO io, CollectionManager col) {
+    public HeadCommand(CollectionManager col) {
         super("head");
-        this.io = io;
         this.col = col;
     }
 
@@ -22,16 +23,11 @@ public class HeadCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
-
+    public Response execute(Request request) throws InvalidRequestException {
         if (col.getCollection().isEmpty()) {
-            io.writeln("The collection is empty");
-            return;
+            return new Response("The collection is empty");
         }
 
-        io.writeln(col.getCollection().get(0));
+        return new ResponseWithRoutes(new Route[] {col.getCollection().get(0)});
     }
 }

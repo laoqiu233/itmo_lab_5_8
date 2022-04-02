@@ -1,17 +1,19 @@
 package com.dmtri.client.commands;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
 import com.dmtri.common.util.TerminalColors;
 
 public class PrintUniqueDistance extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public PrintUniqueDistance(BasicUserIO io, CollectionManager col) {
+    public PrintUniqueDistance(CollectionManager col) {
         super("print_unique_distance");
-        this.io = io;
         this.col = col;
     }
 
@@ -22,15 +24,19 @@ public class PrintUniqueDistance extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
+    public Response execute(Request request) throws InvalidRequestException {
+        List<Double> distances = col.getCollection().stream()
+                                  .filter(x -> x.getDistance() != null)
+                                  .map(x -> x.getDistance())
+                                  .distinct()
+                                  .collect(Collectors.toList());
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Double distance : distances) {
+            sb.append(distance.toString() + '\n');
         }
 
-        col.getCollection().stream()
-        .filter(x -> x.getDistance() != null)
-        .map(x -> x.getDistance())
-        .distinct()
-        .forEach(io::writeln);
+        return new Response(sb.toString());
     }
 }

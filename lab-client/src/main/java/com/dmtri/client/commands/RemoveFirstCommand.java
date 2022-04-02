@@ -1,18 +1,18 @@
 package com.dmtri.client.commands;
 
 import com.dmtri.client.collectionmanagers.CollectionManager;
-import com.dmtri.client.userio.BasicUserIO;
-import com.dmtri.common.exceptions.CommandArgumentException;
+import com.dmtri.common.exceptions.InvalidRequestException;
 import com.dmtri.common.models.Route;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithRoutes;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveFirstCommand extends AbstractCommand {
-    private BasicUserIO io;
     private CollectionManager col;
 
-    public RemoveFirstCommand(BasicUserIO io, CollectionManager col) {
+    public RemoveFirstCommand(CollectionManager col) {
         super("remove_first");
-        this.io = io;
         this.col = col;
     }
 
@@ -23,20 +23,13 @@ public class RemoveFirstCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(String[] args) throws CommandArgumentException {
-        if (args.length > 0) {
-            throw new CommandArgumentException(this.getName(), args.length);
-        }
-
+    public Response execute(Request request) throws InvalidRequestException {
         if (col.getCollection().isEmpty()) {
-            io.writeln("The collection is empty");
-            return;
+            return new Response("The collection is empty");
         }
 
         Route route = col.getCollection().get(0);
-        io.writeln("The following object will be removed:");
-        io.writeln(route);
-
         col.remove(route.getId());
+        return new ResponseWithRoutes("The following route is removed: ", new Route[] {route});
     }
 }
