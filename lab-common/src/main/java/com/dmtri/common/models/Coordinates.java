@@ -1,12 +1,12 @@
 package com.dmtri.common.models;
 
+import java.io.Serializable;
+
 import com.dmtri.common.exceptions.InvalidFieldException;
 
-public class Coordinates {
-    /**
-     * Default validator for coordinates
-     */
+public class Coordinates implements Serializable {
     public static final Validator VALIDATOR = new Validator();
+    private static final long serialVersionUID = 3475182184867235091L;
     private Long x;
     private Double y; // Поле не может быть null
     private Long z;
