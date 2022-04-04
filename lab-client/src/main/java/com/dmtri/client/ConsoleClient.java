@@ -1,12 +1,7 @@
 package com.dmtri.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
 import com.dmtri.common.CommandHandler;
@@ -20,21 +15,24 @@ import com.dmtri.common.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
 public class ConsoleClient {
-    private static final int BUFFERSIZE = 1024;
+    private static final int TIMEOUT = 10;
+    private static final int MILLIS_IN_SECONDS = 1000;
     private BasicUserIO io;
     private CommandHandler ch;
     private String inputPrefix = "> ";
-    private DatagramChannel dc;
+    private RequestSender channel;
 
-    public ConsoleClient() {
+    public ConsoleClient(String address, int port) throws IOException {
         this.io = new BasicUserIO();
         this.ch = CommandHandler.standardCommandHandler(null);
+        DatagramChannel dc = DatagramChannel.open();
+        dc.connect(new InetSocketAddress(address, port));
+        dc.configureBlocking(false);
+        channel = new RequestSender(dc);
     }
 
-    public void writeTrace(Exception e) {
-        io.writeln(TerminalColors.colorString(e.toString(), TerminalColors.RED));
-
-        Throwable t = e.getCause();
+    private void writeTrace(Exception e) {
+        Throwable t = e;
 
         while (t != null) {
             io.writeln(TerminalColors.colorString(t.toString(), TerminalColors.RED));
@@ -47,41 +45,27 @@ public class ConsoleClient {
         );
     }
 
-    private void createConnection(String address, int port) throws IOException {
-        dc = DatagramChannel.open();
-        dc.connect(new InetSocketAddress(address, port));
-    }
+    private Response waitForResponse(RequestSender.SentRequest request) throws IOException {
+        int seconds = 0;
+        long start = System.currentTimeMillis();
 
-    private Response sendRequest(Request request) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-            oos.writeObject(request);
-            dc.send(ByteBuffer.wrap(baos.toByteArray()), dc.getRemoteAddress());
-
-            byte[] arr = new byte[BUFFERSIZE];
-            ByteBuffer buffer = ByteBuffer.wrap(arr);
-
-            dc.receive(buffer);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-
-            Object obj = ois.readObject();
-
-            if (obj instanceof Response) {
-                return (Response) obj;
-            } else {
-                io.writeln("The server responded with an invalid object");
+        while (seconds < TIMEOUT) {
+            if (request.checkForResponse()) {
+                if (request.isInvalidResponse()) {
+                    io.writeln("Received an invalid response");
+                    return null;
+                } else {
+                    return request.getResponse();
+                }
             }
-        } catch (IOException e) {
-            writeTrace(e);
-        } catch (ClassNotFoundException e) {
-            io.writeln("The server responded with an invalid object (Class not found)");
-            writeTrace(e);
+
+            if (System.currentTimeMillis() >= start + (seconds + 1) * MILLIS_IN_SECONDS) {
+                io.write('.');
+                seconds++;
+            }
         }
 
+        io.writeln("Timed out after " + TIMEOUT + " seconds.");
         return null;
     }
 
@@ -89,22 +73,26 @@ public class ConsoleClient {
         String input;
         while ((input = io.read(inputPrefix)) != null) {
             try {
-                Request request = ch.handle(input, io);
+                Request request = ch.handleString(input, io);
 
                 if (request != null) {
-                    Response response = sendRequest(request);
+                    Response response = waitForResponse(channel.sendRequest(request));
+                    if (response != null) {
+                        io.writeln(response.getMessage());
 
-                    io.writeln(response.getMessage());
+                        if (response instanceof ResponseWithRoutes) {
+                            ResponseWithRoutes rwr = (ResponseWithRoutes) response;
 
-                    if (response instanceof ResponseWithException) {
-                        ResponseWithException rwe = (ResponseWithException) response;
-                        writeTrace(rwe.getException());
-                    } else if (response instanceof ResponseWithRoutes) {
-                        ResponseWithRoutes rwr = (ResponseWithRoutes) response;
+                            for (int i = 0; i < rwr.getRoutesCount(); i++) {
+                                io.writeln(rwr.getRoute(i));
+                            }
+                        } else if (response instanceof ResponseWithException) {
+                            ResponseWithException rwe = (ResponseWithException) response;
 
-                        for (int i = 0; i < rwr.getRoutesCount(); i++) {
-                            io.writeln(rwr.getRoute(i));
+                            writeTrace(rwe.getException());
                         }
+                    } else {
+                        io.writeln("Request failed");
                     }
                 }
             } catch (
@@ -112,21 +100,14 @@ public class ConsoleClient {
                 | CommandArgumentException e
             ) {
                 writeTrace(e);
+            } catch (IOException e) {
+                io.writeln("Caught exception when trying to send request");
+                writeTrace(e);
             }
         }
     }
 
     public void run() {
-        String address = io.read("Enter host address: ");
-        int port = Integer.valueOf(io.read("Enter port: "));
-
-        try {
-            createConnection(address, port);
-        } catch (IOException e) {
-            writeTrace(e);
-            return;
-        }
-
         inputCycle();
     }
 }

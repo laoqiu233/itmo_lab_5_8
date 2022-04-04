@@ -23,8 +23,11 @@ import com.dmtri.common.commands.SumOfDistanceCommand;
 import com.dmtri.common.commands.UpdateCommand;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
+import com.dmtri.common.exceptions.InvalidRequestException;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithException;
 import com.dmtri.common.userio.BasicUserIO;
 
 public class CommandHandler {
@@ -51,7 +54,7 @@ public class CommandHandler {
         return ch;
     }
 
-    public Request handle(String commandString, BasicUserIO io) throws CommandNotFoundException, CommandArgumentException {
+    public Request handleString(String commandString, BasicUserIO io) throws CommandNotFoundException, CommandArgumentException {
         String[] commandArgs = commandString.trim().split("\\s+");
 
         AbstractCommand command = commands.get(commandArgs[0]);
@@ -66,6 +69,18 @@ public class CommandHandler {
         }
         Request request = new Request(command.getName(), body);
         return request;
+    }
+
+    public Response handleRequest(Request request) {
+        if (commands.get(request.getCommandName()) != null) {
+            try {
+                return commands.get(request.getCommandName()).execute(request);
+            } catch (InvalidRequestException e) {
+                return new ResponseWithException(e);
+            }
+        }
+
+        return new ResponseWithException(new CommandNotFoundException(request.getCommandName()));
     }
 
     public void addCommand(AbstractCommand command) {

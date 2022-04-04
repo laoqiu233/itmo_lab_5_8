@@ -132,7 +132,7 @@ public class Route implements Comparable<Route>, Serializable {
      *  generated automatically, NOTNULL.</li>
      *  <li>from - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
      *  <li>to - Any {@link com.dmtri.common.models.Location} object, NOTNULL.</li>
-     *  <li>distance - Any double value greater than 1, NOTNULL</li>
+     *  <li>distance - Any double value greater than 1</li>
      * </ul>
      */
     public static class Validator implements AbstractValidator<Route> {
