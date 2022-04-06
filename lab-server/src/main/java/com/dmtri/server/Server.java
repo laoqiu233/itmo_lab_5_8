@@ -3,25 +3,37 @@ package com.dmtri.server;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.collectionmanagers.FileCollectionManager;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
-import com.dmtri.common.util.TerminalColors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 public final class Server {
+    private static final Logger LOGGER = LogManager.getLogger(Server.class);
+
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         String fileName = System.getenv("FILENAME");
+        int port;
 
         if (fileName == null) {
-            System.err.println(TerminalColors.colorString("ERROR: The collection file should be specified in environment variables with the name FILENAME", TerminalColors.RED));
+            LOGGER.fatal("ERROR: The collection file should be specified in environment variables with the name FILENAME");
+            System.exit(1);
+            return;
+        }
+
+        try {
+            port = Integer.valueOf(args[0]);
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+            LOGGER.fatal("Invalid port provided. The port number should be entered as the first argument", e);
+            System.exit(1);
             return;
         }
 
@@ -33,16 +45,14 @@ public final class Server {
             SAXException
             | IOException
             | IncorrectFileStructureException
-            | ParserConfigurationException
-            | TransformerException e
+            | ParserConfigurationException e
         ) {
-            System.out.println(TerminalColors.colorString("Failed to parse provided file \"" + fileName + "\"", TerminalColors.RED));
-            System.out.println(e);
+            LOGGER.fatal("Failed to parse provided file \"" + fileName + "\"", e);
             System.exit(1);
             return;
         }
 
-        ServerInstance server = new ServerInstance(Integer.valueOf(args[0]), cm);
+        ServerInstance server = new ServerInstance(port, cm);
         server.run();
     }
 }

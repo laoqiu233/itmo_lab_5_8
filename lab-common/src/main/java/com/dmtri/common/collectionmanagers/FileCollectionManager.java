@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.dmtri.common.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
@@ -22,6 +24,7 @@ import com.dmtri.common.models.Route;
  * data storage
  */
 public class FileCollectionManager implements SaveableCollectionManager {
+    private static final Logger LOGGER = LogManager.getLogger(FileCollectionManager.class);
     private List<Route> collection;
     private long nextId;
     private String fileName;
@@ -34,7 +37,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    public FileCollectionManager(String fileName) throws IncorrectFileStructureException, IOException, SAXException, ParserConfigurationException, TransformerException {
+    public FileCollectionManager(String fileName) throws IncorrectFileStructureException, IOException, SAXException, ParserConfigurationException {
         XMLCollectionParser.ParsedCollection parsed = XMLCollectionParser.parse(fileName);
 
         nextId = parsed.getNextId();
@@ -104,8 +107,7 @@ public class FileCollectionManager implements SaveableCollectionManager {
             | TransformerException e
         ) {
             // Just log error
-            System.out.println("Failed to write collection to file.");
-            System.out.println(e);
+            LOGGER.error("Failed to write collection to file.", e);
         }
     }
 }

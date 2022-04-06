@@ -11,7 +11,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.exceptions.InvalidFieldException;
@@ -20,9 +19,13 @@ import com.dmtri.common.models.Route;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 public final class XMLCollectionParser {
+    private static final Logger LOGGER = LogManager.getLogger(XMLCollectionParser.class);
+
     private XMLCollectionParser() {
     }
 
@@ -46,7 +49,7 @@ public final class XMLCollectionParser {
 
             return doc;
         } catch (SAXException | FileNotFoundException e) {
-            System.out.println("The file is in a invalid format or does not exist, original file will be rewritten when saved.");
+            LOGGER.warn("The file is in a invalid format or does not exist, original file will be rewritten when saved.");
             return db.newDocument();
         }
     }
@@ -82,17 +85,11 @@ public final class XMLCollectionParser {
             }
             collection.add(route);
         } catch (InvalidFieldException e) {
-            System.out.println("Caught exception while parsing route: ");
-            XMLCollectionWriter.writeElementToConsole(el);
-            System.out.println(e);
-            if (e.getCause() != null) {
-                System.out.println(e.getCause());
-            }
-            System.out.println("Skipping invalid route...");
+            LOGGER.warn("Caught exception while parsing route, skipping invalid route...", e);
         }
     }
 
-    public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException, TransformerException, SAXException  {
+    public static ParsedCollection parse(String fileName) throws IncorrectFileStructureException, IOException, ParserConfigurationException  {
         // Open document and get root
         Element root = getDocumentRoot(openDocument(fileName));
 
@@ -103,7 +100,7 @@ public final class XMLCollectionParser {
             throw new IncorrectFileStructureException("Invalid value for nextId", e);
         }
 
-        System.out.println("Parsing routes in file " + fileName);
+        LOGGER.info("Parsing routes in file " + fileName);
         NodeList nodes = root.getElementsByTagName("Route");
         List<Route> collection = new LinkedList<Route>();
 
@@ -112,7 +109,7 @@ public final class XMLCollectionParser {
             handleRouteElement(el, collection);
         }
 
-        System.out.println("Parsing finished. Total routes retrieved from file: " + collection.size());
+        LOGGER.info("Parsing finished. Total routes retrieved from file: " + collection.size());
         parsed.setCollection(collection);
         return parsed;
     }

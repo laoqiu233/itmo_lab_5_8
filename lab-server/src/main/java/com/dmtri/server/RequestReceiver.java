@@ -12,8 +12,12 @@ import java.nio.channels.DatagramChannel;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RequestReceiver {
     private static final int BUFFERSIZE = 2048;
+    private static final Logger LOGGER = LogManager.getLogger(RequestReceiver.class);
     private DatagramChannel dc;
 
     public RequestReceiver(DatagramChannel dc) {
@@ -25,7 +29,7 @@ public class RequestReceiver {
         SocketAddress sender = dc.receive(buffer);
 
         if (sender != null) {
-            System.out.println("Received packet from " + sender);
+            LOGGER.info("Received packet from " + sender);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array());
             ObjectInputStream ois = new ObjectInputStream(bais);
@@ -35,14 +39,12 @@ public class RequestReceiver {
 
                 if (obj instanceof Request) {
                     Request request = (Request) obj;
-                    System.out.println("Execute command " + request.getCommandName());
                     return new IncomingRequest(request, sender);
                 }
 
-                System.out.println("Received invalid request object");
+                LOGGER.warn("Received invalid request object");
             } catch (ClassNotFoundException e) {
-                System.out.println("Received invalid request object");
-                System.out.println(e);
+                LOGGER.warn("Received invalid request object", e);
             }
         }
 
@@ -64,7 +66,8 @@ public class RequestReceiver {
 
             oos.writeObject(response);
 
-            RequestReceiver.this.dc.send(ByteBuffer.wrap(baos.toByteArray()), sender);
+            dc.send(ByteBuffer.wrap(baos.toByteArray()), sender);
+            LOGGER.trace("Responded to client " + sender + " on command \"" + request.getCommandName() + '"');
         }
 
         public Request getRequest() {

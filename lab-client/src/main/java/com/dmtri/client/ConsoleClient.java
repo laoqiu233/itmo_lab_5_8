@@ -75,6 +75,7 @@ public class ConsoleClient {
             try {
                 Request request = ch.handleString(input, io);
 
+                // If the command is not only client-side
                 if (request != null) {
                     Response response = waitForResponse(channel.sendRequest(request));
                     if (response != null) {
