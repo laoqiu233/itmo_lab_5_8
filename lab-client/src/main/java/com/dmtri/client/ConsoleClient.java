@@ -21,14 +21,12 @@ public class ConsoleClient {
     private CommandHandler ch;
     private String inputPrefix = "> ";
     private RequestSender channel;
+    private InetSocketAddress addr;
 
-    public ConsoleClient(String address, int port) throws IOException {
+    public ConsoleClient(InetSocketAddress addr) throws IOException {
         this.io = new BasicUserIO();
         this.ch = CommandHandler.standardCommandHandler(null);
-        DatagramChannel dc = DatagramChannel.open();
-        dc.connect(new InetSocketAddress(address, port));
-        dc.configureBlocking(false);
-        channel = new RequestSender(dc);
+        this.addr = addr;
     }
 
     private void writeTrace(Exception e) {
@@ -108,7 +106,23 @@ public class ConsoleClient {
         }
     }
 
-    public void run() {
-        inputCycle();
+    public void run() throws IOException {
+        try (DatagramChannel dc = DatagramChannel.open()) {
+            dc.connect(addr);
+            dc.configureBlocking(false);
+            channel = new RequestSender(dc);
+            // Test the connection
+            RequestSender.SentRequest sent = channel.sendRequest(new Request("__HEALTH_CHECK__", null));
+            Response resp = waitForResponse(sent);
+
+            if (resp != null) {
+                io.writeln(resp.getMessage());
+            } else {
+                io.writeln("Connection failed");
+                return;
+            }
+
+            inputCycle();
+        }
     }
 }

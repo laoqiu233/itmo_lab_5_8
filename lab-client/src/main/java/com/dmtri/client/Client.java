@@ -1,6 +1,7 @@
 package com.dmtri.client;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import com.dmtri.common.util.TerminalColors;
 
@@ -11,7 +12,8 @@ public final class Client {
 
     public static void main(String[] args) {
         try {
-            ConsoleClient console = new ConsoleClient(args[0], Integer.valueOf(args[1]));
+            InetSocketAddress addr = new InetSocketAddress(args[0], Integer.valueOf(args[1]));
+            ConsoleClient console = new ConsoleClient(addr);
             console.run();
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             System.out.println(
