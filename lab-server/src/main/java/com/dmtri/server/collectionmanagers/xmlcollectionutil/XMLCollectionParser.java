@@ -19,12 +19,12 @@ import com.dmtri.common.models.Route;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public final class XMLCollectionParser {
-    private static final Logger LOGGER = LogManager.getLogger(XMLCollectionParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLCollectionParser.class);
 
     private XMLCollectionParser() {
     }

@@ -16,11 +16,11 @@ import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 import com.dmtri.server.collectionmanagers.SaveableCollectionManager;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerInstance {
-    private static final Logger LOGGER = LogManager.getLogger(ServerInstance.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerInstance.class);
     private CommandHandler ch;
     private CollectionManager cm;
     private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

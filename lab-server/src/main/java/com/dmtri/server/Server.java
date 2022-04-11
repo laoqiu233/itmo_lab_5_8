@@ -8,12 +8,12 @@ import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.server.collectionmanagers.FileCollectionManager;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 public final class Server {
-    private static final Logger LOGGER = LogManager.getLogger(Server.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private Server() {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
@@ -24,7 +24,7 @@ public final class Server {
         int port;
 
         if (fileName == null) {
-            LOGGER.fatal("ERROR: The collection file should be specified in environment variables with the name FILENAME");
+            LOGGER.error("ERROR: The collection file should be specified in environment variables with the name FILENAME");
             System.exit(1);
             return;
         }
@@ -32,7 +32,7 @@ public final class Server {
         try {
             port = Integer.valueOf(args[0]);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            LOGGER.fatal("Invalid port provided. The port number should be entered as the first argument", e);
+            LOGGER.error("Invalid port provided. The port number should be entered as the first argument", e);
             System.exit(1);
             return;
         }
@@ -47,7 +47,7 @@ public final class Server {
             | IncorrectFileStructureException
             | ParserConfigurationException e
         ) {
-            LOGGER.fatal("Failed to parse provided file \"" + fileName + "\"", e);
+            LOGGER.error("Failed to parse provided file \"" + fileName + "\"", e);
             System.exit(1);
             return;
         }
