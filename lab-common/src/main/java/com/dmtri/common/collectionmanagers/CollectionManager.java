@@ -9,6 +9,8 @@ public interface CollectionManager {
     Route getItemById(long id);
     long add(Route route);
     boolean update(Route route);
+    double sumOfDistances();
+    List<Double> getUniqueDistances();
     void remove(long id);
     int removeIf(Predicate<? super Route> predicate);
     void clear();

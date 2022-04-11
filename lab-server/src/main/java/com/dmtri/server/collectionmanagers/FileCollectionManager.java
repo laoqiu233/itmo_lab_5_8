@@ -110,4 +110,22 @@ public class FileCollectionManager implements SaveableCollectionManager {
             LOGGER.error("Failed to write collection to file.", e);
         }
     }
+
+    @Override
+    public double sumOfDistances() {
+        return collection.stream()
+                        .filter(r -> r.getDistance() != null)
+                        .map(r -> r.getDistance())
+                        .reduce((a, b) -> a + b)
+                        .orElse(0d);
+    }
+
+    @Override
+    public List<Double> getUniqueDistances() {
+        return collection.stream()
+            .filter(x -> x.getDistance() != null)
+            .map(x -> x.getDistance())
+            .distinct()
+            .collect(Collectors.toList());
+    }
 }

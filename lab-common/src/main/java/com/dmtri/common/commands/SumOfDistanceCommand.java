@@ -21,12 +21,6 @@ public class SumOfDistanceCommand extends AbstractCommand {
 
     @Override
     public Response execute(Request request) {
-        Double res = col.getCollection().stream()
-                                        .filter(r -> r.getDistance() != null)
-                                        .map(r -> r.getDistance())
-                                        .reduce((a, b) -> a + b)
-                                        .orElse(0d);
-
-        return new Response("Sum of distances: " + res);
+        return new Response("Sum of distances: " + col.sumOfDistances());
     }
 }

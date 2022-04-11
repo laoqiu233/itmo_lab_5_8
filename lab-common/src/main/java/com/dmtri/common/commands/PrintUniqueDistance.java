@@ -1,8 +1,5 @@
 package com.dmtri.common.commands;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.InvalidRequestException;
 import com.dmtri.common.network.Request;
@@ -25,15 +22,9 @@ public class PrintUniqueDistance extends AbstractCommand {
 
     @Override
     public Response execute(Request request) throws InvalidRequestException {
-        List<Double> distances = col.getCollection().stream()
-                                  .filter(x -> x.getDistance() != null)
-                                  .map(x -> x.getDistance())
-                                  .distinct()
-                                  .collect(Collectors.toList());
-
         StringBuilder sb = new StringBuilder();
 
-        for (Double distance : distances) {
+        for (Double distance : col.getUniqueDistances()) {
             sb.append(distance.toString() + '\n');
         }
 
