@@ -19,7 +19,7 @@ public final class Server {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
         String fileName = System.getenv("FILENAME");
         int port;
 
@@ -52,7 +52,7 @@ public final class Server {
             return;
         }
 
-        ServerInstance server = new ServerInstance(port, cm);
-        server.run();
+        ServerInstance server = new ServerInstance(cm);
+        server.run(port);
     }
 }

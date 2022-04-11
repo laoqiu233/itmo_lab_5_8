@@ -2,11 +2,12 @@ package com.dmtri.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
+import java.nio.channels.SocketChannel;
 
 import com.dmtri.common.CommandHandler;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
+import com.dmtri.common.network.ObjectSocketWrapper;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithException;
@@ -20,7 +21,7 @@ public class ConsoleClient {
     private BasicUserIO io;
     private CommandHandler ch;
     private String inputPrefix = "> ";
-    private RequestSender channel;
+    private ObjectSocketWrapper remote;
     private InetSocketAddress addr;
 
     public ConsoleClient(InetSocketAddress addr) throws IOException {
@@ -43,17 +44,19 @@ public class ConsoleClient {
         );
     }
 
-    private Response waitForResponse(RequestSender.SentRequest request) throws IOException {
+    private Response waitForResponse() throws IOException {
         int seconds = 0;
         long start = System.currentTimeMillis();
 
         while (seconds < TIMEOUT) {
-            if (request.checkForResponse()) {
-                if (request.isInvalidResponse()) {
-                    io.writeln("Received an invalid response");
-                    return null;
+            if (remote.checkForMessage()) {
+                Object received = remote.getPayload();
+
+                if (received != null && received instanceof Response) {
+                    return (Response) received;
                 } else {
-                    return request.getResponse();
+                    io.writeln("Received invalid response from server");
+                    break;
                 }
             }
 
@@ -67,6 +70,22 @@ public class ConsoleClient {
         return null;
     }
 
+    private void handleResponse(Response response) {
+        io.writeln(response.getMessage());
+
+        if (response instanceof ResponseWithRoutes) {
+            ResponseWithRoutes rwr = (ResponseWithRoutes) response;
+
+            for (int i = 0; i < rwr.getRoutesCount(); i++) {
+                io.writeln(rwr.getRoute(i));
+            }
+        } else if (response instanceof ResponseWithException) {
+            ResponseWithException rwe = (ResponseWithException) response;
+
+            writeTrace(rwe.getException());
+        }
+    }
+
     private void inputCycle() {
         String input;
         while ((input = io.read(inputPrefix)) != null) {
@@ -75,24 +94,17 @@ public class ConsoleClient {
 
                 // If the command is not only client-side
                 if (request != null) {
-                    Response response = waitForResponse(channel.sendRequest(request));
+                    remote.sendMessage(request);
+                    // Block until received response or timed out
+                    Response response = waitForResponse();
+
                     if (response != null) {
-                        io.writeln(response.getMessage());
-
-                        if (response instanceof ResponseWithRoutes) {
-                            ResponseWithRoutes rwr = (ResponseWithRoutes) response;
-
-                            for (int i = 0; i < rwr.getRoutesCount(); i++) {
-                                io.writeln(rwr.getRoute(i));
-                            }
-                        } else if (response instanceof ResponseWithException) {
-                            ResponseWithException rwe = (ResponseWithException) response;
-
-                            writeTrace(rwe.getException());
-                        }
+                        handleResponse(response);
                     } else {
                         io.writeln("Request failed");
                     }
+
+                    remote.clearInBuffer();
                 }
             } catch (
                 CommandNotFoundException
@@ -102,25 +114,16 @@ public class ConsoleClient {
             } catch (IOException e) {
                 io.writeln("Caught exception when trying to send request");
                 writeTrace(e);
+                io.writeln("Stopping...");
             }
         }
     }
 
     public void run() throws IOException {
-        try (DatagramChannel dc = DatagramChannel.open()) {
-            dc.connect(addr);
-            dc.configureBlocking(false);
-            channel = new RequestSender(dc);
-            // Test the connection
-            RequestSender.SentRequest sent = channel.sendRequest(new Request("__HEALTH_CHECK__", null));
-            Response resp = waitForResponse(sent);
-
-            if (resp != null) {
-                io.writeln(resp.getMessage());
-            } else {
-                io.writeln("Connection failed");
-                return;
-            }
+        try (SocketChannel socket = SocketChannel.open()) {
+            socket.connect(addr);
+            socket.configureBlocking(false);
+            remote = new ObjectSocketWrapper(socket);
 
             inputCycle();
         }

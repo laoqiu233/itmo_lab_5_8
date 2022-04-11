@@ -2,7 +2,6 @@ package com.dmtri.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-
 import com.dmtri.common.util.TerminalColors;
 
 public final class Client {
