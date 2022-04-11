@@ -115,6 +115,7 @@ public class ConsoleClient {
                 io.writeln("Caught exception when trying to send request");
                 writeTrace(e);
                 io.writeln("Stopping...");
+                return;
             }
         }
     }
