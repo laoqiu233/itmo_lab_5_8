@@ -1,4 +1,4 @@
-package com.dmtri.common.collectionmanagers.xmlcollectionutil;
+package com.dmtri.server.collectionmanagers.xmlcollectionutil;
 
 import com.dmtri.common.models.Coordinates;
 import com.dmtri.common.models.Location;

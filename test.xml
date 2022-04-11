@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<routes nextId="4">
+<routes nextId="6">
     <Route id="1">
         <name>Trans-Siberian Railway</name>
-        <distance>9289.0</distance>
         <creationDate>1904-06-21</creationDate>
         <from>
             <coordinates x="100" y="1000.5" z="20"/>
@@ -12,10 +11,10 @@
             <coordinates x="1000" y="700.35" z="20"/>
             <name>Vladivostok</name>
         </to>
+        <distance>9289.0</distance>
     </Route>
     <Route id="2">
         <name>Saint Petersburg - Moscow railway</name>
-        <distance>649.7</distance>
         <creationDate>1904-06-21</creationDate>
         <from>
             <coordinates x="100" y="1000.5" z="20"/>
@@ -25,10 +24,10 @@
             <coordinates x="80" y="1200.35" z="20"/>
             <name>Vladivostok</name>
         </to>
+        <distance>649.7</distance>
     </Route>
     <Route id="3">
         <name>Khabarovsk-Komsomolsk Railway</name>
-        <distance>400.5</distance>
         <creationDate>2003-10-15</creationDate>
         <from>
             <coordinates x="100" y="1000.5" z="20"/>
@@ -38,5 +37,19 @@
             <coordinates x="1000" y="700.35" z="20"/>
             <name>Komsomolsk</name>
         </to>
+        <distance>400.5</distance>
+    </Route>
+    <Route id="5">
+        <name>test2</name>
+        <creationDate>2022-04-11</creationDate>
+        <from>
+            <coordinates y="123.0"/>
+            <name>a</name>
+        </from>
+        <to>
+            <coordinates y="123.0"/>
+            <name>b</name>
+        </to>
+        <distance>2.0</distance>
     </Route>
 </routes>

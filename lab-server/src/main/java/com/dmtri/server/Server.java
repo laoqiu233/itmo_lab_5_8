@@ -5,8 +5,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import com.dmtri.common.collectionmanagers.CollectionManager;
-import com.dmtri.common.collectionmanagers.FileCollectionManager;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
+import com.dmtri.server.collectionmanagers.FileCollectionManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

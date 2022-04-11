@@ -1,4 +1,4 @@
-package com.dmtri.common.collectionmanagers.xmlcollectionutil;
+package com.dmtri.server.collectionmanagers.xmlcollectionutil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;

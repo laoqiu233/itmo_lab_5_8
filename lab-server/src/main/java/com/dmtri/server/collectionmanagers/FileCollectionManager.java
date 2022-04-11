@@ -1,4 +1,4 @@
-package com.dmtri.common.collectionmanagers;
+package com.dmtri.server.collectionmanagers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,10 +14,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import com.dmtri.common.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
-import com.dmtri.common.collectionmanagers.xmlcollectionutil.XMLCollectionWriter;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.common.models.Route;
+import com.dmtri.server.collectionmanagers.xmlcollectionutil.XMLCollectionParser;
+import com.dmtri.server.collectionmanagers.xmlcollectionutil.XMLCollectionWriter;
 
 /**
  * Collection manager which uses an XML file for
