@@ -7,7 +7,7 @@ import java.nio.channels.SocketChannel;
 import com.dmtri.common.CommandHandler;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
-import com.dmtri.common.network.ObjectSocketWrapper;
+import com.dmtri.common.network.ObjectSocketChannelWrapper;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithException;
@@ -21,7 +21,7 @@ public class ConsoleClient {
     private BasicUserIO io;
     private CommandHandler ch;
     private String inputPrefix = "> ";
-    private ObjectSocketWrapper remote;
+    private ObjectSocketChannelWrapper remote;
     private InetSocketAddress addr;
 
     public ConsoleClient(InetSocketAddress addr) throws IOException {
@@ -124,7 +124,7 @@ public class ConsoleClient {
         try (SocketChannel socket = SocketChannel.open()) {
             socket.connect(addr);
             socket.configureBlocking(false);
-            remote = new ObjectSocketWrapper(socket);
+            remote = new ObjectSocketChannelWrapper(socket);
 
             inputCycle();
         }

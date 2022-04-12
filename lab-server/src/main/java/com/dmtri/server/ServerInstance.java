@@ -3,9 +3,9 @@ package com.dmtri.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class ServerInstance {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInstance.class);
+    private static final int SOCKET_TIMEOUT = 10;
     private CommandHandler ch;
     private CollectionManager cm;
     private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -66,18 +67,18 @@ public class ServerInstance {
 
                     if (received != null && received instanceof Request) {
                         Request request = (Request) received;
-                        LOGGER.info("Request from " + client.getSocket().getRemoteAddress() + " for command \"" + request.getCommandName() + '"');
+                        LOGGER.info("Request from " + client.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
                         Response response = ch.handleRequest(request);
                         client.sendMessage(response);
-                        LOGGER.info("Sent response for " + client.getSocket().getRemoteAddress());
+                        LOGGER.info("Sent response for " + client.getSocket().getRemoteSocketAddress());
                     } else {
-                        LOGGER.warn("Received invalid request from " + client.getSocket().getRemoteAddress());
+                        LOGGER.warn("Received invalid request from " + client.getSocket().getRemoteSocketAddress());
                     }
 
                     client.clearInBuffer();
                 }
             } catch (IOException e) {
-                LOGGER.info("Client  " + client.getSocket().getRemoteAddress() + " has been disconnected");
+                LOGGER.info("Client  " + client.getSocket().getRemoteSocketAddress() + " has been disconnected");
                 client.getSocket().close();
                 it.remove();
             }
@@ -85,9 +86,8 @@ public class ServerInstance {
     }
 
     public void run(int port) throws IOException {
-        try (ServerSocketChannel channel = ServerSocketChannel.open();) {
-            channel.bind(new InetSocketAddress(port));
-            channel.configureBlocking(false);
+        try (ServerSocket socket = new ServerSocket(port)) {
+            socket.setSoTimeout(SOCKET_TIMEOUT);
 
             LOGGER.info("Server is listening on port " + port);
 
@@ -98,11 +98,15 @@ public class ServerInstance {
                 }
 
                 // Accept pending connections
-                SocketChannel newClient = null;
-                while ((newClient = channel.accept()) != null) {
-                    newClient.configureBlocking(false);
-                    clients.add(new ObjectSocketWrapper(newClient));
-                    LOGGER.info("Received connection from " + newClient.getRemoteAddress());
+                try {
+                    while (true) {
+                        Socket newClient = socket.accept();
+                        newClient.setSoTimeout(SOCKET_TIMEOUT);
+                        LOGGER.info("Received connection from " + newClient.getRemoteSocketAddress());
+                        clients.add(new ObjectSocketWrapper(newClient));
+                    }
+                } catch (SocketTimeoutException e) {
+                    LOGGER.trace("No more pending connections");
                 }
 
                 // Handle new requests
