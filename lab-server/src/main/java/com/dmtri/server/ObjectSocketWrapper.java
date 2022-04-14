@@ -1,4 +1,4 @@
-package com.dmtri.common.network;
+package com.dmtri.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+
+import com.dmtri.common.network.ObjectEncoder;
 
 public class ObjectSocketWrapper {
     private final Socket socket;
@@ -21,7 +23,7 @@ public class ObjectSocketWrapper {
     }
 
     public void sendMessage(Object object) throws IOException {
-        byte[] msg = ObjectSocketChannelWrapper.encodeObject(object).array();
+        byte[] msg = ObjectEncoder.encodeObject(object).array();
 
         socket.getOutputStream().write(msg);
     }

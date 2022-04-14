@@ -7,7 +7,6 @@ import java.nio.channels.SocketChannel;
 import com.dmtri.common.CommandHandler;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
-import com.dmtri.common.network.ObjectSocketChannelWrapper;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithException;
