@@ -9,14 +9,17 @@ import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.CommandNotFoundException;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithAuthCredentials;
 import com.dmtri.common.network.ResponseWithException;
 import com.dmtri.common.network.ResponseWithRoutes;
 import com.dmtri.common.userio.BasicUserIO;
+import com.dmtri.common.usermanagers.AuthCredentials;
 import com.dmtri.common.util.TerminalColors;
 
 public class ConsoleClient {
     private static final int TIMEOUT = 10;
     private static final int MILLIS_IN_SECONDS = 1000;
+    private AuthCredentials auth = null;
     private BasicUserIO io;
     private CommandHandler ch;
     private String inputPrefix = "> ";
@@ -25,7 +28,7 @@ public class ConsoleClient {
 
     public ConsoleClient(InetSocketAddress addr) throws IOException {
         this.io = new BasicUserIO();
-        this.ch = CommandHandler.standardCommandHandler(null);
+        this.ch = CommandHandler.standardCommandHandler(null, null);
         this.addr = addr;
     }
 
@@ -78,6 +81,10 @@ public class ConsoleClient {
             for (int i = 0; i < rwr.getRoutesCount(); i++) {
                 io.writeln(rwr.getRoute(i));
             }
+        } else if (response instanceof ResponseWithAuthCredentials) {
+            ResponseWithAuthCredentials rwa = (ResponseWithAuthCredentials) response;
+            auth = rwa.getAuthCredentials();
+            inputPrefix = auth.getLogin() + " > ";
         } else if (response instanceof ResponseWithException) {
             ResponseWithException rwe = (ResponseWithException) response;
 
@@ -89,7 +96,7 @@ public class ConsoleClient {
         String input;
         while ((input = io.read(inputPrefix)) != null) {
             try {
-                Request request = ch.handleString(input, io);
+                Request request = ch.handleString(input, io, auth);
 
                 // If the command is not only client-side
                 if (request != null) {

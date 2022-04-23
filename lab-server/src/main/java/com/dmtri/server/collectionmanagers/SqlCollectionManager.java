@@ -36,7 +36,8 @@ public class SqlCollectionManager implements CollectionManager {
                                                    + "   to_coordinates_x bigint,"
                                                    + "   to_coordinates_y double precision NOT NULL,"
                                                    + "   to_coordinates_z bigint,"
-                                                   + "   distance double precision)";
+                                                   + "   distance double precision,"
+                                                   + "   owner_id integer NOT NULL)";
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlCollectionManager.class);
     private final Connection conn;
     private final List<Route> collection = new LinkedList<>();
@@ -68,7 +69,7 @@ public class SqlCollectionManager implements CollectionManager {
 
     private Route mapRowToRoute(ResultSet res) throws SQLException {
         try {
-            return new Route(
+            Route route = new Route(
                 res.getLong("id"),
                 res.getString("name"),
                 res.getTimestamp("creation_date").toLocalDateTime().toLocalDate(),
@@ -90,14 +91,17 @@ public class SqlCollectionManager implements CollectionManager {
                 ),
                 res.getObject("distance") == null ? null : res.getDouble("distance")
             );
+
+            route.setOwnerId(res.getLong("owned_id"));
+
+            return route;
         } catch (InvalidFieldException e) {
             return null;
         }
     }
 
     private void prepareRouteStatement(PreparedStatement s, Route route, int paramOffset) throws SQLException {
-        // Style check workaround >:(
-        final int paramCount = 11;
+        final int paramCount = 12; // Style check workaround >:(
         final int[] paramOffsets = new int[paramCount];
         for (int i = 1; i <= paramCount; i++) {
             paramOffsets[i - 1] = i;
@@ -134,6 +138,7 @@ public class SqlCollectionManager implements CollectionManager {
         } else {
             s.setNull(paramOffset + paramOffsets[i++], Types.DOUBLE);
         }
+        s.setLong(paramOffset + paramOffsets[i++], route.getOwnerId());
     }
 
     @Override
@@ -159,7 +164,7 @@ public class SqlCollectionManager implements CollectionManager {
     @Override
     public long add(Route route) {
         String query = "INSERT INTO routes VALUES ("
-                     + "    default,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+                     + "    default,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
 
         try (PreparedStatement s = conn.prepareStatement(query)) {
             lock.lock();

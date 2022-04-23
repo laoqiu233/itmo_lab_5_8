@@ -10,7 +10,7 @@ import com.dmtri.common.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
 public class RemoveAllByDistanceCommand extends AbstractCommand {
-    private CollectionManager col;
+    private final CollectionManager col;
 
     public RemoveAllByDistanceCommand(CollectionManager col) {
         super("remove_all_by_distance");
@@ -39,10 +39,10 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) throws InvalidRequestException {
+    public Response execute(Request request, Long userId) throws InvalidRequestException {
         try {
             Double distance = Double.parseDouble(request.getBody().getArg(0));
-            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance)));
+            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance) && x.getOwnerId() == userId));
             return new Response("Removed " + res + " items");
         } catch (NumberFormatException e) {
             throw new InvalidRequestException(new CommandArgumentException("Invalid distance entered.", e));

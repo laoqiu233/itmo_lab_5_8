@@ -23,7 +23,7 @@ public class HeadCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) throws InvalidRequestException {
+    public Response execute(Request request, Long userId) throws InvalidRequestException {
         if (col.getCollection().isEmpty()) {
             return new Response("The collection is empty");
         }

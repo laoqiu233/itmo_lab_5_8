@@ -48,14 +48,14 @@ public class RemoveGreaterCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) throws InvalidRequestException {
+    public Response execute(Request request, Long userId) throws InvalidRequestException {
         if (request.getBody() == null || !(request.getBody() instanceof RequestBodyWithRoute)) {
             throw new InvalidRequestException("Request should have a route attached");
         }
 
         Route temp = ((RequestBodyWithRoute) request.getBody()).getRoute();
 
-        int res = col.removeIf(x -> x.compareTo(temp) > 0);
+        int res = col.removeIf(x -> x.compareTo(temp) > 0 && x.getOwnerId() == userId);
 
         return new Response("Removed " + res + " items");
     }

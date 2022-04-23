@@ -5,9 +5,12 @@ import java.util.NoSuchElementException;
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidRequestException;
+import com.dmtri.common.exceptions.UnauthorizedException;
+import com.dmtri.common.models.Route;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithException;
 import com.dmtri.common.userio.BasicUserIO;
 import com.dmtri.common.util.TerminalColors;
 
@@ -41,9 +44,18 @@ public class RemoveByIdCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) throws InvalidRequestException {
+    public Response execute(Request request, Long userId) throws InvalidRequestException {
         try {
-            col.remove(Long.valueOf(request.getBody().getArg(0)));
+            Route toRemove = col.getItemById(Long.valueOf(request.getBody().getArg(0)));
+            if (toRemove == null) {
+                throw new NoSuchElementException();
+            }
+
+            if (toRemove.getOwnerId() != userId) {
+                return new ResponseWithException(new UnauthorizedException());
+            }
+
+            col.remove(toRemove.getId());
             return new Response();
         } catch (NumberFormatException e) {
             throw new InvalidRequestException(new CommandArgumentException("Failed to convert " + request.getBody().getArg(0) + " to a number", e));

@@ -9,13 +9,24 @@ import com.dmtri.common.userio.BasicUserIO;
 
 public abstract class AbstractCommand {
     private final String name;
+    private final boolean requireAuth;
 
     public AbstractCommand(String name) {
         this.name = name;
+        requireAuth = true;
+    }
+
+    public AbstractCommand(String name, boolean requireAuth) {
+        this.name = name;
+        this.requireAuth = requireAuth;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean requiresAuth() {
+        return requireAuth;
     }
 
     public RequestBody packageBody(String[] args, BasicUserIO io) throws CommandArgumentException {
@@ -26,6 +37,6 @@ public abstract class AbstractCommand {
         return new RequestBody(args);
     }
 
-    public abstract Response execute(Request request) throws InvalidRequestException;
+    public abstract Response execute(Request request, Long userId) throws InvalidRequestException;
     public abstract String getUsage();
 }

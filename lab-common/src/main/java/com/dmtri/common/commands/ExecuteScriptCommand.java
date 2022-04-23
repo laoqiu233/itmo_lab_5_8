@@ -59,7 +59,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
         return null;
     }
 
-    public Response execute(Request request) {
+    public Response execute(Request request, Long userId) {
         throw new UnsupportedOperationException();
     }
 }

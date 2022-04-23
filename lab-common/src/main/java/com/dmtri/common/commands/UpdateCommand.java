@@ -46,12 +46,15 @@ public class UpdateCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) throws InvalidRequestException {
+    public Response execute(Request request, Long userId) throws InvalidRequestException {
         if (request.getBody() == null || !(request.getBody() instanceof RequestBodyWithRoute)) {
             throw new InvalidRequestException("Request should have a route attached");
         }
 
-        if (!col.update(((RequestBodyWithRoute) request.getBody()).getRoute())) {
+        Route route = ((RequestBodyWithRoute) request.getBody()).getRoute();
+        route.setOwnerId(userId);
+
+        if (!col.update(route)) {
             throw new InvalidRequestException(new CommandArgumentException("No item with specified id was found in collection"));
         }
         return new Response("Updated");

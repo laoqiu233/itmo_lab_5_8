@@ -13,6 +13,7 @@ public class Route implements Comparable<Route>, Serializable {
     private Location from; //Поле не может быть null
     private Location to; //Поле не может быть null
     private Double distance; //Значение поля должно быть больше 1
+    private Long ownerId = null;
 
     /**
      * Creates a route object and validates data using the {@link #validate()} method.
@@ -62,6 +63,14 @@ public class Route implements Comparable<Route>, Serializable {
         return to;
     }
 
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -77,6 +86,8 @@ public class Route implements Comparable<Route>, Serializable {
         sb.append(to.toString().replaceAll("\\n", "\n\t"));
         sb.append(",\n\tdistance=");
         sb.append(distance);
+        sb.append(",\n\towner=");
+        sb.append(ownerId);
         sb.append("\n}");
 
         return sb.toString();

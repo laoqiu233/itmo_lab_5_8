@@ -10,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.server.collectionmanagers.FileCollectionManager;
 import com.dmtri.server.collectionmanagers.SqlCollectionManager;
+import com.dmtri.server.usermanagers.BasicUserManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public final class Server {
             dbUser,
             dbPassword
         )) {
-            ServerInstance server = new ServerInstance(new SqlCollectionManager(conn));
+            ServerInstance server = new ServerInstance(new SqlCollectionManager(conn), new BasicUserManager());
             server.run(port);
         } catch (SQLException e) {
             LOGGER.error("Failed to establish postresql connection", e);
@@ -69,7 +70,7 @@ public final class Server {
 
     private static void startFileCollectionServer(int port, String fileName) {
         try {
-            ServerInstance server = new ServerInstance(new FileCollectionManager(fileName));
+            ServerInstance server = new ServerInstance(new FileCollectionManager(fileName), new BasicUserManager());
             server.run(port);
         } catch (
             SAXException

@@ -20,7 +20,7 @@ public class SumOfDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request) {
+    public Response execute(Request request, Long userId) {
         return new Response("Sum of distances: " + col.sumOfDistances());
     }
 }

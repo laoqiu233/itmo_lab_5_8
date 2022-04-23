@@ -18,6 +18,7 @@ import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithException;
+import com.dmtri.common.usermanagers.UserManager;
 import com.dmtri.server.collectionmanagers.SaveableCollectionManager;
 
 import org.slf4j.Logger;
@@ -31,10 +32,12 @@ public class ServerInstance {
     private CommandHandler ch;
     private CollectionManager cm;
     private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    private final UserManager users;
 
-    public ServerInstance(CollectionManager cm) throws IOException {
-        ch = CommandHandler.standardCommandHandler(cm);
+    public ServerInstance(CollectionManager cm, UserManager users) throws IOException {
+        ch = CommandHandler.standardCommandHandler(cm, users);
         this.cm = cm;
+        this.users = users;
     }
 
     private boolean acceptConsoleInput() throws IOException {
@@ -129,7 +132,7 @@ public class ServerInstance {
                             Request request = (Request) received;
                             LOGGER.info("Request from " + socket.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
                             try {
-                                Response response = requestHandlerPool.submit(() -> ch.handleRequest(request)).get();
+                                Response response = requestHandlerPool.submit(() -> ch.handleRequest(request, users)).get();
                                 responseSenderPool.submit(() -> {
                                     if (!socket.sendMessage(response)) {
                                         LOGGER.error("Failed to send message to client " + this.socket.getSocket().getRemoteSocketAddress());
