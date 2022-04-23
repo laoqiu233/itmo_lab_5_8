@@ -11,6 +11,7 @@ import com.dmtri.common.exceptions.IncorrectFileStructureException;
 import com.dmtri.server.collectionmanagers.FileCollectionManager;
 import com.dmtri.server.collectionmanagers.SqlCollectionManager;
 import com.dmtri.server.usermanagers.BasicUserManager;
+import com.dmtri.server.usermanagers.SqlUserManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,9 @@ public final class Server {
             dbUser,
             dbPassword
         )) {
-            ServerInstance server = new ServerInstance(new SqlCollectionManager(conn), new BasicUserManager());
+            // Create users table first
+            SqlUserManager users = new SqlUserManager(conn);
+            ServerInstance server = new ServerInstance(new SqlCollectionManager(conn), users);
             server.run(port);
         } catch (SQLException e) {
             LOGGER.error("Failed to establish postresql connection", e);

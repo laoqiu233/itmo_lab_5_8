@@ -37,7 +37,9 @@ public class SqlCollectionManager implements CollectionManager {
                                                    + "   to_coordinates_y double precision NOT NULL,"
                                                    + "   to_coordinates_z bigint,"
                                                    + "   distance double precision,"
-                                                   + "   owner_id integer NOT NULL)";
+                                                   + "   owner_id integer NOT NULL,"
+                                                   + "   CONSTRAINT fk_owner"
+                                                   + "      FOREIGN KEY(owner_id) REFERENCES users(id) ON DELETE CASCADE)";
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlCollectionManager.class);
     private final Connection conn;
     private final List<Route> collection = new LinkedList<>();
@@ -92,7 +94,7 @@ public class SqlCollectionManager implements CollectionManager {
                 res.getObject("distance") == null ? null : res.getDouble("distance")
             );
 
-            route.setOwnerId(res.getLong("owned_id"));
+            route.setOwnerId(res.getLong("owner_id"));
 
             return route;
         } catch (InvalidFieldException e) {
