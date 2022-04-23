@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import com.dmtri.server.collectionmanagers.xmlcollectionutil.XMLCollectionWriter
  */
 public class FileCollectionManager implements SaveableCollectionManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileCollectionManager.class);
+    private final Lock lock = new ReentrantLock();
     private List<Route> collection;
     private long nextId;
     private String fileName;
@@ -51,55 +54,86 @@ public class FileCollectionManager implements SaveableCollectionManager {
     }
 
     public Route getItemById(long id) {
-        return collection.stream()
-                         .filter(x -> x.getId() == id)
-                         .findFirst()
-                         .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
+        try {
+            lock.lock();
+            return collection.stream()
+                    .filter(x -> x.getId() == id)
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find item with id " + id));
+        } finally {
+            lock.unlock();
+        }
     }
 
     public long add(Route route) {
-        route.setId(nextId++);
-        collection.add(route);
-        return route.getId();
+        try {
+            lock.lock();
+            route.setId(nextId++);
+            collection.add(route);
+            return route.getId();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean update(Route route) {
-        if (!collection.removeIf(x -> x.getId() == route.getId())) {
-            return false;
-        }
+        try {
+            lock.lock();
+            if (!collection.removeIf(x -> x.getId() == route.getId())) {
+                return false;
+            }
 
-        collection.add(route);
-        return true;
+            collection.add(route);
+            return true;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void remove(long id) {
-        boolean res = collection.removeIf(x -> x.getId() == id);
+        try {
+            lock.lock();
+            boolean res = collection.removeIf(x -> x.getId() == id);
 
-        if (!res) {
-            throw new NoSuchElementException("Cannot find item with id " + id);
+            if (!res) {
+                throw new NoSuchElementException("Cannot find item with id " + id);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     public int removeIf(Predicate<? super Route> predicate) {
-        // Using streams instead of collection.removeIf
-        // Because I want to return number of elements removed
-        List<Long> toRemove = collection.stream()
-            .filter(predicate)
-            .map(x -> x.getId())
-            .collect(Collectors.toList());
+        try {
+            lock.lock();
+            // Using streams instead of collection.removeIf
+            // Because I want to return number of elements removed
+            List<Long> toRemove = collection.stream()
+                .filter(predicate)
+                .map(x -> x.getId())
+                .collect(Collectors.toList());
 
-        toRemove.forEach(this::remove);
+            toRemove.forEach(this::remove);
 
-        return toRemove.size();
+            return toRemove.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void clear() {
-        collection.clear();
-        nextId = 1;
+        try {
+            lock.lock();
+            collection.clear();
+            nextId = 1;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void save() throws FileNotFoundException {
         try {
+            lock.lock();
             XMLCollectionWriter.writeCollection(fileName, collection, nextId);
         } catch (
             ParserConfigurationException
@@ -108,24 +142,36 @@ public class FileCollectionManager implements SaveableCollectionManager {
         ) {
             // Just log error
             LOGGER.error("Failed to write collection to file.", e);
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public double sumOfDistances() {
-        return collection.stream()
+        try {
+            lock.lock();
+            return collection.stream()
                         .filter(r -> r.getDistance() != null)
                         .map(r -> r.getDistance())
                         .reduce((a, b) -> a + b)
                         .orElse(0d);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public List<Double> getUniqueDistances() {
-        return collection.stream()
-            .filter(x -> x.getDistance() != null)
-            .map(x -> x.getDistance())
-            .distinct()
-            .collect(Collectors.toList());
+        try {
+            lock.lock();
+            return collection.stream()
+                .filter(x -> x.getDistance() != null)
+                .map(x -> x.getDistance())
+                .distinct()
+                .collect(Collectors.toList());
+        } finally {
+            lock.unlock();
+        }
     }
 }

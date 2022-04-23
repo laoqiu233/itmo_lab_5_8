@@ -50,6 +50,10 @@ public class AddCommand extends AbstractCommand {
 
         long newId = col.add(body.getRoute());
 
-        return new Response("Route added, assigned id " + newId);
+        if (newId == 0) {
+            return new Response("Failed to add route");
+        } else {
+            return new Response("Route added, assigned id " + newId);
+        }
     }
 }

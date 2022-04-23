@@ -7,13 +7,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
 import com.dmtri.common.CommandHandler;
 import com.dmtri.common.collectionmanagers.CollectionManager;
-import com.dmtri.common.network.ObjectSocketWrapper;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithException;
 import com.dmtri.server.collectionmanagers.SaveableCollectionManager;
 
 import org.slf4j.Logger;
@@ -22,13 +26,13 @@ import org.slf4j.LoggerFactory;
 public class ServerInstance {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInstance.class);
     private static final int SOCKET_TIMEOUT = 10;
+    private final ForkJoinPool requestHandlerPool = new ForkJoinPool();
+    private final ExecutorService responseSenderPool = Executors.newCachedThreadPool();
     private CommandHandler ch;
     private CollectionManager cm;
     private final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    private final HashSet<ObjectSocketWrapper> clients;
 
     public ServerInstance(CollectionManager cm) throws IOException {
-        clients = new HashSet<>();
         ch = CommandHandler.standardCommandHandler(cm);
         this.cm = cm;
     }
@@ -56,36 +60,9 @@ public class ServerInstance {
         return false;
     }
 
-    public void handleRequests() throws IOException {
-        Iterator<ObjectSocketWrapper> it = clients.iterator();
-        while (it.hasNext()) {
-            ObjectSocketWrapper client = it.next();
-
-            try {
-                if (client.checkForMessage()) {
-                    Object received = client.getPayload();
-
-                    if (received != null && received instanceof Request) {
-                        Request request = (Request) received;
-                        LOGGER.info("Request from " + client.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
-                        Response response = ch.handleRequest(request);
-                        client.sendMessage(response);
-                        LOGGER.info("Sent response for " + client.getSocket().getRemoteSocketAddress());
-                    } else {
-                        LOGGER.warn("Received invalid request from " + client.getSocket().getRemoteSocketAddress());
-                    }
-
-                    client.clearInBuffer();
-                }
-            } catch (IOException e) {
-                LOGGER.info("Client  " + client.getSocket().getRemoteSocketAddress() + " has been disconnected");
-                client.getSocket().close();
-                it.remove();
-            }
-        }
-    }
-
     public void run(int port) throws IOException {
+        Set<ClientThread> clients = new HashSet<>();
+
         try (ServerSocket socket = new ServerSocket(port)) {
             socket.setSoTimeout(SOCKET_TIMEOUT);
 
@@ -94,6 +71,9 @@ public class ServerInstance {
             while (true) {
                 // Accept input from console and stop server if needed
                 if (acceptConsoleInput()) {
+                    clients.forEach(x -> x.stop());
+                    requestHandlerPool.shutdown();
+                    responseSenderPool.shutdown();
                     return;
                 }
 
@@ -103,14 +83,71 @@ public class ServerInstance {
                         Socket newClient = socket.accept();
                         newClient.setSoTimeout(SOCKET_TIMEOUT);
                         LOGGER.info("Received connection from " + newClient.getRemoteSocketAddress());
-                        clients.add(new ObjectSocketWrapper(newClient));
+                        ClientThread client = new ClientThread(new ObjectSocketWrapper(newClient));
+                        clients.add(client);
+                        client.start();
                     }
                 } catch (SocketTimeoutException e) {
                     LOGGER.trace("No more pending connections");
                 }
+            }
+        }
+    }
 
-                // Handle new requests
-                handleRequests();
+    private class ClientThread {
+        private final ObjectSocketWrapper socket;
+        private final Thread thread;
+        private boolean running = true;
+
+        ClientThread(ObjectSocketWrapper socket) {
+            this.socket = socket;
+            this.thread = new Thread(this::handleRequests);
+            this.thread.setName("Client" + this.socket.getSocket().getRemoteSocketAddress());
+        }
+
+        void start() {
+            thread.start();
+        }
+
+        void stop() {
+            running = false;
+            LOGGER.info("Client  " + socket.getSocket().getRemoteSocketAddress() + " has been disconnected");
+            try {
+                socket.getSocket().close();
+            } catch (IOException e) {
+                LOGGER.warn("Failed to close connection with client " + socket.getSocket().getRemoteSocketAddress(), e);
+            }
+        }
+
+        void handleRequests() {
+            while (running) {
+                try {
+                    if (socket.checkForMessage()) {
+                        Object received = socket.getPayload();
+
+                        if (received != null && received instanceof Request) {
+                            Request request = (Request) received;
+                            LOGGER.info("Request from " + socket.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
+                            try {
+                                Response response = requestHandlerPool.submit(() -> ch.handleRequest(request)).get();
+                                responseSenderPool.submit(() -> {
+                                    if (!socket.sendMessage(response)) {
+                                        LOGGER.error("Failed to send message to client " + this.socket.getSocket().getRemoteSocketAddress());
+                                    }
+                                });
+                            } catch (InterruptedException | ExecutionException e) {
+                                socket.sendMessage(new ResponseWithException(e));
+                            }
+                            LOGGER.info("Sent response for " + socket.getSocket().getRemoteSocketAddress());
+                        } else {
+                            LOGGER.warn("Received invalid request from " + socket.getSocket().getRemoteSocketAddress());
+                        }
+
+                        socket.clearInBuffer();
+                    }
+                } catch (IOException e) {
+                    stop();
+                }
             }
         }
     }

@@ -22,10 +22,15 @@ public class ObjectSocketWrapper {
         this.payloadBuffer = null;
     }
 
-    public void sendMessage(Object object) throws IOException {
-        byte[] msg = ObjectEncoder.encodeObject(object).array();
+    public boolean sendMessage(Object object) {
+        try {
+            byte[] msg = ObjectEncoder.encodeObject(object).array();
 
-        socket.getOutputStream().write(msg);
+            socket.getOutputStream().write(msg);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public boolean checkForMessage() throws IOException {
