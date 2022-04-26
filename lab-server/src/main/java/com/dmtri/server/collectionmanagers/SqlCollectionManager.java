@@ -45,9 +45,11 @@ public class SqlCollectionManager implements CollectionManager {
     private final List<Route> collection = new LinkedList<>();
     private final Lock lock = new ReentrantLock();
 
-    public SqlCollectionManager(Connection conn) throws SQLException {
+    public SqlCollectionManager(Connection conn) {
         this.conn = conn;
+    }
 
+    public void initTable() throws SQLException {
         // Setup tables
         try (Statement s = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             s.execute(CREATE_TABLE_QUERY);

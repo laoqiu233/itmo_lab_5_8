@@ -63,7 +63,9 @@ public final class Server {
         )) {
             // Create users table first
             SqlUserManager users = new SqlUserManager(conn);
-            ServerInstance server = new ServerInstance(new SqlCollectionManager(conn), users);
+            SqlCollectionManager col = new SqlCollectionManager(conn);
+            col.initTable();
+            ServerInstance server = new ServerInstance(col, users);
             server.run(port);
         } catch (SQLException e) {
             LOGGER.error("Failed to establish postresql connection", e);
