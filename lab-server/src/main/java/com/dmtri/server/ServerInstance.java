@@ -139,9 +139,15 @@ public class ServerInstance {
                             LOGGER.info("Request from " + socket.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
                             requestHandlerPool.submit(() -> {
                                 Response resp = ch.handleRequest(request, users);
-                                responseSenderPool.submit(() -> socket.sendMessage(resp));
+                                responseSenderPool.submit(() -> {
+                                    if (socket.sendMessage(resp)) {
+                                        LOGGER.info("Sent response for " + socket.getSocket().getRemoteSocketAddress());
+                                    } else {
+                                        LOGGER.error("Failed to send response for " + socket.getSocket().getRemoteSocketAddress());
+                                        stop();
+                                    }
+                                });
                             });
-                            LOGGER.info("Sent response for " + socket.getSocket().getRemoteSocketAddress());
                         } else {
                             LOGGER.warn("Received invalid request from " + socket.getSocket().getRemoteSocketAddress());
                         }
