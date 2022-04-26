@@ -72,6 +72,9 @@ public class ServerInstance {
             LOGGER.info("Server is listening on port " + port);
 
             while (true) {
+                // Remove dead threads
+                clients.removeIf(x -> !x.isRunning());
+
                 // Accept input from console and stop server if needed
                 if (acceptConsoleInput()) {
                     clients.forEach(x -> x.stop());
@@ -106,6 +109,10 @@ public class ServerInstance {
             this.socket = socket;
             this.thread = new Thread(this::handleRequests);
             this.thread.setName("Client" + this.socket.getSocket().getRemoteSocketAddress());
+        }
+
+        boolean isRunning() {
+            return running;
         }
 
         void start() {
