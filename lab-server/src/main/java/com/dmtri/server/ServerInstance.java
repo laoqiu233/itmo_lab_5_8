@@ -103,7 +103,7 @@ public class ServerInstance {
     private class ClientThread {
         private final ObjectSocketWrapper socket;
         private final Thread thread;
-        private boolean running = true;
+        private boolean running = false;
 
         ClientThread(ObjectSocketWrapper socket) {
             this.socket = socket;
@@ -117,6 +117,7 @@ public class ServerInstance {
 
         void start() {
             thread.start();
+            running = true;
         }
 
         void stop() {
