@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 
 import com.dmtri.common.CommandHandler;
 import com.dmtri.common.collectionmanagers.CollectionManager;
@@ -139,16 +140,10 @@ public class ServerInstance {
                         if (received != null && received instanceof Request) {
                             Request request = (Request) received;
                             LOGGER.info("Request from " + socket.getSocket().getRemoteSocketAddress() + " for command \"" + request.getCommandName() + '"');
-                            try {
-                                Response response = requestHandlerPool.submit(() -> ch.handleRequest(request, users)).get();
-                                responseSenderPool.submit(() -> {
-                                    if (!socket.sendMessage(response)) {
-                                        LOGGER.error("Failed to send message to client " + this.socket.getSocket().getRemoteSocketAddress());
-                                    }
-                                });
-                            } catch (InterruptedException | ExecutionException e) {
-                                socket.sendMessage(new ResponseWithException(e));
-                            }
+                            requestHandlerPool.submit(() -> {
+                                Response resp = ch.handleRequest(request, users);
+                                responseSenderPool.submit(() -> socket.sendMessage(resp));
+                            });
                             LOGGER.info("Sent response for " + socket.getSocket().getRemoteSocketAddress());
                         } else {
                             LOGGER.warn("Received invalid request from " + socket.getSocket().getRemoteSocketAddress());
