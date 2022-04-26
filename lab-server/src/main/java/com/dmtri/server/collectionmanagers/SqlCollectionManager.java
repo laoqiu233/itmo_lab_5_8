@@ -103,44 +103,39 @@ public class SqlCollectionManager implements CollectionManager {
     }
 
     private void prepareRouteStatement(PreparedStatement s, Route route, int paramOffset) throws SQLException {
-        final int paramCount = 12; // Style check workaround >:(
-        final int[] paramOffsets = new int[paramCount];
-        for (int i = 1; i <= paramCount; i++) {
-            paramOffsets[i - 1] = i;
-        }
         int i = 0;
-        s.setString(paramOffset + paramOffsets[i++], route.getName());
-        s.setTimestamp(paramOffset + paramOffsets[i++], Timestamp.valueOf(route.getCreationDate().atStartOfDay()));
-        s.setString(paramOffset + paramOffsets[i++], route.getFrom().getName());
+        s.setString(paramOffset + ++i, route.getName());
+        s.setTimestamp(paramOffset + ++i, Timestamp.valueOf(route.getCreationDate().atStartOfDay()));
+        s.setString(paramOffset + ++i, route.getFrom().getName());
         if (route.getFrom().getCoordinates().getX() != null) {
-            s.setLong(paramOffset + paramOffsets[i++], route.getFrom().getCoordinates().getX());
+            s.setLong(paramOffset + ++i, route.getFrom().getCoordinates().getX());
         } else {
-            s.setNull(paramOffset + paramOffsets[i++], Types.BIGINT);
+            s.setNull(paramOffset + ++i, Types.BIGINT);
         }
-        s.setDouble(paramOffset + paramOffsets[i++], route.getFrom().getCoordinates().getY());
+        s.setDouble(paramOffset + ++i, route.getFrom().getCoordinates().getY());
         if (route.getFrom().getCoordinates().getZ() != null) {
-            s.setLong(paramOffset + paramOffsets[i++], route.getFrom().getCoordinates().getZ());
+            s.setLong(paramOffset + ++i, route.getFrom().getCoordinates().getZ());
         } else {
-            s.setNull(paramOffset + paramOffsets[i++], Types.BIGINT);
+            s.setNull(paramOffset + ++i, Types.BIGINT);
         }
-        s.setString(paramOffset + paramOffsets[i++], route.getTo().getName());
+        s.setString(paramOffset + ++i, route.getTo().getName());
         if (route.getTo().getCoordinates().getX() != null) {
-            s.setLong(paramOffset + paramOffsets[i++], route.getTo().getCoordinates().getX());
+            s.setLong(paramOffset + ++i, route.getTo().getCoordinates().getX());
         } else {
-            s.setNull(paramOffset + paramOffsets[i++], Types.BIGINT);
+            s.setNull(paramOffset + ++i, Types.BIGINT);
         }
-        s.setDouble(paramOffset + paramOffsets[i++], route.getTo().getCoordinates().getY());
+        s.setDouble(paramOffset + ++i, route.getTo().getCoordinates().getY());
         if (route.getTo().getCoordinates().getZ() != null) {
-            s.setLong(paramOffset + paramOffsets[i++], route.getTo().getCoordinates().getZ());
+            s.setLong(paramOffset + ++i, route.getTo().getCoordinates().getZ());
         } else {
-            s.setNull(paramOffset + paramOffsets[i++], Types.BIGINT);
+            s.setNull(paramOffset + ++i, Types.BIGINT);
         }
         if (route.getDistance() != null) {
-            s.setDouble(paramOffset + paramOffsets[i++], route.getDistance());
+            s.setDouble(paramOffset + ++i, route.getDistance());
         } else {
-            s.setNull(paramOffset + paramOffsets[i++], Types.DOUBLE);
+            s.setNull(paramOffset + ++i, Types.DOUBLE);
         }
-        s.setLong(paramOffset + paramOffsets[i++], route.getOwnerId());
+        s.setLong(paramOffset + ++i, route.getOwnerId());
     }
 
     @Override
