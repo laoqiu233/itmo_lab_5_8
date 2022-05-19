@@ -40,6 +40,11 @@ public class ObjectSocketWrapper {
             }
 
             int readBytes = socket.getInputStream().read(sizeInBuffer, sizeInBufferPos, Integer.BYTES - sizeInBufferPos);
+
+            if (readBytes == -1) {
+                throw new IOException("Failed to read bytes from the socket");
+            }
+
             sizeInBufferPos += readBytes;
             if (sizeInBufferPos < Integer.BYTES) {
                 return false;
