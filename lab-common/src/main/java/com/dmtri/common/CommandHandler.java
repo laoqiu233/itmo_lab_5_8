@@ -83,13 +83,11 @@ public class CommandHandler {
             Long userId = users.authenticate(request.getAuth());
 
             if (userId == null && commands.get(request.getCommandName()).requiresAuth()) {
-                System.out.println(request.getAuth());
-                System.out.println(userId);
                 return new ResponseWithException(new UnauthenticatedException());
             }
 
             try {
-                return commands.get(request.getCommandName()).execute(request, userId);
+                return commands.get(request.getCommandName()).execute(request, request.getAuth() == null ? null : request.getAuth().getLogin());
             } catch (InvalidRequestException e) {
                 return new ResponseWithException(e);
             }

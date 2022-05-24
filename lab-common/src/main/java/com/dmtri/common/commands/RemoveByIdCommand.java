@@ -44,14 +44,14 @@ public class RemoveByIdCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) throws InvalidRequestException {
+    public Response execute(Request request, String username) throws InvalidRequestException {
         try {
             Route toRemove = col.getItemById(Long.valueOf(request.getBody().getArg(0)));
             if (toRemove == null) {
                 throw new NoSuchElementException();
             }
 
-            if (toRemove.getOwnerId() != userId) {
+            if (!toRemove.getOwner().equals(username)) {
                 return new ResponseWithException(new UnauthorizedException());
             }
 

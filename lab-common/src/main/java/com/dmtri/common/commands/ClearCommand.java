@@ -19,7 +19,7 @@ public class ClearCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) {
+    public Response execute(Request request, String username) {
         col.clear();
 
         return new Response("Collection cleared");

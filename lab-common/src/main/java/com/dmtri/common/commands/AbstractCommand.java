@@ -37,6 +37,6 @@ public abstract class AbstractCommand {
         return new RequestBody(args);
     }
 
-    public abstract Response execute(Request request, Long userId) throws InvalidRequestException;
+    public abstract Response execute(Request request, String username) throws InvalidRequestException;
     public abstract String getUsage();
 }

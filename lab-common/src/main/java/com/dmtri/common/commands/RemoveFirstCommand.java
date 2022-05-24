@@ -25,14 +25,14 @@ public class RemoveFirstCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) throws InvalidRequestException {
+    public Response execute(Request request, String username) throws InvalidRequestException {
         if (col.getCollection().isEmpty()) {
             return new Response("The collection is empty");
         }
 
         Route route = col.getCollection().get(0);
 
-        if (route.getOwnerId() != userId) {
+        if (!route.getOwner().equals(username)) {
             return new ResponseWithException(new UnauthorizedException());
         }
 

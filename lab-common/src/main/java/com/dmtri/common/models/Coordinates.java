@@ -51,9 +51,9 @@ public class Coordinates implements Serializable {
 
         Coordinates t = (Coordinates) obj;
 
-        return x.equals(t.x)
+        return (x == null ? t.x == null : x.equals(t.x))
             && y.equals(t.y)
-            && z.equals(t.z);
+            && (z == null ? t.z == null : z.equals(t.z));
     }
 
     public int hashCode() {

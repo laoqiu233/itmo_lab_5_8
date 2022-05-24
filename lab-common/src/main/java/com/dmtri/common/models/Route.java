@@ -13,7 +13,7 @@ public class Route implements Comparable<Route>, Serializable {
     private Location from; //Поле не может быть null
     private Location to; //Поле не может быть null
     private Double distance; //Значение поля должно быть больше 1
-    private Long ownerId = null;
+    private String owner = null;
 
     /**
      * Creates a route object and validates data using the {@link #validate()} method.
@@ -63,12 +63,12 @@ public class Route implements Comparable<Route>, Serializable {
         return to;
     }
 
-    public void setOwnerId(long ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
+    public String getOwner() {
+        return owner;
     }
 
     public String toString() {
@@ -87,7 +87,7 @@ public class Route implements Comparable<Route>, Serializable {
         sb.append(",\n\tdistance=");
         sb.append(distance);
         sb.append(",\n\towner=");
-        sb.append(ownerId);
+        sb.append(owner);
         sb.append("\n}");
 
         return sb.toString();
@@ -105,7 +105,7 @@ public class Route implements Comparable<Route>, Serializable {
 
         return id.equals(t.id)
             && name.equals(t.name)
-            && distance.equals(t.distance)
+            && (distance == null ? t.distance == null : distance.equals(t.distance))
             && creationDate.equals(t.creationDate)
             && from.equals(t.from)
             && to.equals(t.to);
@@ -117,7 +117,9 @@ public class Route implements Comparable<Route>, Serializable {
         final int a = 7;
         int hash = a;
         hash = k * hash + id.hashCode();
-        hash = k * hash + distance.hashCode();
+        if (distance != null) {
+            hash = k * hash + distance.hashCode();
+        }
         hash = k * hash + name.hashCode();
         hash = k * hash + creationDate.hashCode();
         hash = k * hash + from.hashCode();
@@ -127,7 +129,7 @@ public class Route implements Comparable<Route>, Serializable {
 
     @Override
     public int compareTo(Route o) {
-        if (this.distance == null || o.distance == null) {
+        if (this.distance == null || o.distance == null || (this.distance.equals(o.distance))) {
             return Long.compare(this.id, o.id);
         }
         return Double.compare(distance, o.distance);

@@ -48,7 +48,7 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) throws InvalidRequestException {
+    public Response execute(Request request, String username) throws InvalidRequestException {
         throw new ClientSideCommandException();
     }
 }

@@ -21,7 +21,7 @@ public class PrintUniqueDistance extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) throws InvalidRequestException {
+    public Response execute(Request request, String username) throws InvalidRequestException {
         StringBuilder sb = new StringBuilder();
 
         for (Double distance : col.getUniqueDistances()) {

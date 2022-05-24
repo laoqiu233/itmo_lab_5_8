@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -40,6 +41,12 @@ public class SqlCollectionManager implements CollectionManager {
                                                    + "   owner_id integer NOT NULL,"
                                                    + "   CONSTRAINT fk_owner"
                                                    + "      FOREIGN KEY(owner_id) REFERENCES users(id) ON DELETE CASCADE)";
+    private static final String SELECT_QUERY = "SELECT r.id, r.name, r.creation_date, "
+                                             + "r.from_name, r.from_coordinates_x, r.from_coordinates_y, "
+                                             + "r.from_coordinates_z, r.to_name, r.to_coordinates_x, "
+                                             + "r.to_coordinates_y, r.to_coordinates_z, r.distance, "
+                                             + "u.login AS owner FROM routes AS r LEFT JOIN users AS u "
+                                             + "ON r.owner_id = u.id";
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlCollectionManager.class);
     private final Connection conn;
     private final List<Route> collection = new LinkedList<>();
@@ -54,7 +61,7 @@ public class SqlCollectionManager implements CollectionManager {
         try (Statement s = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             s.execute(CREATE_TABLE_QUERY);
 
-            try (ResultSet res = s.executeQuery("SELECT * FROM routes")) {
+            try (ResultSet res = s.executeQuery(SELECT_QUERY)) {
                 int invalidRoutes = 0;
 
                 while (res.next()) {
@@ -65,6 +72,8 @@ public class SqlCollectionManager implements CollectionManager {
                         invalidRoutes++;
                     }
                 }
+
+                Collections.sort(collection);
 
                 LOGGER.info("Loaded " + collection.size() + " routes from DB, removed " + invalidRoutes + " invalid routes.");
             }
@@ -96,7 +105,7 @@ public class SqlCollectionManager implements CollectionManager {
                 res.getObject("distance") == null ? null : res.getDouble("distance")
             );
 
-            route.setOwnerId(res.getLong("owner_id"));
+            route.setOwner(res.getString("owner"));
 
             return route;
         } catch (InvalidFieldException e) {
@@ -137,7 +146,7 @@ public class SqlCollectionManager implements CollectionManager {
         } else {
             s.setNull(paramOffset + ++i, Types.DOUBLE);
         }
-        s.setLong(paramOffset + ++i, route.getOwnerId());
+        s.setString(paramOffset + ++i, route.getOwner());
     }
 
     @Override
@@ -163,7 +172,8 @@ public class SqlCollectionManager implements CollectionManager {
     @Override
     public long add(Route route) {
         String query = "INSERT INTO routes VALUES ("
-                     + "    default,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+                     + "    default,?,?,?,?,?,?,?,?,?,?,?,(SELECT id FROM users WHERE login = ?)) "
+                     + "    RETURNING id";
 
         try (PreparedStatement s = conn.prepareStatement(query)) {
             lock.lock();
@@ -173,6 +183,7 @@ public class SqlCollectionManager implements CollectionManager {
                 Long id = res.getLong("id");
                 route.setId(id);
                 collection.add(route);
+                Collections.sort(collection);
                 return id;
             }
         } catch (SQLException e) {
@@ -208,6 +219,7 @@ public class SqlCollectionManager implements CollectionManager {
             if (count > 0) {
                 collection.removeIf(x -> x.getId() == route.getId());
                 collection.add(route);
+                Collections.sort(collection);
                 return true;
             } else {
                 return false;

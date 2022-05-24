@@ -25,7 +25,7 @@ public class ExitCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) {
+    public Response execute(Request request, String username) {
         throw new UnsupportedOperationException();
     }
 }

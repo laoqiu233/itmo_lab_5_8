@@ -41,14 +41,14 @@ public class AddCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, Long userId) throws InvalidRequestException {
+    public Response execute(Request request, String username) throws InvalidRequestException {
         if (request.getBody() == null || !(request.getBody() instanceof RequestBodyWithRoute)) {
             throw new InvalidRequestException("Request should have a route attached");
         }
 
         RequestBodyWithRoute body = (RequestBodyWithRoute) request.getBody();
 
-        body.getRoute().setOwnerId(userId);
+        body.getRoute().setOwner(username);
 
         long newId = col.add(body.getRoute());
 
