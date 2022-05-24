@@ -3,16 +3,29 @@ package com.dmtri.client;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.UnresolvedAddressException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.dmtri.client.views.ConnectionView;
 import com.dmtri.client.views.LoginView;
 import com.dmtri.client.views.MainView;
+import com.dmtri.common.models.Route;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithRoutes;
 import com.dmtri.common.usermanagers.AuthCredentials;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -20,17 +33,18 @@ import javafx.stage.Stage;
 
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
-    private static final int SLEEP_TIME = 10;
+    private static final int SLEEP_TIME = 100;
     private ObjectSocketChannelWrapper channel;
-    private Scene scene;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
+    private ObservableSet<Route> routes = FXCollections.observableSet();
+    private RoutesThread routesThread = new RoutesThread();
     private ConnectionView connectionView = new ConnectionView(this);
     private LoginView loginView = new LoginView(this);
     private MainView mainView = new MainView(this);
+    private Scene scene = new Scene(connectionView.getView());
 
     public void start(Stage primaryStage) {
-        scene = new Scene(connectionView.getView());
-
+        routesThread.start();
         primaryStage.setTitle("Route Manager");
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
@@ -48,8 +62,10 @@ public class GraphicClient extends Application {
 
     public void setAuth(AuthCredentials auth) {
         if (auth == null) {
+            routesThread.setWorking(false);
             scene.setRoot(loginView.getView());
         } else {
+            routesThread.setWorking(true);
             scene.setRoot(mainView.getView());
         }
         this.auth.set(auth);
@@ -59,6 +75,19 @@ public class GraphicClient extends Application {
         return auth;
     }
 
+    public Set<Route> getRoutes() {
+        return routes.stream().collect(Collectors.toSet());
+    }
+
+    public void setRoutes(Collection<Route> routes) {
+        this.routes.retainAll(routes);
+        this.routes.addAll(routes);
+    }
+
+    public ObservableSet<Route> routesProperty() {
+        return routes;
+    }
+
     public void connect(InetSocketAddress address) {
         try {
             SocketChannel socket = SocketChannel.open();
@@ -66,6 +95,8 @@ public class GraphicClient extends Application {
             socket.configureBlocking(false);
             channel = new ObjectSocketChannelWrapper(socket);
             scene.setRoot(loginView.getView());
+        } catch (UnresolvedAddressException e) {
+            new Alert(AlertType.ERROR, "The address you provided is invalid").showAndWait();
         } catch (IOException e) {
             new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
             channel = null;
@@ -83,6 +114,7 @@ public class GraphicClient extends Application {
         }
         channel = null;
         scene.setRoot(connectionView.getView());
+        routesThread.setWorking(false);
     }
 
     public Response sendMessage(Object msg) {
@@ -107,6 +139,48 @@ public class GraphicClient extends Application {
             new Alert(AlertType.ERROR, e.getLocalizedMessage()).show();
             disconnect();
             return null;
+        }
+    }
+
+    private class RoutesThread extends Thread {
+        private volatile boolean workFlag = false;
+
+        RoutesThread() {
+            this.setName("routes-fetching-thread");
+            this.setDaemon(true);
+        }
+
+        public void setWorking(boolean flag) {
+            workFlag = flag;
+        }
+
+        public void run() {
+            try {
+                while (true) {
+                    if (workFlag) {
+                        Response resp = sendMessage(new Request(
+                            "show",
+                            new RequestBody(new String[] {}),
+                            getAuth()
+                        ));
+
+                        if (resp instanceof ResponseWithRoutes) {
+                            ResponseWithRoutes rwr = (ResponseWithRoutes) resp;
+                            Set<Route> newRoutes = new HashSet<>();
+
+                            for (int i = 0; i < rwr.getRoutesCount(); i++) {
+                                newRoutes.add(rwr.getRoute(i));
+                            }
+
+                            Platform.runLater(() -> setRoutes(newRoutes));
+                        }
+
+                        Thread.sleep(SLEEP_TIME);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

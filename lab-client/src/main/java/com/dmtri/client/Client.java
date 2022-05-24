@@ -29,8 +29,8 @@ public final class Client {
                 e.printStackTrace();
                 return;
             }
+        } else {
+            Application.launch(GraphicClient.class);
         }
-
-        Application.launch(GraphicClient.class);
     }
 }

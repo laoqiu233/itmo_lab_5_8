@@ -58,6 +58,7 @@ public class LoginView {
     private void sendLoginRequest(MouseEvent event) {
         event.consume();
         disableButtons();
+        promptMsg.set("");
         Response resp = client.sendMessage(new Request(
             "login",
             new RequestBody(new String[] {loginField.getText(), passwordField.getText()}),
@@ -78,6 +79,7 @@ public class LoginView {
     private void sendRegisterRequest(MouseEvent event) {
         event.consume();
         disableButtons();
+        promptMsg.set("");
         Response resp = client.sendMessage(new Request(
             "register",
             new RequestBody(new String[] {loginField.getText(), passwordField.getText()}),
@@ -88,7 +90,7 @@ public class LoginView {
             if (resp instanceof ResponseWithAuthCredentials) {
                 client.setAuth(((ResponseWithAuthCredentials) resp).getAuthCredentials());
             } else {
-
+                promptMsg.set(resp.getMessage());
             }
         }
 

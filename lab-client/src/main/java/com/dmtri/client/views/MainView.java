@@ -1,8 +1,16 @@
 package com.dmtri.client.views;
 
-import com.dmtri.client.GraphicClient;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.dmtri.client.GraphicClient;
+import com.dmtri.common.models.Route;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -16,23 +24,28 @@ import javafx.scene.layout.HBox;
 
 public class MainView {
     private static final int GAP = 20;
-    private GraphicClient client;
     private Parent view;
+    private GraphicClient client;
+    private RoutesTableView tableTab;
+    private FilterView filterView;
+    private ObservableSet<Route> filteredRoutes = FXCollections.observableSet();
+    private final InvalidationListener listener = new InvalidationListener() {
+        public void invalidated(Observable observable) {
+            Set<Route> newFilteredRoutes = client.getRoutes().stream().filter(filterView.getFilter()).collect(Collectors.toSet());
+            filteredRoutes.retainAll(newFilteredRoutes);
+            filteredRoutes.addAll(newFilteredRoutes);
+        }
+    };
 
     public MainView(GraphicClient client) {
         this.client = client;
-        view = createLayout();
-    }
+        filterView = new FilterView();
+        filterView.filterProperty().addListener(listener);
+        client.routesProperty().addListener(listener);
 
-    public Parent getView() {
-        return view;
-    }
-
-    private Parent createLayout() {
-        BorderPane root = new BorderPane();
         Label usernameLabel = new Label();
         usernameLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> client.getAuth() == null ? "" : "Logged in as: " + client.getAuth().getLogin(), 
+            () -> client.getAuth() == null ? "" : "Logged in as: " + client.getAuth().getLogin(),
             client.authProperty()
         ));
         Button logoutButton = new Button("Logout");
@@ -41,15 +54,22 @@ public class MainView {
         userInfo.setAlignment(Pos.CENTER_RIGHT);
         userInfo.setPadding(new Insets(GAP));
         userInfo.getChildren().addAll(usernameLabel, logoutButton);
+        BorderPane root = new BorderPane();
         root.setTop(userInfo);
-
-        Tab tab1 = new Tab("Penis");
-        Tab tab2 = new Tab("Titties");
-        Tab tab3 = new Tab("Big bootie");
-        TabPane center = new TabPane(tab1, tab2, tab3);
+        root.setLeft(filterView.getView());
+        tableTab = new RoutesTableView(filteredRoutes);
+        Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
+        Tab tab2 = new Tab("Graph View");
+        TabPane center = new TabPane(tab1, tab2);
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);
 
-        return root;
+        //root.setRight(new RouteInspectorView(client, client.selectedRouteProperty()).getView());   
+        
+        this.view = root;
+    }
+
+    public Parent getView() {
+        return view;
     }
 }
