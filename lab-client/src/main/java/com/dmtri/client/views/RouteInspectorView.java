@@ -11,15 +11,12 @@ import com.dmtri.common.models.Coordinates;
 import com.dmtri.common.models.Location;
 import com.dmtri.common.models.Route;
 
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -52,19 +49,9 @@ public class RouteInspectorView {
         this.routeToInspectProperty = routeToInspectProperty;
         routeToInspectProperty.addListener((o, oldV, newV) -> fillFields(newV));
         routeIsEditableProperty.bind(Bindings.createBooleanBinding(RouteInspectorView.this::routeIsEditable, client.authProperty(), routeToInspectProperty));
+        createAllFields();
 
-        nameField = new ValidationField<>("Name", x -> (x.isEmpty() ? null : x), Route.VALIDATOR::validateName);
-        distanceField = new ValidationField<>("Distance", new NumberStringConverter<>(Double::parseDouble), Route.VALIDATOR::validateDistance);
-        fromNameField = new ValidationField<>("Starting Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
-        fromXField = new ValidationField<>("Starting X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
-        fromYField = new ValidationField<>("Starting Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
-        fromZField = new ValidationField<>("Starting Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
-        toNameField = new ValidationField<>("Ending Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
-        toXField = new ValidationField<>("Ending X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
-        toYField = new ValidationField<>("Ending Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
-        toZField = new ValidationField<>("Ending Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
-
-        routeReadyProperty.bind(Bindings.and(nameField.valueReadyProperty, 
+        routeReadyProperty.bind(Bindings.and(nameField.valueReadyProperty,
                                 Bindings.and(distanceField.valueReadyProperty,
                                 Bindings.and(fromNameField.valueReadyProperty,
                                 Bindings.and(fromXField.valueReadyProperty,
@@ -73,7 +60,7 @@ public class RouteInspectorView {
                                 Bindings.and(toNameField.valueReadyProperty,
                                 Bindings.and(toXField.valueReadyProperty,
                                 Bindings.and(toYField.valueReadyProperty,
-                                Bindings.and(toZField.valueReadyProperty, 
+                                Bindings.and(toZField.valueReadyProperty,
                                 routeIsEditableProperty)))))))))));
 
         VBox box = new VBox(GAP);
@@ -132,7 +119,18 @@ public class RouteInspectorView {
         }
     }
 
-    
+    private void createAllFields() {
+        nameField = new ValidationField<>("Name", x -> (x.isEmpty() ? null : x), Route.VALIDATOR::validateName);
+        distanceField = new ValidationField<>("Distance", new NumberStringConverter<>(Double::parseDouble), Route.VALIDATOR::validateDistance);
+        fromNameField = new ValidationField<>("Starting Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
+        fromXField = new ValidationField<>("Starting X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
+        fromYField = new ValidationField<>("Starting Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
+        fromZField = new ValidationField<>("Starting Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
+        toNameField = new ValidationField<>("Ending Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
+        toXField = new ValidationField<>("Ending X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
+        toYField = new ValidationField<>("Ending Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
+        toZField = new ValidationField<>("Ending Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
+    }
 
     private void fillFields(Route route) {
         if (route == null) {
@@ -170,14 +168,16 @@ public class RouteInspectorView {
     }
 
     private class ValidationField<T> {
-        StringConverter<T> converter;
-        Node component;
-        TextField valueField;
-        Label promptLabel = new Label();
-        BooleanProperty valueReadyProperty = new SimpleBooleanProperty(false);
+        private StringConverter<T> converter;
+        private AbstractValidator<T> validator;
+        private Node component;
+        private TextField valueField;
+        private Label promptLabel = new Label();
+        private BooleanProperty valueReadyProperty = new SimpleBooleanProperty(false);
 
         ValidationField(String fieldName, StringConverter<T> converter, AbstractValidator<T> validator) {
             this.converter = converter;
+            this.validator = validator;
             Label fieldLabel = new Label(fieldName);
             promptLabel.setTextFill(Color.RED);
             valueField = new TextField();
@@ -188,33 +188,34 @@ public class RouteInspectorView {
             mainBox.getChildren().addAll(inputBox, promptLabel);
             component = mainBox;
 
-            valueField.textProperty().addListener((o, oldV, newV) -> {
-                promptLabel.setText("");
+            valueField.textProperty().addListener((o, oldV, newV) -> validateAndUpdate(newV));
+        }
 
-                // If we aren't editing any routes just exit
-                if (routeToInspectProperty.get() == null) {
-                    valueReadyProperty.set(false);
-                    return;
-                }
+        void validateAndUpdate(String newV) {
+            promptLabel.setText("");
 
-                T value = converter.convert(newV);
+            // If we aren't editing any routes just exit
+            if (routeToInspectProperty.get() == null) {
+                valueReadyProperty.set(false);
+                return;
+            }
 
-                if (value == null && !newV.isEmpty()) {
-                    valueReadyProperty.set(false);
-                    promptLabel.setText("Invalid value provided");
-                    return;
-                }
+            T value = converter.convert(newV);
+            if (value == null && !newV.isEmpty()) {
+                valueReadyProperty.set(false);
+                promptLabel.setText("Invalid value provided");
+                return;
+            }
 
-                try {
-                    validator.validate(value);
-                } catch (InvalidFieldException e) {
-                    valueReadyProperty.set(false);
-                    promptLabel.setText(e.getMessage());
-                    return;
-                }
+            try {
+                validator.validate(value);
+            } catch (InvalidFieldException e) {
+                valueReadyProperty.set(false);
+                promptLabel.setText(e.getMessage());
+                return;
+            }
 
-                valueReadyProperty.set(true);
-            });
+            valueReadyProperty.set(true);
         }
 
         void emptyValue() {

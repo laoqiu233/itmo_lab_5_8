@@ -4,7 +4,7 @@ package com.dmtri.client.util;
  * Class to handle number conversion and NumberFormatException
  */
 public class NumberStringConverter<T extends Number> implements StringConverter<T> {
-    StringConverter<T> baseConverter;
+    private StringConverter<T> baseConverter;
 
     public NumberStringConverter(StringConverter<T> baseConverter) {
         this.baseConverter = baseConverter;

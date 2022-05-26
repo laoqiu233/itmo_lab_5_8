@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.dmtri.common.models.Route;
 
@@ -38,7 +37,7 @@ public class RoutesTableView {
                     // Insertion sort
                     // Use natural ordering if the user did not specify a comparator
                     // using headers in table view
-                    for (int i=0; i<orderedRouteList.size(); i++) {
+                    for (int i = 0; i < orderedRouteList.size(); i++) {
                         if (getComparator().compare(change.getElementAdded(), orderedRouteList.get(i)) < 0) {
                             orderedRouteList.add(i, change.getElementAdded());
                             return;
@@ -95,9 +94,9 @@ public class RoutesTableView {
                                                .boxed().collect(Collectors.toMap(x -> it.next(), x -> x));
         // Here we use the built-in sort of observable list with the permutation map
         // If we instead used setAll(), a list change event with remove and add
-        // will be fired instead of a permutation event, which leads to 
+        // will be fired instead of a permutation event, which leads to
         // the user's selection being dropped.
-        // Of course, we could add a listener to the table's selected item and rollback 
+        // Of course, we could add a listener to the table's selected item and rollback
         // the change if it was caused by sorting.
         // But somehow that causes the change to happen two times, so the selected row goes like:
         // RouteA -> null (Initial selection drop)

@@ -32,22 +32,7 @@ public class FilterView {
         Label headerLabel = new Label("Filter");
         headerLabel.setFont(new Font(HEADER_SIZE));
 
-        ChoiceBox<FilterConfigurator> filterFieldChoice = new ChoiceBox<>();
-        filterFieldChoice.getItems().addAll(
-            new FilterConfigurator("None"), 
-            new ComparableFilterConfigurator<Long>("ID", x -> x.getId(), new NumberStringConverter<>(Long::parseLong)),
-            new StringFilterConfigurator("Name", x -> x.getName()),
-            new ComparableFilterConfigurator<Double>("Distance", x -> x.getDistance(), new NumberStringConverter<>(Double::parseDouble)),
-            new StringFilterConfigurator("Starting location", x -> x.getFrom().getName()),
-            new ComparableFilterConfigurator<Long>("Start X", x -> x.getFrom().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)),
-            new ComparableFilterConfigurator<Double>("Start Y", x -> x.getFrom().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)),
-            new ComparableFilterConfigurator<Long>("Start Z", x -> x.getFrom().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)),
-            new StringFilterConfigurator("Ending location", x -> x.getTo().getName()),
-            new ComparableFilterConfigurator<Long>("End X", x -> x.getTo().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)),
-            new ComparableFilterConfigurator<Double>("End Y", x -> x.getTo().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)),
-            new ComparableFilterConfigurator<Long>("End Z", x -> x.getTo().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)),
-            new StringFilterConfigurator("Owner", x -> x.getOwner())
-        );
+        ChoiceBox<FilterConfigurator> filterFieldChoice = createChoiceBox();
 
         VBox box = new VBox(GAP);
         box.getChildren().addAll(headerLabel, filterFieldChoice);
@@ -86,18 +71,43 @@ public class FilterView {
         return filterProperty;
     }
 
+    private ChoiceBox<FilterConfigurator> createChoiceBox() {
+        ChoiceBox<FilterConfigurator> filterFieldChoice = new ChoiceBox<>();
+        filterFieldChoice.getItems().addAll(
+            new FilterConfigurator("None"),
+            new ComparableFilterConfigurator<Long>("ID", x -> x.getId(), new NumberStringConverter<>(Long::parseLong)),
+            new StringFilterConfigurator("Name", x -> x.getName()),
+            new ComparableFilterConfigurator<Double>("Distance", x -> x.getDistance(), new NumberStringConverter<>(Double::parseDouble)),
+            new StringFilterConfigurator("Starting location", x -> x.getFrom().getName()),
+            new ComparableFilterConfigurator<Long>("Start X", x -> x.getFrom().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)),
+            new ComparableFilterConfigurator<Double>("Start Y", x -> x.getFrom().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)),
+            new ComparableFilterConfigurator<Long>("Start Z", x -> x.getFrom().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)),
+            new StringFilterConfigurator("Ending location", x -> x.getTo().getName()),
+            new ComparableFilterConfigurator<Long>("End X", x -> x.getTo().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)),
+            new ComparableFilterConfigurator<Double>("End Y", x -> x.getTo().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)),
+            new ComparableFilterConfigurator<Long>("End Z", x -> x.getTo().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)),
+            new StringFilterConfigurator("Owner", x -> x.getOwner())
+        );
+
+        return filterFieldChoice;
+    }
+
     private static class FilterConfigurator {
-        ObjectProperty<Predicate<Route>> filterProperty = new SimpleObjectProperty<>(x -> true);
-        Node view;
-        String fieldName;
+        private Node view;
+        private ObjectProperty<Predicate<Route>> filterProperty = new SimpleObjectProperty<>(x -> true);
+        private String fieldName;
 
         FilterConfigurator(String fieldName) {
             this.fieldName = fieldName;
-            view = new Label("No filter applied");
+            setView(new Label("No filter applied"));
         }
 
         Node getView() {
             return view;
+        }
+
+        void setView(Node view) {
+            this.view = view;
         }
 
         ObjectProperty<Predicate<Route>> filterProperty() {
@@ -111,11 +121,11 @@ public class FilterView {
     }
 
     private static class ComparableFilterConfigurator<T extends Comparable<T>> extends FilterConfigurator {
-        ChoiceBox<Operation> operationChoice;
-        TextField operandField;
-        Label errorPrompt;
-        Callback<Route, T> valueGetter;
-        StringConverter<T> converter;
+        private ChoiceBox<Operation> operationChoice;
+        private TextField operandField;
+        private Label errorPrompt;
+        private Callback<Route, T> valueGetter;
+        private StringConverter<T> converter;
 
         ComparableFilterConfigurator(String fieldName, Callback<Route, T> valueGetter, StringConverter<T> converter) {
             super(fieldName);
@@ -131,7 +141,7 @@ public class FilterView {
 
             VBox box = new VBox(GAP);
             box.getChildren().addAll(operationChoice, operandField, errorPrompt);
-            view = box;
+            setView(box);
 
             // If anything changes trigger the property set event
             operationChoice.getSelectionModel().selectedItemProperty().addListener(x -> {
@@ -144,7 +154,7 @@ public class FilterView {
             errorPrompt.setText("");
             T operand = converter.convert(operandField.getText());
             Operation selectedOperation = operationChoice.getSelectionModel().getSelectedItem();
-            
+
             // If no operand is available then no filter is applied
             if (operand == null) {
                 if (!operandField.getText().isEmpty()) {
@@ -164,13 +174,13 @@ public class FilterView {
             };
         }
 
-        static enum Operation {
+        private enum Operation {
             GT(">", x -> x > 0), GE(">=", x -> x >= 0),
             EQ("=", x -> x == 0), LE("<=", x -> x <= 0),
             LT("<", x -> x < 0);
 
-            String verbal;
-            Predicate<Integer> operation;
+            private String verbal;
+            private Predicate<Integer> operation;
 
             Operation(String verbal, Predicate<Integer> operation) {
                 this.verbal = verbal;
@@ -189,14 +199,14 @@ public class FilterView {
     }
 
     private class StringFilterConfigurator extends FilterConfigurator {
-        TextField searchField;
+        private TextField searchField;
 
         StringFilterConfigurator(String fieldName, Callback<Route, String> valueGetter) {
             super(fieldName);
             searchField = new TextField();
             searchField.setPromptText("Search for...");
             searchField.textProperty().addListener(o -> filterProperty().set(x -> valueGetter.call(x).contains(searchField.getCharacters())));
-            view = searchField;
+            setView(searchField);
         }
     }
 }

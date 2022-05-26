@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -44,6 +45,37 @@ public class MainView {
         filterView.filterProperty().addListener(listener);
         client.routesProperty().addListener(listener);
 
+        BorderPane root = new BorderPane();
+        root.setTop(createUserInfoBox());
+        root.setLeft(filterView.getView());
+        root.setRight(createRouteInspectionBox());
+        tableTab = new RoutesTableView(filteredRoutes);
+        Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
+        Tab tab2 = new Tab("Graph View");
+        TabPane center = new TabPane(tab1, tab2);
+        center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+        root.setCenter(center);
+
+        this.view = root;
+    }
+
+    public Parent getView() {
+        return view;
+    }
+
+    private Node createRouteInspectionBox() {
+        RouteInspectorView inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
+        Button updateButton = new Button("Update");
+        updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        Button deleteButton = new Button("Delete");
+        deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        VBox routeInspectionBox = new VBox(GAP);
+        routeInspectionBox.getChildren().addAll(inspector.getView(), updateButton, deleteButton);
+
+        return routeInspectionBox;
+    }
+
+    private Node createUserInfoBox() {
         Label usernameLabel = new Label();
         usernameLabel.textProperty().bind(Bindings.createStringBinding(
             () -> client.getAuth() == null ? "" : "Logged in as: " + client.getAuth().getLogin(),
@@ -55,15 +87,6 @@ public class MainView {
         userInfo.setAlignment(Pos.CENTER_RIGHT);
         userInfo.setPadding(new Insets(GAP));
         userInfo.getChildren().addAll(usernameLabel, logoutButton);
-        BorderPane root = new BorderPane();
-        root.setTop(userInfo);
-        root.setLeft(filterView.getView());
-        tableTab = new RoutesTableView(filteredRoutes);
-        Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
-        Tab tab2 = new Tab("Graph View");
-        TabPane center = new TabPane(tab1, tab2);
-        center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-        root.setCenter(center);
 
         Label testLabel = new Label();
         userInfo.getChildren().add(testLabel);
@@ -72,21 +95,6 @@ public class MainView {
             System.out.println("Selection changed from " + (oldVal == null ? "null" : oldVal.getId()) + " to " + (newVal == null ? "null" : newVal.getId()));
         });
 
-        RouteInspectorView inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
-        Button updateButton = new Button("Update");
-        updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
-        Button deleteButton = new Button("Delete");
-        deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
-        HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(updateButton, deleteButton);
-        VBox sidePanelBox = new VBox(10);
-        sidePanelBox.getChildren().addAll(inspector.getView(), buttonBox);
-        root.setRight(sidePanelBox);
-        
-        this.view = root;
-    }
-
-    public Parent getView() {
-        return view;
+        return userInfo;
     }
 }
