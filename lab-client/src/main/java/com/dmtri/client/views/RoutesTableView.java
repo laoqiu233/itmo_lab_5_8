@@ -2,12 +2,16 @@ package com.dmtri.client.views;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.dmtri.common.models.Route;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,7 +27,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class RoutesTableView {
     private TableView<Route> tableView;
     private ObservableList<Route> orderedRouteList = FXCollections.observableList(new LinkedList<>());
-    private boolean wasSorted = false;
+    private ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
 
     public RoutesTableView(ObservableSet<Route> routes) {
         tableView = createTable();
@@ -33,9 +37,9 @@ public class RoutesTableView {
                 if (change.wasAdded()) {
                     // Insertion sort
                     // Use natural ordering if the user did not specify a comparator
-                    Comparator<Route> comparator = (tableView.getComparator() == null ? (a, b) -> a.compareTo(b) : tableView.getComparator());
+                    // using headers in table view
                     for (int i=0; i<orderedRouteList.size(); i++) {
-                        if (comparator.compare(change.getElementAdded(), orderedRouteList.get(i)) < 0) {
+                        if (getComparator().compare(change.getElementAdded(), orderedRouteList.get(i)) < 0) {
                             orderedRouteList.add(i, change.getElementAdded());
                             return;
                         }
@@ -43,10 +47,10 @@ public class RoutesTableView {
                     orderedRouteList.add(change.getElementAdded());
                 }
                 if (change.wasRemoved()) {
-                    orderedRouteList.remove(change.getElementRemoved());
                     if (tableView.getSelectionModel().getSelectedItem() == change.getElementRemoved()) {
                         tableView.getSelectionModel().select(null);
                     }
+                    orderedRouteList.remove(change.getElementRemoved());
                 }
             }
         });
@@ -58,11 +62,7 @@ public class RoutesTableView {
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
-            // If the selection change was caused by sorting, rollback the change
-            if (wasSorted) {
-                tableView.getSelectionModel().select(orderedRouteList.contains(oldVal) ? oldVal : newVal);
-                wasSorted = false;
-            }
+            setSelectedRoute(newVal);
         });
     }
 
@@ -70,16 +70,47 @@ public class RoutesTableView {
         return tableView;
     }
 
+    public ObjectProperty<Route> selectedRouteProperty() {
+        return selectedRouteProperty;
+    }
+    public Route getSelectedRoute() {
+        return selectedRouteProperty.get();
+    }
+    public void setSelectedRoute(Route route) {
+        selectedRouteProperty.set(route);
+        if (route != tableView.getSelectionModel().getSelectedItem()) {
+            tableView.getSelectionModel().select(route);
+        }
+    }
+
+    private Comparator<Route> getComparator() {
+        return (tableView.getComparator() == null ? (a, b) -> a.compareTo(b) : tableView.getComparator());
+    }
+
     private void sortList() {
         // Sorting should be done using stream api :\
-        wasSorted = true;
-        Stream<Route> s = orderedRouteList.stream();
-        if (tableView.getSortOrder().isEmpty()) {
-            s = s.sorted();
-        } else {
-            s = s.sorted(tableView.getComparator());
-        }
-        orderedRouteList.setAll(s.collect(Collectors.toList()));
+        Iterator<Route> it = orderedRouteList.stream().sorted(getComparator()).iterator();
+        // Create a permutation index map
+        Map<Route, Integer> permMap = IntStream.range(0, orderedRouteList.size())
+                                               .boxed().collect(Collectors.toMap(x -> it.next(), x -> x));
+        // Here we use the built-in sort of observable list with the permutation map
+        // If we instead used setAll(), a list change event with remove and add
+        // will be fired instead of a permutation event, which leads to 
+        // the user's selection being dropped.
+        // Of course, we could add a listener to the table's selected item and rollback 
+        // the change if it was caused by sorting.
+        // But somehow that causes the change to happen two times, so the selected row goes like:
+        // RouteA -> null (Initial selection drop)
+        // null -> RouteA (We roll back the change in the listener since it's caused by sorting)
+        // RouteA -> null (For some reason the selection drops again???)
+        // null -> RouteA (And restores itself for unknown reasons)
+        //
+        // I've tried to figure out why this happens by digging into javafx code, but with no success
+        // So here it is, my stupid fix so that my code complies with the task requirement to
+        // sort with stream API although the table already has the ability to sort.
+        // Furthermore, causing a permutation event to fire once instead of two seperate
+        // remove and add events makes more sense when sorting.
+        orderedRouteList.sort((a, b) -> permMap.get(a).compareTo(permMap.get(b)));
     }
 
     private TableView<Route> createTable() {

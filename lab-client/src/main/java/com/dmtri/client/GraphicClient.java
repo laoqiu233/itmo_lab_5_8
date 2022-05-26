@@ -7,7 +7,6 @@ import java.nio.channels.UnresolvedAddressException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.dmtri.client.views.ConnectionView;

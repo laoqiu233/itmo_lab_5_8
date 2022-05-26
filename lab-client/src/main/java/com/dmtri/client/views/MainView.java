@@ -21,6 +21,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class MainView {
     private static final int GAP = 20;
@@ -64,7 +65,23 @@ public class MainView {
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);
 
-        //root.setRight(new RouteInspectorView(client, client.selectedRouteProperty()).getView());   
+        Label testLabel = new Label();
+        userInfo.getChildren().add(testLabel);
+        testLabel.textProperty().bind(Bindings.createStringBinding(() -> ("Selected: " + (tableTab.getSelectedRoute() == null ? "none" : tableTab.getSelectedRoute().getId())), tableTab.selectedRouteProperty()));
+        tableTab.selectedRouteProperty().addListener((o, oldVal, newVal) -> {
+            System.out.println("Selection changed from " + (oldVal == null ? "null" : oldVal.getId()) + " to " + (newVal == null ? "null" : newVal.getId()));
+        });
+
+        RouteInspectorView inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
+        Button updateButton = new Button("Update");
+        updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        Button deleteButton = new Button("Delete");
+        deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(updateButton, deleteButton);
+        VBox sidePanelBox = new VBox(10);
+        sidePanelBox.getChildren().addAll(inspector.getView(), buttonBox);
+        root.setRight(sidePanelBox);
         
         this.view = root;
     }
