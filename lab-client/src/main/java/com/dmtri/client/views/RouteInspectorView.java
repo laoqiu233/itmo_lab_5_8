@@ -22,12 +22,12 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class RouteInspectorView {
-    private static final int GAP = 10;
+    private static final int GAP = 3;
+    private static final int HORIZONTAL_PADDING = 8;
     private GraphicClient client;
     private ObjectProperty<Route> routeToInspectProperty;
     private ReadOnlyBooleanWrapper routeReadyProperty = new ReadOnlyBooleanWrapper(false);
@@ -64,7 +64,7 @@ public class RouteInspectorView {
                                 routeIsEditableProperty)))))))))));
 
         VBox box = new VBox(GAP);
-        box.setPadding(new Insets(GAP));
+        box.setPadding(new Insets(GAP, HORIZONTAL_PADDING, GAP, HORIZONTAL_PADDING));
         box.getChildren().addAll(
             nameField.getComponent(),
             distanceField.getComponent(),
@@ -182,10 +182,8 @@ public class RouteInspectorView {
             promptLabel.setTextFill(Color.RED);
             valueField = new TextField();
             valueField.editableProperty().bind(routeIsEditableProperty);
-            HBox inputBox = new HBox(GAP);
-            inputBox.getChildren().addAll(fieldLabel, valueField);
             VBox mainBox = new VBox(GAP);
-            mainBox.getChildren().addAll(inputBox, promptLabel);
+            mainBox.getChildren().addAll(fieldLabel, valueField, promptLabel);
             component = mainBox;
 
             valueField.textProperty().addListener((o, oldV, newV) -> validateAndUpdate(newV));
@@ -193,16 +191,15 @@ public class RouteInspectorView {
 
         void validateAndUpdate(String newV) {
             promptLabel.setText("");
+            valueReadyProperty.set(false);
 
             // If we aren't editing any routes just exit
             if (routeToInspectProperty.get() == null) {
-                valueReadyProperty.set(false);
                 return;
             }
 
             T value = converter.convert(newV);
             if (value == null && !newV.isEmpty()) {
-                valueReadyProperty.set(false);
                 promptLabel.setText("Invalid value provided");
                 return;
             }
@@ -210,7 +207,6 @@ public class RouteInspectorView {
             try {
                 validator.validate(value);
             } catch (InvalidFieldException e) {
-                valueReadyProperty.set(false);
                 promptLabel.setText(e.getMessage());
                 return;
             }
@@ -224,6 +220,10 @@ public class RouteInspectorView {
 
         void setValue(T value) {
             valueField.setText(value == null ? "" : value.toString());
+            // If we provide a route with null parameters, the text field
+            // will not fire a changed event, in that case 
+            // we manually call the method to prompt the user
+            validateAndUpdate(valueField.getText());
         }
 
         T getValue() {

@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 
 import com.dmtri.client.GraphicClient;
 import com.dmtri.common.models.Route;
+import com.dmtri.common.network.Request;
+import com.dmtri.common.network.RequestBody;
+import com.dmtri.common.network.RequestBodyWithRoute;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -20,16 +23,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class MainView {
     private static final int GAP = 20;
+    private static final int SMALL_GAP = 7;
     private Parent view;
     private GraphicClient client;
     private RoutesTableView tableTab;
     private FilterView filterView;
+    private RouteInspectorView inspector;
     private ObservableSet<Route> filteredRoutes = FXCollections.observableSet();
     private final InvalidationListener listener = new InvalidationListener() {
         public void invalidated(Observable observable) {
@@ -46,15 +53,15 @@ public class MainView {
         client.routesProperty().addListener(listener);
 
         BorderPane root = new BorderPane();
-        root.setTop(createUserInfoBox());
         root.setLeft(filterView.getView());
-        root.setRight(createRouteInspectionBox());
         tableTab = new RoutesTableView(filteredRoutes);
         Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
         Tab tab2 = new Tab("Graph View");
         TabPane center = new TabPane(tab1, tab2);
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);
+        root.setTop(createUserInfoBox());
+        root.setRight(createRouteInspectionBox());
 
         this.view = root;
     }
@@ -63,14 +70,40 @@ public class MainView {
         return view;
     }
 
+    private void sendUpdatedRoute(MouseEvent e) {
+        client.sendMessage(new Request(
+            "update", 
+            new RequestBodyWithRoute(new String[] {}, inspector.getRoute()), 
+            client.getAuth()
+        ));
+    }
+
+    private void deleteSelectedRoute(MouseEvent e) {
+        client.sendMessage(new Request(
+            "remove_by_id",
+            new RequestBody(new String[] {Long.toString(inspector.getRoute().getId())}),
+            client.getAuth()
+        ));
+    }
+
     private Node createRouteInspectionBox() {
-        RouteInspectorView inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
+        inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
         Button updateButton = new Button("Update");
         updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        updateButton.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(updateButton, Priority.ALWAYS);
+        updateButton.setOnMouseClicked(this::sendUpdatedRoute);
         Button deleteButton = new Button("Delete");
         deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
+        deleteButton.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(deleteButton, Priority.ALWAYS);
+        deleteButton.setOnMouseClicked(this::deleteSelectedRoute);
+        HBox buttonBox = new HBox(SMALL_GAP);
+        buttonBox.setPadding(new Insets(0, SMALL_GAP, 0, SMALL_GAP));
+        buttonBox.setMaxWidth(Double.MAX_VALUE);
+        buttonBox.getChildren().addAll(updateButton, deleteButton);
         VBox routeInspectionBox = new VBox(GAP);
-        routeInspectionBox.getChildren().addAll(inspector.getView(), updateButton, deleteButton);
+        routeInspectionBox.getChildren().addAll(inspector.getView(), buttonBox);
 
         return routeInspectionBox;
     }

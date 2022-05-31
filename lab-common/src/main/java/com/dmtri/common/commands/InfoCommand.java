@@ -23,7 +23,6 @@ public class InfoCommand extends AbstractCommand {
         StringBuilder sb = new StringBuilder();
         sb.append("Collection type: " + col.getCollection().getClass().getSimpleName() + '\n');
         sb.append("Item count: " + col.getCollection().size() + '\n');
-
         return new Response(sb.toString());
     }
 }

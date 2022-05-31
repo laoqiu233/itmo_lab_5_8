@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dmtri.client.views.CommandsMenu;
 import com.dmtri.client.views.ConnectionView;
 import com.dmtri.client.views.LoginView;
 import com.dmtri.client.views.MainView;
@@ -27,7 +28,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class GraphicClient extends Application {
@@ -40,13 +44,19 @@ public class GraphicClient extends Application {
     private ConnectionView connectionView = new ConnectionView(this);
     private LoginView loginView = new LoginView(this);
     private MainView mainView = new MainView(this);
-    private Scene scene = new Scene(connectionView.getView());
+    private Menu languageMenu = new Menu("Language");
+    private Menu commandsMenu = new CommandsMenu(this);
+    private MenuBar menuBar = new MenuBar(languageMenu);
+    private BorderPane sceneRoot = new BorderPane();
+    private Scene scene = new Scene(sceneRoot);
 
     public void start(Stage primaryStage) {
         routesThread.start();
         primaryStage.setTitle("Route Manager");
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
+        sceneRoot.setTop(menuBar);
+        sceneRoot.setCenter(connectionView.getView());
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -62,10 +72,12 @@ public class GraphicClient extends Application {
     public void setAuth(AuthCredentials auth) {
         if (auth == null) {
             routesThread.setWorking(false);
-            scene.setRoot(loginView.getView());
+            sceneRoot.setCenter(loginView.getView());
+            menuBar.getMenus().remove(commandsMenu);
         } else {
             routesThread.setWorking(true);
-            scene.setRoot(mainView.getView());
+            sceneRoot.setCenter(mainView.getView());
+            menuBar.getMenus().add(commandsMenu);
         }
         this.auth.set(auth);
     }
@@ -93,7 +105,7 @@ public class GraphicClient extends Application {
             socket.connect(address);
             socket.configureBlocking(false);
             channel = new ObjectSocketChannelWrapper(socket);
-            scene.setRoot(loginView.getView());
+            sceneRoot.setCenter(loginView.getView());
         } catch (UnresolvedAddressException e) {
             new Alert(AlertType.ERROR, "The address you provided is invalid").showAndWait();
         } catch (IOException e) {
@@ -112,11 +124,12 @@ public class GraphicClient extends Application {
             new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
         }
         channel = null;
-        scene.setRoot(connectionView.getView());
+        sceneRoot.setCenter(connectionView.getView());
+        setAuth(null);
         routesThread.setWorking(false);
     }
 
-    public Response sendMessage(Object msg) {
+    public synchronized Response sendMessage(Object msg) {
         try {
             channel.sendMessage(msg);
 
@@ -135,8 +148,10 @@ public class GraphicClient extends Application {
             channel.clearInBuffer();
             return null;
         } catch (IOException | InterruptedException e) {
-            new Alert(AlertType.ERROR, e.getLocalizedMessage()).show();
-            disconnect();
+            Platform.runLater(() -> {
+                new Alert(AlertType.ERROR, e.getLocalizedMessage()).show();
+                disconnect();
+            });
             return null;
         }
     }
