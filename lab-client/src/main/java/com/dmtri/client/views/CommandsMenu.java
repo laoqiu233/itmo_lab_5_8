@@ -1,5 +1,7 @@
 package com.dmtri.client.views;
 
+import java.util.Optional;
+
 import com.dmtri.client.GraphicClient;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.network.Request;
@@ -17,6 +19,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -36,10 +39,27 @@ public class CommandsMenu extends Menu {
         printUniqueDistance.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("print_unique_distance")));
         MenuItem clear = new MenuItem("Clear");
         clear.setOnAction(e -> executeCommandWithEmptyBody("clear"));
+        MenuItem removeAllByDistance = new MenuItem("Remove all by distance");
+        removeAllByDistance.setOnAction(e -> displayRemoveByDistanceDialog());
         MenuItem sumOfDistance = new MenuItem("Sum of distances");
         sumOfDistance.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("sum_of_distance")));
 
-        getItems().addAll(add, info, printUniqueDistance, clear, sumOfDistance);
+        getItems().addAll(add, info, printUniqueDistance, clear, removeAllByDistance, sumOfDistance);
+    }
+
+    private void displayRemoveByDistanceDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Remove by distance");
+        dialog.setHeaderText("Enter the distance");
+        dialog.setContentText("Distance");
+        Optional<String> res = dialog.showAndWait();
+        if (res.isPresent()) {
+            client.sendMessage(new Request(
+                "remove_all_by_distance",
+                new RequestBody(new String[] {res.get()}),
+                client.getAuth()
+            ));
+        }
     }
 
     private void displayAddRouteWindow() {
