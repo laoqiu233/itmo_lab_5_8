@@ -22,6 +22,11 @@ public class Location implements Serializable {
         VALIDATOR.validate(this);
     }
 
+    public Location() {
+        name = "";
+        coordinates = new Coordinates();
+    }
+
     public String getName() {
         return name;
     }

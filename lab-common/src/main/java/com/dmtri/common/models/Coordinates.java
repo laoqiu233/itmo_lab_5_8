@@ -25,6 +25,12 @@ public class Coordinates implements Serializable {
         VALIDATOR.validate(this);
     }
 
+    public Coordinates() {
+        x = null;
+        y = null;
+        z = null;
+    }
+
     public Long getX() {
         return x;
     }
@@ -60,9 +66,9 @@ public class Coordinates implements Serializable {
         final int k = 31;
         final int a = 7;
         int hash = a;
-        hash = k * hash + x.hashCode();
-        hash = k * hash + y.hashCode();
-        hash = k * hash + z.hashCode();
+        hash = k * hash + (x == null ? 0 : x.hashCode());
+        hash = k * hash + (y == null ? 0 : y.hashCode());
+        hash = k * hash + (z == null ? 0 : z.hashCode());
         return hash;
     }
 

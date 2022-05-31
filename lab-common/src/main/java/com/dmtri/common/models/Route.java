@@ -35,6 +35,16 @@ public class Route implements Comparable<Route>, Serializable {
         VALIDATOR.validate(this);
     }
 
+    // Creates an empty route
+    public Route() {
+        this.id = 1l;
+        this.name = "";
+        this.creationDate = null;
+        this.from = new Location();
+        this.to = new Location();
+        this.distance = null;
+    }
+
     public long getId() {
         return id;
     }
