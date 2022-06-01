@@ -77,8 +77,8 @@ public class MainView {
 
     private void sendUpdatedRoute(MouseEvent e) {
         client.sendMessage(new Request(
-            "update", 
-            new RequestBodyWithRoute(new String[] {}, inspector.getRoute()), 
+            "update",
+            new RequestBodyWithRoute(new String[] {}, inspector.getRoute()),
             client.getAuth()
         ));
     }

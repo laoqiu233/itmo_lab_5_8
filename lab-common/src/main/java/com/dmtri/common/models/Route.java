@@ -37,7 +37,7 @@ public class Route implements Comparable<Route>, Serializable {
 
     // Creates an empty route
     public Route() {
-        this.id = 1l;
+        this.id = 1L;
         this.name = "";
         this.creationDate = null;
         this.from = new Location();

@@ -223,7 +223,7 @@ public class RouteInspectorView {
         void setValue(T value) {
             valueField.setText(value == null ? "" : value.toString());
             // If we provide a route with null parameters, the text field
-            // will not fire a changed event, in that case 
+            // will not fire a changed event, in that case
             // we manually call the method to prompt the user
             validateAndUpdate(valueField.getText());
         }

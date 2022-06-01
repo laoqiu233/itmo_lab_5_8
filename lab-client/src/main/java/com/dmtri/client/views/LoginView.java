@@ -9,7 +9,7 @@ import com.dmtri.common.network.ResponseWithAuthCredentials;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -25,7 +25,7 @@ import javafx.scene.text.FontWeight;
 public class LoginView {
     private static final double GAP = 10;
     private static final double HEADER_FONT_SIZE = 50;
-    private Parent view;
+    private Node view;
     private GraphicClient client;
     private TextField loginField;
     private PasswordField passwordField;
@@ -39,7 +39,7 @@ public class LoginView {
         view = createLayout();
     }
 
-    public Parent getView() {
+    public Node getView() {
         return view;
     }
 
@@ -97,29 +97,12 @@ public class LoginView {
         enableButtons();
     }
 
-    private Parent createLayout() {
+    private Node createLayout() {
         final Label headerLabel = new Label();
         headerLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginHeader"));
         headerLabel.setFont(Font.font("Montserrat", FontWeight.BOLD, HEADER_FONT_SIZE));
         final Label subheaderLabel = new Label();
         subheaderLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginSubHeader"));
-        final Label loginLabel = new Label();
-        loginLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginLabel"));
-        loginField = new TextField();
-        loginField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("loginPrompt"));
-        final Label passwordLabel = new Label();
-        passwordLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordLabel"));
-        passwordField = new PasswordField();
-        passwordField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordPrompt"));
-
-        GridPane loginPassGrid = new GridPane();
-        loginPassGrid.add(loginLabel, 0, 0);
-        loginPassGrid.add(passwordLabel, 0, 1);
-        loginPassGrid.add(loginField, 1, 0);
-        loginPassGrid.add(passwordField, 1, 1);
-        loginPassGrid.setHgap(GAP);
-        loginPassGrid.setVgap(GAP);
-        loginPassGrid.setAlignment(Pos.CENTER);
 
         loginButton = new Button();
         loginButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginButton"));
@@ -139,9 +122,31 @@ public class LoginView {
         prompt.setTextFill(Color.RED);
 
         VBox box = new VBox(GAP);
-        box.getChildren().addAll(headerLabel, subheaderLabel, loginPassGrid, prompt, buttonGroup);
+        box.getChildren().addAll(headerLabel, subheaderLabel, createLoginPassGrid(), prompt, buttonGroup);
         box.setAlignment(Pos.CENTER);
 
         return box;
+    }
+
+    private Node createLoginPassGrid() {
+        final Label loginLabel = new Label();
+        loginLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginLabel"));
+        loginField = new TextField();
+        loginField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("loginPrompt"));
+        final Label passwordLabel = new Label();
+        passwordLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordLabel"));
+        passwordField = new PasswordField();
+        passwordField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordPrompt"));
+
+        GridPane loginPassGrid = new GridPane();
+        loginPassGrid.add(loginLabel, 0, 0);
+        loginPassGrid.add(passwordLabel, 0, 1);
+        loginPassGrid.add(loginField, 1, 0);
+        loginPassGrid.add(passwordField, 1, 1);
+        loginPassGrid.setHgap(GAP);
+        loginPassGrid.setVgap(GAP);
+        loginPassGrid.setAlignment(Pos.CENTER);
+
+        return loginPassGrid;
     }
 }

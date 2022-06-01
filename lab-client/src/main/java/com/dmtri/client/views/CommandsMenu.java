@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class CommandsMenu extends Menu {
+    private static final int GAP = 10;
     private final GraphicClient client;
 
     public CommandsMenu(GraphicClient client) {
@@ -82,7 +83,7 @@ public class CommandsMenu extends Menu {
         VBox stageBox = new VBox();
         stageBox.getChildren().addAll(inspector.getView(), addButton);
         stageBox.setAlignment(Pos.TOP_CENTER);
-        stageBox.setPadding(new Insets(10));
+        stageBox.setPadding(new Insets(GAP));
         Stage routeStage = new Stage();
         routeStage.titleProperty().bind(client.getLocaleManager().getObservableStringByKey("addCommandTitle"));
         routeStage.setScene(new Scene(stageBox));
@@ -100,7 +101,7 @@ public class CommandsMenu extends Menu {
     private Response executeCommandWithEmptyBody(String commandName) {
         return client.sendMessage(new Request(
             commandName,
-            new RequestBody(new String[] {}), 
+            new RequestBody(new String[] {}),
             client.getAuth())
         );
     }
@@ -114,7 +115,7 @@ public class CommandsMenu extends Menu {
                 alert.setContentText(resp.getMessage());
             } else {
                 alert.contentTextProperty().bind(Bindings.createStringBinding(
-                    () -> MessageFormat.format(client.getLocaleManager().getObservableStringByKey(resp.getLocaleKey()).get(), resp.getParams()), 
+                    () -> MessageFormat.format(client.getLocaleManager().getObservableStringByKey(resp.getLocaleKey()).get(), resp.getParams()),
                     client.getLocaleManager().localeProperty())
                 );
             }

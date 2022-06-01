@@ -1,7 +1,7 @@
 package com.dmtri.common.exceptions;
 
 public class InvalidFieldException extends Exception {
-    private String localeKey = null;
+    private final String localeKey = null;
 
     public InvalidFieldException() {
     }
