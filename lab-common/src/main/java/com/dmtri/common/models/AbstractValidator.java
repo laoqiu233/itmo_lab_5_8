@@ -22,9 +22,9 @@ public interface AbstractValidator<T> {
      * @param message message to put in exception
      * @throws InvalidFieldException the provided field is null
      */
-    static void ensureNotNull(Object field, String message) throws InvalidFieldException {
+    static void ensureNotNull(Object field, String message, String localeKey) throws InvalidFieldException {
         if (field == null) {
-            throw new InvalidFieldException(message);
+            throw new InvalidFieldException(message, localeKey);
         }
     }
 }

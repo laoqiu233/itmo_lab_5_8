@@ -49,17 +49,19 @@ public class MainView {
 
     public MainView(GraphicClient client) {
         this.client = client;
-        filterView = new FilterView();
+        filterView = new FilterView(client.getLocaleManager());
         filterView.filterProperty().addListener(listener);
         client.routesProperty().addListener(listener);
 
         BorderPane root = new BorderPane();
         root.setLeft(filterView.getView());
-        tableTab = new RoutesTableView(filteredRoutes);
-        graphicTab = new RoutesGraphicView(filteredRoutes);
+        tableTab = new RoutesTableView(filteredRoutes, client.getLocaleManager());
+        graphicTab = new RoutesGraphicView(filteredRoutes, client.getLocaleManager());
         tableTab.selectedRouteProperty().bindBidirectional(graphicTab.selectedRouteProperty());
         Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
+        tab1.textProperty().bind(client.getLocaleManager().getObservableStringByKey("routesTable"));
         Tab tab2 = new Tab("Graph View", graphicTab.getView());
+        tab2.textProperty().bind(client.getLocaleManager().getObservableStringByKey("routesGraph"));
         TabPane center = new TabPane(tab1, tab2);
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);

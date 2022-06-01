@@ -21,6 +21,7 @@ public class SumOfDistanceCommand extends AbstractCommand {
 
     @Override
     public Response execute(Request request, String username) {
-        return new Response("Sum of distances: " + col.sumOfDistances());
+        Double sumOfDistances = col.sumOfDistances();
+        return new Response("Sum of distances: " + sumOfDistances, "sumOfDistancesResponse", new Object[] {sumOfDistances});
     }
 }

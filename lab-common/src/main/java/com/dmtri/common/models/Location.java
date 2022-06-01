@@ -85,11 +85,11 @@ public class Location implements Serializable {
         }
 
         public void validateCoordinates(Coordinates coordinates) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(coordinates, "Coordinates for location can not be null");
+            AbstractValidator.ensureNotNull(coordinates, "Coordinates for location can not be null", null);
         }
 
         public void validateName(String name) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(name, "Field name for object of type location can not be null");
+            AbstractValidator.ensureNotNull(name, "Field name for object of type location can not be null", "locationNameNotNull");
         }
     }
 }

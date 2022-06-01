@@ -1,34 +1,51 @@
 package com.dmtri.client.views;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.swing.text.DateFormatter;
+
+import com.dmtri.client.LocaleManager;
 import com.dmtri.common.models.Route;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Parent;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
 public class RoutesTableView {
+    private final LocaleManager localeManager;
     private TableView<Route> tableView;
     private ObservableList<Route> orderedRouteList = FXCollections.observableList(new LinkedList<>());
     private ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
 
-    public RoutesTableView(ObservableSet<Route> routes) {
+    public RoutesTableView(ObservableSet<Route> routes, LocaleManager localeManager) {
+        this.localeManager = localeManager;
         tableView = createTable();
 
         routes.addListener(new SetChangeListener<Route>() {
@@ -117,35 +134,89 @@ public class RoutesTableView {
     }
 
     private TableView<Route> createTable() {
-        TableColumn<Route, Long> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        TableColumn<Route, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<Route, LocalDate> creationDateCol = new TableColumn<>("Creation date");
-        creationDateCol.setCellValueFactory(new PropertyValueFactory<>("creationDate"));
-        TableColumn<Route, Double> distanceCol = new TableColumn<>("Distance");
-        distanceCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getDistance()));
-        TableColumn<Route, String> fromNameCol = new TableColumn<>("Starting location");
-        fromNameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFrom().getName()));
-        TableColumn<Route, Long> fromXCol = new TableColumn<>("Start X");
-        fromXCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getFrom().getCoordinates().getX()));
-        TableColumn<Route, Double> fromYCol = new TableColumn<>("Start Y");
-        fromYCol.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getFrom().getCoordinates().getY()).asObject());
-        TableColumn<Route, Long> fromZCol = new TableColumn<>("Start Z");
-        fromZCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getFrom().getCoordinates().getZ()));
-        TableColumn<Route, String> toNameCol = new TableColumn<>("Ending location");
-        toNameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTo().getName()));
-        TableColumn<Route, Long> toXCol = new TableColumn<>("End X");
-        toXCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getTo().getCoordinates().getX()));
-        TableColumn<Route, Double> toYCol = new TableColumn<>("End Y");
-        toYCol.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getTo().getCoordinates().getY()).asObject());
-        TableColumn<Route, Long> toZCol = new TableColumn<>("End Z");
-        toZCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getTo().getCoordinates().getZ()));
-        TableColumn<Route, String> ownerCol = new TableColumn<>("Owner");
-        ownerCol.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getOwner()));
+        TableColumn<Route, Long> idCol = createColumn(
+            "idLabel", new PropertyValueFactory<>("id"),
+            id -> NumberFormat.getIntegerInstance().format(id)
+        );
+        TableColumn<Route, String> nameCol = createColumn(
+            "nameLabel", new PropertyValueFactory<>("name"),
+            x -> x
+        );
+        TableColumn<Route, LocalDate> creationDateCol = createColumn(
+            "creationDateLabel", new PropertyValueFactory<>("creationDate"),
+            date -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+        );
+        TableColumn<Route, Double> distanceCol = createColumn(
+            "distanceLabel", new PropertyValueFactory<>("distance"),
+            distance -> NumberFormat.getNumberInstance().format(distance)
+        );
+        TableColumn<Route, String> fromNameCol = createColumn(
+            "startingLocationNameLabel", data -> new SimpleStringProperty(data.getValue().getFrom().getName()),
+            x -> x
+        );
+        TableColumn<Route, Long> fromXCol = createColumn(
+            "startingLocationXLabel", data -> new SimpleObjectProperty<>(data.getValue().getFrom().getCoordinates().getX()),
+            x -> NumberFormat.getIntegerInstance().format(x)
+        );
+        TableColumn<Route, Double> fromYCol = createColumn(
+            "startingLocationYLabel", data -> new SimpleObjectProperty<>(data.getValue().getFrom().getCoordinates().getY()),
+            x -> NumberFormat.getNumberInstance().format(x)
+        );
+        TableColumn<Route, Long> fromZCol = createColumn(
+            "startingLocationZLabel", data -> new SimpleObjectProperty<>(data.getValue().getFrom().getCoordinates().getZ()),
+            x -> NumberFormat.getIntegerInstance().format(x)
+        );
+        TableColumn<Route, String> toNameCol = createColumn(
+            "endingLocationNameLabel", data -> new SimpleStringProperty(data.getValue().getTo().getName()),
+            name -> name
+        );
+        TableColumn<Route, Long> toXCol = createColumn(
+            "endingLocationXLabel", data -> new SimpleObjectProperty<>(data.getValue().getTo().getCoordinates().getX()),
+            x -> NumberFormat.getIntegerInstance().format(x)
+        );
+        TableColumn<Route, Double> toYCol = createColumn(
+            "endingLocationYLabel", data -> new SimpleObjectProperty<>(data.getValue().getTo().getCoordinates().getY()),
+            x -> NumberFormat.getNumberInstance().format(x)
+        );
+        TableColumn<Route, Long> toZCol = createColumn(
+            "endingLocationZLabel", data -> new SimpleObjectProperty<>(data.getValue().getTo().getCoordinates().getZ()),
+            x -> NumberFormat.getIntegerInstance().format(x)
+        );
+        TableColumn<Route, String> ownerCol = createColumn(
+            "ownerLabel", new PropertyValueFactory<>("owner"),
+            x -> x
+        );
         TableView<Route> table = new TableView<>(orderedRouteList);
         table.getColumns().addAll(idCol, nameCol, creationDateCol, distanceCol, fromNameCol, fromXCol, fromYCol, fromZCol, toNameCol, toXCol, toYCol, toZCol, ownerCol);
 
         return table;
+    }
+
+    private <T> TableColumn<Route, T> createColumn(String localeKey, Callback<CellDataFeatures<Route, T>, ObservableValue<T>> valueFactory, Callback<T, String> formatter) {
+        TableColumn<Route, T> newColumn = new TableColumn<>();
+        newColumn.textProperty().bind(localeManager.getObservableStringByKey(localeKey));
+        newColumn.setCellValueFactory(valueFactory);
+        newColumn.setCellFactory(tc -> new LocaleFormattedTableCell<>(formatter));
+        return newColumn;
+    }
+
+    private class LocaleFormattedTableCell<T> extends TableCell<Route, T> {
+        Callback<T, String> formatter;
+
+        LocaleFormattedTableCell(Callback<T, String> formatter) {
+            this.formatter = formatter;
+        }
+
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                textProperty().unbind();
+                setText("");
+            } else {
+                textProperty().bind(Bindings.createStringBinding(() -> formatter.call(item), localeManager.localeProperty()));
+            }
+        }
     }
 }

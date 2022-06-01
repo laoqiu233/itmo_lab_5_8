@@ -22,8 +22,8 @@ public class ConnectionView {
     private final GraphicClient client;
 
     public ConnectionView(GraphicClient client) {
-        view = createLayout();
         this.client = client;
+        view = createLayout();
     }
 
     public Parent getView() {
@@ -31,10 +31,13 @@ public class ConnectionView {
     }
 
     private Parent createLayout() {
-        final Label addressLabel = new Label("Address");
-        addressField.setPromptText("Enter the address");
-        final Label portLabel = new Label("Port");
-        portField.setPromptText("Enter the port");
+        connectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("connectButton"));
+        final Label addressLabel = new Label();
+        addressLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("addressLabel"));
+        addressField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("addressPrompt"));
+        final Label portLabel = new Label();
+        portLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("portLabel"));
+        portField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("portPrompt"));
         portField.setTextFormatter(new TextFormatter<>(change -> {
             if (!change.getControlNewText().equals("")) {
                 try {

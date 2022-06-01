@@ -35,8 +35,8 @@ public class LoginView {
     private StringProperty promptMsg = new SimpleStringProperty("");
 
     public LoginView(GraphicClient client) {
-        view = createLayout();
         this.client = client;
+        view = createLayout();
     }
 
     public Parent getView() {
@@ -98,15 +98,19 @@ public class LoginView {
     }
 
     private Parent createLayout() {
-        final Label headerLabel = new Label("Route Manager");
+        final Label headerLabel = new Label();
+        headerLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginHeader"));
         headerLabel.setFont(Font.font("Montserrat", FontWeight.BOLD, HEADER_FONT_SIZE));
-        final Label subheaderLabel = new Label("Please Login or Register");
-        final Label loginLabel = new Label("Login");
+        final Label subheaderLabel = new Label();
+        subheaderLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginSubHeader"));
+        final Label loginLabel = new Label();
+        loginLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginLabel"));
         loginField = new TextField();
-        loginField.setPromptText("Your login");
-        final Label passwordLabel = new Label("Password");
+        loginField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("loginPrompt"));
+        final Label passwordLabel = new Label();
+        passwordLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordLabel"));
         passwordField = new PasswordField();
-        passwordField.setPromptText("Your password");
+        passwordField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordPrompt"));
 
         GridPane loginPassGrid = new GridPane();
         loginPassGrid.add(loginLabel, 0, 0);
@@ -117,11 +121,14 @@ public class LoginView {
         loginPassGrid.setVgap(GAP);
         loginPassGrid.setAlignment(Pos.CENTER);
 
-        loginButton = new Button("Login");
+        loginButton = new Button();
+        loginButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginButton"));
         loginButton.setOnMouseClicked(this::sendLoginRequest);
         registerButton = new Button("Register");
+        registerButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("registerButton"));
         registerButton.setOnMouseClicked(this::sendRegisterRequest);
         disconnectButton = new Button("Disconnect");
+        disconnectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("disconnectButton"));
         disconnectButton.setOnMouseClicked(e -> client.disconnect());
         HBox buttonGroup = new HBox(GAP);
         buttonGroup.getChildren().addAll(loginButton, registerButton, disconnectButton);

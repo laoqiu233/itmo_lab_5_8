@@ -120,16 +120,16 @@ public class RouteInspectorView {
     }
 
     private void createAllFields() {
-        nameField = new ValidationField<>("Name", x -> (x.isEmpty() ? null : x), Route.VALIDATOR::validateName);
-        distanceField = new ValidationField<>("Distance", new NumberStringConverter<>(Double::parseDouble), Route.VALIDATOR::validateDistance);
-        fromNameField = new ValidationField<>("Starting Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
-        fromXField = new ValidationField<>("Starting X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
-        fromYField = new ValidationField<>("Starting Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
-        fromZField = new ValidationField<>("Starting Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
-        toNameField = new ValidationField<>("Ending Name", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
-        toXField = new ValidationField<>("Ending X", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
-        toYField = new ValidationField<>("Ending Y", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
-        toZField = new ValidationField<>("Ending Z", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
+        nameField = new ValidationField<>("nameLabel", x -> (x.isEmpty() ? null : x), Route.VALIDATOR::validateName);
+        distanceField = new ValidationField<>("distanceLabel", new NumberStringConverter<>(Double::parseDouble), Route.VALIDATOR::validateDistance);
+        fromNameField = new ValidationField<>("startingLocationNameLabel", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
+        fromXField = new ValidationField<>("startingLocationXLabel", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
+        fromYField = new ValidationField<>("startingLocationYLabel", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
+        fromZField = new ValidationField<>("startingLocationZLabel", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
+        toNameField = new ValidationField<>("endingLocationNameLabel", x -> (x.isEmpty() ? null : x), Location.VALIDATOR::validateName);
+        toXField = new ValidationField<>("endingLocationXLabel", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateX);
+        toYField = new ValidationField<>("endingLocationYLabel", new NumberStringConverter<>(Double::parseDouble), Coordinates.VALIDATOR::validateY);
+        toZField = new ValidationField<>("endingLocationZLabel", new NumberStringConverter<>(Long::parseLong), Coordinates.VALIDATOR::validateZ);
     }
 
     private void fillFields(Route route) {
@@ -175,10 +175,11 @@ public class RouteInspectorView {
         private Label promptLabel = new Label();
         private BooleanProperty valueReadyProperty = new SimpleBooleanProperty(false);
 
-        ValidationField(String fieldName, StringConverter<T> converter, AbstractValidator<T> validator) {
+        ValidationField(String localeKey, StringConverter<T> converter, AbstractValidator<T> validator) {
             this.converter = converter;
             this.validator = validator;
-            Label fieldLabel = new Label(fieldName);
+            Label fieldLabel = new Label();
+            fieldLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(localeKey));
             promptLabel.setTextFill(Color.RED);
             valueField = new TextField();
             valueField.editableProperty().bind(routeIsEditableProperty);
@@ -190,6 +191,7 @@ public class RouteInspectorView {
         }
 
         void validateAndUpdate(String newV) {
+            promptLabel.textProperty().unbind();
             promptLabel.setText("");
             valueReadyProperty.set(false);
 
@@ -200,14 +202,14 @@ public class RouteInspectorView {
 
             T value = converter.convert(newV);
             if (value == null && !newV.isEmpty()) {
-                promptLabel.setText("Invalid value provided");
+                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("invalidValue"));
                 return;
             }
 
             try {
                 validator.validate(value);
             } catch (InvalidFieldException e) {
-                promptLabel.setText(e.getMessage());
+                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(e.getLocaleKey()));
                 return;
             }
 

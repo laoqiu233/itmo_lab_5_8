@@ -6,6 +6,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -37,6 +40,7 @@ import javafx.stage.Stage;
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
     private static final int SLEEP_TIME = 100;
+    private final LocaleManager localeManager = new LocaleManager(Locale.getDefault());
     private ObjectSocketChannelWrapper channel;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
     private ObservableSet<Route> routes = FXCollections.observableSet();
@@ -51,8 +55,20 @@ public class GraphicClient extends Application {
     private Scene scene = new Scene(sceneRoot);
 
     public void start(Stage primaryStage) {
+        // Create language menu
+        languageMenu.textProperty().bind(localeManager.getObservableStringByKey("languageMenuName"));
+        RadioMenuItem englishMenuItem = new RadioMenuItem("English");
+        englishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.ENGLISH));
+        RadioMenuItem russianMenuItem = new RadioMenuItem("Русский");
+        russianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("ru-RU")));
+        ToggleGroup group = new ToggleGroup();
+        englishMenuItem.setSelected(true);
+        englishMenuItem.setToggleGroup(group);
+        russianMenuItem.setToggleGroup(group);
+        languageMenu.getItems().addAll(englishMenuItem, russianMenuItem);
+
         routesThread.start();
-        primaryStage.setTitle("Route Manager");
+        primaryStage.titleProperty().bind(localeManager.getObservableStringByKey("loginHeader"));
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
         sceneRoot.setTop(menuBar);
@@ -65,10 +81,16 @@ public class GraphicClient extends Application {
         return channel;
     }
 
+    public LocaleManager getLocaleManager() {
+        return localeManager;
+    }
+
+    public ObjectProperty<AuthCredentials> authProperty() {
+        return auth;
+    }
     public AuthCredentials getAuth() {
         return auth.get();
     }
-
     public void setAuth(AuthCredentials auth) {
         if (auth == null) {
             routesThread.setWorking(false);
@@ -80,10 +102,6 @@ public class GraphicClient extends Application {
             menuBar.getMenus().add(commandsMenu);
         }
         this.auth.set(auth);
-    }
-
-    public ObjectProperty<AuthCredentials> authProperty() {
-        return auth;
     }
 
     public Set<Route> getRoutes() {

@@ -1,5 +1,6 @@
 package com.dmtri.client.views;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 
 import com.dmtri.client.GraphicClient;
@@ -29,19 +30,26 @@ public class CommandsMenu extends Menu {
 
     public CommandsMenu(GraphicClient client) {
         super("Commands");
+        textProperty().bind(client.getLocaleManager().getObservableStringByKey("commandsMenuName"));
         this.client = client;
 
-        MenuItem add = new MenuItem("Add");
+        MenuItem add = new MenuItem();
+        add.textProperty().bind(client.getLocaleManager().getObservableStringByKey("addCommand"));
         add.setOnAction(e -> displayAddRouteWindow());
-        MenuItem info = new MenuItem("Info");
+        MenuItem info = new MenuItem();
+        info.textProperty().bind(client.getLocaleManager().getObservableStringByKey("infoCommand"));
         info.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("info")));
-        MenuItem printUniqueDistance = new MenuItem("Print unique distances");
+        MenuItem printUniqueDistance = new MenuItem();
+        printUniqueDistance.textProperty().bind(client.getLocaleManager().getObservableStringByKey("uniqueDistancesCommand"));
         printUniqueDistance.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("print_unique_distance")));
-        MenuItem clear = new MenuItem("Clear");
+        MenuItem clear = new MenuItem();
+        clear.textProperty().bind(client.getLocaleManager().getObservableStringByKey("clearCommand"));
         clear.setOnAction(e -> executeCommandWithEmptyBody("clear"));
-        MenuItem removeAllByDistance = new MenuItem("Remove all by distance");
+        MenuItem removeAllByDistance = new MenuItem();
+        removeAllByDistance.textProperty().bind(client.getLocaleManager().getObservableStringByKey("removeAllByDistanceCommand"));
         removeAllByDistance.setOnAction(e -> displayRemoveByDistanceDialog());
-        MenuItem sumOfDistance = new MenuItem("Sum of distances");
+        MenuItem sumOfDistance = new MenuItem();
+        sumOfDistance.textProperty().bind(client.getLocaleManager().getObservableStringByKey("sumOfDistancesCommand"));
         sumOfDistance.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("sum_of_distance")));
 
         getItems().addAll(add, info, printUniqueDistance, clear, removeAllByDistance, sumOfDistance);
@@ -49,9 +57,9 @@ public class CommandsMenu extends Menu {
 
     private void displayRemoveByDistanceDialog() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Remove by distance");
-        dialog.setHeaderText("Enter the distance");
-        dialog.setContentText("Distance");
+        dialog.titleProperty().bind(client.getLocaleManager().getObservableStringByKey("removeAllByDistanceCommand"));
+        dialog.headerTextProperty().bind(client.getLocaleManager().getObservableStringByKey("distancePrompt"));
+        dialog.contentTextProperty().bind(client.getLocaleManager().getObservableStringByKey("distanceLabel"));
         Optional<String> res = dialog.showAndWait();
         if (res.isPresent()) {
             client.sendMessage(new Request(
@@ -68,14 +76,15 @@ public class CommandsMenu extends Menu {
         ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>(null);
         RouteInspectorView inspector = new RouteInspectorView(client, routeProperty);
         routeProperty.set(emptyRoute);
-        Button addButton = new Button("Add");
+        Button addButton = new Button();
+        addButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("addCommand"));
         addButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
         VBox stageBox = new VBox();
         stageBox.getChildren().addAll(inspector.getView(), addButton);
         stageBox.setAlignment(Pos.TOP_CENTER);
         stageBox.setPadding(new Insets(10));
         Stage routeStage = new Stage();
-        routeStage.setTitle("Add a route");
+        routeStage.titleProperty().bind(client.getLocaleManager().getObservableStringByKey("addCommandTitle"));
         routeStage.setScene(new Scene(stageBox));
         addButton.setOnMouseClicked(e -> {
             client.sendMessage(new Request(
@@ -99,9 +108,16 @@ public class CommandsMenu extends Menu {
     private void showCommandResultAsAlert(Response resp) {
         if (resp != null) {
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Command Result");
-            alert.setHeaderText("Command success");
-            alert.setContentText(resp.getMessage());
+            alert.titleProperty().bind(client.getLocaleManager().getObservableStringByKey("commandResultLabel"));
+            alert.headerTextProperty().bind(client.getLocaleManager().getObservableStringByKey("commandSuccessLabel"));
+            if (resp.getLocaleKey() == null) {
+                alert.setContentText(resp.getMessage());
+            } else {
+                alert.contentTextProperty().bind(Bindings.createStringBinding(
+                    () -> MessageFormat.format(client.getLocaleManager().getObservableStringByKey(resp.getLocaleKey()).get(), resp.getParams()), 
+                    client.getLocaleManager().localeProperty())
+                );
+            }
             alert.show();
         }
     }

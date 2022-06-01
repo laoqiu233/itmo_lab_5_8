@@ -96,7 +96,7 @@ public class Coordinates implements Serializable {
         }
 
         public void validateY(Double y) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(y, "Field y for coordinate objects can not be null.");
+            AbstractValidator.ensureNotNull(y, "Field y for coordinate objects can not be null.", "coordinatesYNotNull");
         }
 
         public void validateZ(Long z) throws InvalidFieldException {

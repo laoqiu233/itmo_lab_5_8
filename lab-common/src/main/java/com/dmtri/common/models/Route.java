@@ -169,35 +169,35 @@ public class Route implements Comparable<Route>, Serializable {
         }
 
         public void validateId(Long id) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(id, "id of routes can not be null");
+            AbstractValidator.ensureNotNull(id, "id of routes can not be null", "idNotNull");
             if (id <= 0) {
-                throw new InvalidFieldException("id of routes should be greater than 0");
+                throw new InvalidFieldException("id of routes should be greater than 0", "idGreaterThan0");
             }
         }
 
         public void validateName(String name) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(name, "name of routes can not be null");
+            AbstractValidator.ensureNotNull(name, "name of routes can not be null", "routeNameNotEmpty");
             if (name.length() == 0) {
-                throw new InvalidFieldException("name of routes can not be an empty string");
+                throw new InvalidFieldException("name of routes can not be an empty string", "routeNameNotEmpty");
             }
         }
 
         public void validateFrom(Location from) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(from, "starting point of routes can not be null");
+            AbstractValidator.ensureNotNull(from, "starting point of routes can not be null", null);
         }
 
         public void validateTo(Location to) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(to, "ending point of routes can not be null");
+            AbstractValidator.ensureNotNull(to, "ending point of routes can not be null", null);
         }
 
         public void validateDistance(Double distance) throws InvalidFieldException {
             if (distance != null && distance <= 1) {
-                throw new InvalidFieldException("distance of routes should be greater than 1");
+                throw new InvalidFieldException("distance of routes should be greater than 1", "distanceGreaterThan1");
             }
         }
 
         public void validateCreationDate(java.time.LocalDate creationDate) throws InvalidFieldException {
-            AbstractValidator.ensureNotNull(creationDate, "creation date of routes can not be null");
+            AbstractValidator.ensureNotNull(creationDate, "creation date of routes can not be null", null);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.dmtri.client.views;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.dmtri.client.LocaleManager;
 import com.dmtri.common.models.Location;
 import com.dmtri.common.models.Route;
 
@@ -36,13 +38,15 @@ public class RoutesGraphicView {
     private static final double MAX_RADIUS = 100;
     private final Image backgroundImage = new Image("/map.png");
     private final ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
+    private final LocaleManager localeManager;
     private Canvas canvas;
     private ScrollPane view;
     private Pane clickableShapes = new Pane();
     private Set<GraphicRoute> graphicRoutes = new HashSet<>();
     private Map<String, Color> ownerColors = new HashMap<>();
 
-    public RoutesGraphicView(ObservableSet<Route> routeSet) {
+    public RoutesGraphicView(ObservableSet<Route> routeSet, LocaleManager localeManager) {
+        this.localeManager = localeManager;
         canvas = new Canvas(backgroundImage.getWidth(), backgroundImage.getHeight());
         canvas.getGraphicsContext2D().setTextAlign(TextAlignment.CENTER);
         canvas.getGraphicsContext2D().setTextBaseline(VPos.CENTER);
@@ -80,6 +84,7 @@ public class RoutesGraphicView {
             }
         });
         selectedRouteProperty.addListener((o, oldV, newV) -> redrawOnCanvas());
+        localeManager.localeProperty().addListener((o, oldV, newV) -> redrawOnCanvas());
 
         Text coordsText = new Text();
         coordsText.setTextAlignment(TextAlignment.LEFT);
@@ -191,10 +196,20 @@ public class RoutesGraphicView {
             gc.setLineWidth(3);
             gc.strokeText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.strokeText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
-            gc.strokeText(route.getName() + "\nDistance: " + route.getDistance() + "\nOwned by: " + route.getOwner(), (startLocation.getCenterX() + endLocation.getCenterX()) / 2, (startLocation.getCenterY() + endLocation.getCenterY()) / 2);
+            gc.strokeText(route.getName()
+                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + NumberFormat.getNumberInstance().format(route.getDistance())
+                         + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(), 
+                         (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
+                         (startLocation.getCenterY() + endLocation.getCenterY()) / 2
+            );
             gc.fillText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.fillText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
-            gc.fillText(route.getName() + "\nDistance: " + route.getDistance() + "\nOwned by: " + route.getOwner(), (startLocation.getCenterX() + endLocation.getCenterX()) / 2, (startLocation.getCenterY() + endLocation.getCenterY()) / 2);
+            gc.fillText(route.getName()
+                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + NumberFormat.getNumberInstance().format(route.getDistance())
+                         + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(), 
+                         (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
+                         (startLocation.getCenterY() + endLocation.getCenterY()) / 2
+            );
         }
 
         void removeFromPane() {
