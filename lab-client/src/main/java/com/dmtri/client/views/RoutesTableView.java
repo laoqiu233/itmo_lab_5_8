@@ -60,6 +60,10 @@ public class RoutesTableView {
             sortList();
         });
 
+        selectedRouteProperty.addListener((o, oldVal, newVal) -> {
+            tableView.getSelectionModel().select(newVal);
+        });
+
         tableView.getSelectionModel().selectedItemProperty().addListener((o, oldVal, newVal) -> {
             setSelectedRoute(newVal);
         });

@@ -35,6 +35,7 @@ public class MainView {
     private Parent view;
     private GraphicClient client;
     private RoutesTableView tableTab;
+    private RoutesGraphicView graphicTab;
     private FilterView filterView;
     private RouteInspectorView inspector;
     private ObservableSet<Route> filteredRoutes = FXCollections.observableSet();
@@ -55,8 +56,10 @@ public class MainView {
         BorderPane root = new BorderPane();
         root.setLeft(filterView.getView());
         tableTab = new RoutesTableView(filteredRoutes);
+        graphicTab = new RoutesGraphicView(filteredRoutes);
+        tableTab.selectedRouteProperty().bindBidirectional(graphicTab.selectedRouteProperty());
         Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
-        Tab tab2 = new Tab("Graph View");
+        Tab tab2 = new Tab("Graph View", graphicTab.getView());
         TabPane center = new TabPane(tab1, tab2);
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);
