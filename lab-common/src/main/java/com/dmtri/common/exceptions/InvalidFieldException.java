@@ -1,13 +1,15 @@
 package com.dmtri.common.exceptions;
 
 public class InvalidFieldException extends Exception {
-    private final String localeKey = null;
+    private final String localeKey;
 
     public InvalidFieldException() {
+        localeKey = null;
     }
 
     public InvalidFieldException(String message) {
         super(message);
+        localeKey = null;
     }
 
     public InvalidFieldException(String message, String localeKey) {
@@ -17,15 +19,18 @@ public class InvalidFieldException extends Exception {
 
     public InvalidFieldException(Throwable cause) {
         super(cause);
+        localeKey = null;
     }
 
     public InvalidFieldException(String message, Throwable cause) {
         super(message, cause);
+        localeKey = null;
     }
 
     public InvalidFieldException(String message, Throwable cause, boolean enableSuppression,
             boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+        localeKey = null;
     }
 
     public String getLocaleKey() {
