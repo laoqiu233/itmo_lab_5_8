@@ -208,7 +208,7 @@ public class RoutesGraphicView {
             gc.strokeText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.strokeText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.strokeText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + NumberFormat.getNumberInstance().format(route.getDistance())
+                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + (route.getDistance() == null ? "null" : NumberFormat.getNumberInstance().format(route.getDistance()))
                          + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2
@@ -216,7 +216,7 @@ public class RoutesGraphicView {
             gc.fillText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.fillText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.fillText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + NumberFormat.getNumberInstance().format(route.getDistance())
+                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + (route.getDistance() == null ? "null" : NumberFormat.getNumberInstance().format(route.getDistance()))
                          + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2

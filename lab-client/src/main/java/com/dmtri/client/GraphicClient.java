@@ -1,5 +1,12 @@
 package com.dmtri.client;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -19,7 +26,9 @@ import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithRoutes;
+import com.dmtri.common.userio.BasicUserIO;
 import com.dmtri.common.usermanagers.AuthCredentials;
+import com.dmtri.common.util.TerminalColors;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -32,15 +41,20 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
     private static final int SLEEP_TIME = 100;
     private final LocaleManager localeManager = new LocaleManager(Locale.getDefault());
+    private Stage primaryStage;
     private ObjectSocketChannelWrapper channel;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
     private ObservableSet<Route> routes = FXCollections.observableSet();
@@ -55,6 +69,9 @@ public class GraphicClient extends Application {
     private Scene scene = new Scene(sceneRoot);
 
     public void start(Stage primaryStage) {
+        TerminalColors.doColoring(false);
+        this.primaryStage = primaryStage;
+
         // Create language menu
         languageMenu.textProperty().bind(localeManager.getObservableStringByKey("languageMenuName"));
         RadioMenuItem englishMenuItem = new RadioMenuItem("English");
@@ -115,6 +132,35 @@ public class GraphicClient extends Application {
 
     public ObservableSet<Route> routesProperty() {
         return routes;
+    }
+
+    public void chooseScriptAndExecute() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.titleProperty().bind(localeManager.getObservableStringByKey("scriptChooserTitle"));
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        try (FileInputStream fileInput = new FileInputStream(selectedFile);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
+            scriptIO.setRepeatInput(true);
+
+            ConsoleClient console = new ConsoleClient(
+                channel.getSocket().getRemoteAddress(),
+                scriptIO
+            );
+            console.setAuth(getAuth());
+            console.run();
+
+            TextArea area = new TextArea();
+            area.setEditable(false);
+            area.setText(baos.toString());
+
+            Stage resultWindow = new Stage();
+            resultWindow.setTitle("Script execution result");
+            resultWindow.setScene(new Scene(new BorderPane(area)));
+            resultWindow.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void connect(InetSocketAddress address) {

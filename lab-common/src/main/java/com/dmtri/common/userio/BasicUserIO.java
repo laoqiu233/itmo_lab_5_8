@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 
 public class BasicUserIO {
+    private boolean repeatInput = false;
     private LinkedList<BufferedReader> inStack;
     private BufferedWriter out;
 
@@ -21,6 +22,10 @@ public class BasicUserIO {
         this.inStack = new LinkedList<>();
         this.inStack.add(new BufferedReader(new InputStreamReader(in)));
         this.out = new BufferedWriter(new OutputStreamWriter(out));
+    }
+
+    public void setRepeatInput(boolean repeatInput) {
+        this.repeatInput = repeatInput;
     }
 
     public void write(Object s) {
@@ -57,7 +62,11 @@ public class BasicUserIO {
             } while (inStack.size() > 0);
 
             if (inStack.size() == 0) {
-                System.exit(0);
+                return null;
+            }
+
+            if (repeatInput) {
+                writeln(input);
             }
 
             return input;

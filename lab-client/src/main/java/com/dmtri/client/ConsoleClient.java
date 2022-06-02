@@ -2,6 +2,7 @@ package com.dmtri.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 
 import com.dmtri.common.CommandHandler;
@@ -24,12 +25,21 @@ public class ConsoleClient {
     private CommandHandler ch;
     private String inputPrefix = "> ";
     private ObjectSocketChannelWrapper remote;
-    private InetSocketAddress addr;
+    private SocketAddress addr;
 
-    public ConsoleClient(InetSocketAddress addr) throws IOException {
+    public ConsoleClient(SocketAddress addr) throws IOException {
         this.io = new BasicUserIO();
         this.ch = CommandHandler.standardCommandHandler(null, null);
         this.addr = addr;
+    }
+
+    public ConsoleClient(SocketAddress addr, BasicUserIO io) throws IOException {
+        this(addr);
+        this.io = io;
+    }
+
+    public void setAuth(AuthCredentials auth) {
+        this.auth = auth;
     }
 
     private void writeTrace(Exception e) {

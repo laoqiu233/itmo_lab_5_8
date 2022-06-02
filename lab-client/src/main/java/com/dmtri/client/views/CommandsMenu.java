@@ -52,8 +52,11 @@ public class CommandsMenu extends Menu {
         MenuItem sumOfDistance = new MenuItem();
         sumOfDistance.textProperty().bind(client.getLocaleManager().getObservableStringByKey("sumOfDistancesCommand"));
         sumOfDistance.setOnAction(e -> showCommandResultAsAlert(executeCommandWithEmptyBody("sum_of_distance")));
+        MenuItem executeScript = new MenuItem();
+        executeScript.textProperty().bind(client.getLocaleManager().getObservableStringByKey("executeScriptCommand"));
+        executeScript.setOnAction(e -> client.chooseScriptAndExecute());
 
-        getItems().addAll(add, info, printUniqueDistance, clear, removeAllByDistance, sumOfDistance);
+        getItems().addAll(add, info, printUniqueDistance, clear, removeAllByDistance, sumOfDistance, executeScript);
     }
 
     private void displayRemoveByDistanceDialog() {
