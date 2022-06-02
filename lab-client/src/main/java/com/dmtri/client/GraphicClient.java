@@ -141,28 +141,30 @@ public class GraphicClient extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.titleProperty().bind(localeManager.getObservableStringByKey("scriptChooserTitle"));
         File selectedFile = fileChooser.showOpenDialog(mainWindow);
-        try (FileInputStream fileInput = new FileInputStream(selectedFile);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
-            scriptIO.setRepeatInput(true);
+        if (selectedFile != null) {
+                try (FileInputStream fileInput = new FileInputStream(selectedFile);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
+                scriptIO.setRepeatInput(true);
 
-            ConsoleClient console = new ConsoleClient(
-                channel.getSocket().getRemoteAddress(),
-                scriptIO
-            );
-            console.setAuth(getAuth());
-            console.run();
+                ConsoleClient console = new ConsoleClient(
+                    channel.getSocket().getRemoteAddress(),
+                    scriptIO
+                );
+                console.setAuth(getAuth());
+                console.run();
 
-            TextArea area = new TextArea();
-            area.setEditable(false);
-            area.setText(baos.toString());
+                TextArea area = new TextArea();
+                area.setEditable(false);
+                area.setText(baos.toString());
 
-            Stage resultWindow = new Stage();
-            resultWindow.titleProperty().bind(localeManager.getObservableStringByKey("scriptResultTitle"));
-            resultWindow.setScene(new Scene(new BorderPane(area)));
-            resultWindow.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+                Stage resultWindow = new Stage();
+                resultWindow.titleProperty().bind(localeManager.getObservableStringByKey("scriptResultTitle"));
+                resultWindow.setScene(new Scene(new BorderPane(area)));
+                resultWindow.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

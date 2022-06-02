@@ -48,34 +48,21 @@ public class RoutesGraphicView {
     private final ScrollPane view;
     private final Pane clickableShapes = new Pane();
     private final Set<GraphicRoute> graphicRoutes = new HashSet<>();
-    private final Map<String, Color> ownerColors = new HashMap<>();
     private final SetChangeListener<Route> listener = new SetChangeListener<Route>() {
         @Override
         public void onChanged(Change<? extends Route> change) {
             if (change.wasAdded()) {
-                if (!ownerColors.containsKey(change.getElementAdded().getOwner())) {
-                    Random random = new Random();
-                    ownerColors.put(change.getElementAdded().getOwner(), Color.rgb(
-                        random.nextInt(MAX_RGB),
-                        random.nextInt(MAX_RGB),
-                        random.nextInt(MAX_RGB)
-                    ));
-                }
                 graphicRoutes.add(new GraphicRoute(change.getElementAdded()));
             }
 
             if (change.wasRemoved()) {
-                Set<String> notRemovedOwners = new HashSet<>();
                 for (Iterator<GraphicRoute> it = graphicRoutes.iterator(); it.hasNext();) {
                     GraphicRoute graphicRoute = it.next();
                     if (graphicRoute.getRoute().equals(change.getElementRemoved())) {
                         graphicRoute.removeFromPane();
                         it.remove();
-                    } else {
-                        notRemovedOwners.add(graphicRoute.getRoute().getOwner());
                     }
                 }
-                ownerColors.keySet().removeIf(x -> !notRemovedOwners.contains(x));
             }
 
             redrawOnCanvas();
@@ -197,8 +184,14 @@ public class RoutesGraphicView {
                 gc.setLineWidth(lineBetween.getStrokeWidth() * 2);
                 gc.strokeLine(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             }
-            gc.setFill(ownerColors.get(route.getOwner()));
-            gc.setStroke(ownerColors.get(route.getOwner()));
+            Random random = new Random(route.getOwner().hashCode());
+            Color color = Color.rgb(
+                random.nextInt(MAX_RGB),
+                random.nextInt(MAX_RGB),
+                random.nextInt(MAX_RGB)
+            );  
+            gc.setFill(color);
+            gc.setStroke(color);
             gc.setLineWidth(lineBetween.getStrokeWidth());
             gc.strokeLine(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.fillOval(startLocation.getCenterX() - startLocation.getRadius(), startLocation.getCenterY() - startLocation.getRadius(), startLocation.getRadius() * 2, startLocation.getRadius() * 2);
