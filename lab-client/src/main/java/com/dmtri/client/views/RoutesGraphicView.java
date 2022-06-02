@@ -150,7 +150,6 @@ public class RoutesGraphicView {
         private final EventHandler<MouseEvent> clickHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                System.out.println("Clicked on " + route.getId());
                 setSelectedRoute(route);
             }
         };

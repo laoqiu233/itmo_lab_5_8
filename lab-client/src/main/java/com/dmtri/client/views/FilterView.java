@@ -97,7 +97,6 @@ public class FilterView {
 
         // Refresh locale
         localeManager.localeProperty().addListener((o, oldV, newV) -> {
-            System.out.println("Refreshing filter list");
             FilterConfigurator prevChoice = filterFieldChoice.getValue();
             filterFieldChoice.getItems().clear();
             filterFieldChoice.getItems().addAll(configurators);

@@ -184,7 +184,6 @@ public class GraphicClient extends Application {
     }
 
     public void disconnect() {
-        System.out.println("Disconnecting");
         routesThread.setWorking(false);
         if (channel != null) {
             try {
