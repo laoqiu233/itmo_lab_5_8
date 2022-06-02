@@ -1,10 +1,8 @@
 package com.dmtri.client.views;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -12,6 +10,7 @@ import com.dmtri.client.LocaleManager;
 import com.dmtri.common.models.Location;
 import com.dmtri.common.models.Route;
 
+import javafx.animation.FadeTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableSet;
@@ -32,6 +31,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 
 public class RoutesGraphicView {
     private static final int MAX_RGB = 256;
@@ -41,6 +41,7 @@ public class RoutesGraphicView {
     private static final double MAX_RADIUS = 200;
     private static final double GRAPH_FONT_SIZE = 20;
     private static final double GRAPH_TEXT_OUTLINE_STROKE = 3;
+    private static final double TRANSITION_MILLIS = 500;
     private final Image backgroundImage = new Image("/map.png");
     private final ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
     private final LocaleManager localeManager;
@@ -75,6 +76,7 @@ public class RoutesGraphicView {
         canvas.getGraphicsContext2D().setTextAlign(TextAlignment.CENTER);
         canvas.getGraphicsContext2D().setTextBaseline(VPos.CENTER);
         clickableShapes.setMinSize(canvas.getWidth(), canvas.getHeight());
+        clickableShapes.setMaxSize(canvas.getWidth(), canvas.getHeight());
         routeSet.addListener(listener);
         selectedRouteProperty.addListener((o, oldV, newV) -> redrawOnCanvas());
         localeManager.localeProperty().addListener((o, oldV, newV) -> redrawOnCanvas());
@@ -134,7 +136,6 @@ public class RoutesGraphicView {
         double radius = (MAX_RADIUS - MIN_RADIUS) / (Y_HI - Y_LO) * clippedY + MIN_RADIUS;
 
         Circle newCircle = new Circle(centerX, centerY, radius);
-        newCircle.setFill(Color.TRANSPARENT);
 
         return newCircle;
     }
@@ -144,6 +145,7 @@ public class RoutesGraphicView {
         private final Circle startLocation;
         private final Circle endLocation;
         private final Line lineBetween;
+        private boolean showOnCanvas = false;
 
         private final EventHandler<MouseEvent> clickHandler = new EventHandler<MouseEvent>() {
             @Override
@@ -164,7 +166,17 @@ public class RoutesGraphicView {
                 (route.getDistance() == null ? 1 : Math.min(route.getDistance(), MIN_RADIUS))
             );
             lineBetween.setOnMouseClicked(clickHandler);
-            lineBetween.setStroke(Color.TRANSPARENT);
+            shapesFill(getColorByOwnerHashCode());
+            makeTransition(startLocation, 0, 1).play();
+            makeTransition(endLocation, 0, 1).play();
+            FadeTransition lineTransition = makeTransition(lineBetween, 0, 1);
+            lineTransition.setOnFinished(e -> {
+                showOnCanvas = true;
+                // Make the shapes clickable but transparent, so the display is handled by canvas
+                shapesFill(Color.TRANSPARENT);
+                redrawOnCanvas();
+            });
+            lineTransition.play();
             clickableShapes.getChildren().addAll(startLocation, endLocation, lineBetween);
         }
 
@@ -172,7 +184,25 @@ public class RoutesGraphicView {
             return route;
         }
 
+        Color getColorByOwnerHashCode() {
+            Random random = new Random(route.getOwner().hashCode());
+            return Color.rgb(
+                random.nextInt(MAX_RGB),
+                random.nextInt(MAX_RGB),
+                random.nextInt(MAX_RGB)
+            );
+        }
+
+        void shapesFill(Color color) {
+            startLocation.setFill(color);
+            endLocation.setFill(color);
+            lineBetween.setStroke(color);
+        }
+
         void draw() {
+            if (!showOnCanvas) {
+                return;
+            }
             GraphicsContext gc = canvas.getGraphicsContext2D();
             // Make a black outline if the route is selected
             if (route.equals(getSelectedRoute())) {
@@ -184,18 +214,17 @@ public class RoutesGraphicView {
                 gc.setLineWidth(lineBetween.getStrokeWidth() * 2);
                 gc.strokeLine(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             }
-            Random random = new Random(route.getOwner().hashCode());
-            Color color = Color.rgb(
-                random.nextInt(MAX_RGB),
-                random.nextInt(MAX_RGB),
-                random.nextInt(MAX_RGB)
-            );  
-            gc.setFill(color);
-            gc.setStroke(color);
+            gc.setFill(getColorByOwnerHashCode());
+            gc.setStroke(getColorByOwnerHashCode());
             gc.setLineWidth(lineBetween.getStrokeWidth());
             gc.strokeLine(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.fillOval(startLocation.getCenterX() - startLocation.getRadius(), startLocation.getCenterY() - startLocation.getRadius(), startLocation.getRadius() * 2, startLocation.getRadius() * 2);
             gc.fillOval(endLocation.getCenterX() - endLocation.getRadius(), endLocation.getCenterY() - endLocation.getRadius(), endLocation.getRadius() * 2, endLocation.getRadius() * 2);
+            drawText();
+        }
+
+        void drawText() {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
             gc.setFont(new Font(GRAPH_FONT_SIZE));
             gc.setFill(Color.WHITE);
             gc.setStroke(Color.BLACK);
@@ -219,7 +248,20 @@ public class RoutesGraphicView {
         }
 
         void removeFromPane() {
-            clickableShapes.getChildren().removeAll(startLocation, endLocation);
+            showOnCanvas = false;
+            shapesFill(getColorByOwnerHashCode());
+            makeTransition(startLocation, 1, 0).play();
+            makeTransition(endLocation, 1, 0).play();
+            FadeTransition lineTransition = makeTransition(lineBetween, 1, 0);
+            lineTransition.setOnFinished(e -> clickableShapes.getChildren().removeAll(startLocation, endLocation, lineBetween));
+            lineTransition.play();
+        }
+
+        FadeTransition makeTransition(Node node, double from, double to) {
+            FadeTransition transition = new FadeTransition(Duration.millis(TRANSITION_MILLIS), node);
+            transition.setFromValue(from);
+            transition.setToValue(to);
+            return transition;
         }
     }
 }
