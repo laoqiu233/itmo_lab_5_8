@@ -19,7 +19,7 @@ public class ShowCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, String username) {
+    public Response execute(Request request) {
         Route[] a = new Route[col.getCollection().size()];
         return new ResponseWithRoutes(col.getCollection().toArray(a));
     }

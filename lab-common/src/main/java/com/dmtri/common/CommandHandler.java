@@ -87,7 +87,7 @@ public class CommandHandler {
             }
 
             try {
-                return commands.get(request.getCommandName()).execute(request, request.getAuth() == null ? null : request.getAuth().getLogin());
+                return commands.get(request.getCommandName()).execute(request);
             } catch (InvalidRequestException e) {
                 return new ResponseWithException(e);
             }

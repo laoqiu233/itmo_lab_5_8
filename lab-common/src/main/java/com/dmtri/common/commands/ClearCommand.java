@@ -19,7 +19,7 @@ public class ClearCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, String username) {
+    public Response execute(Request request) {
         col.removeIf(x -> x.getOwner().equals(request.getAuth().getLogin()));
 
         return new Response("Collection cleared");

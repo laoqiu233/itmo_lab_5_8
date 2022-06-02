@@ -19,7 +19,7 @@ public class InfoCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, String username) throws InvalidRequestException {
+    public Response execute(Request request) throws InvalidRequestException {
         StringBuilder sb = new StringBuilder();
         sb.append("Collection type: " + col.getCollection().getClass().getSimpleName() + '\n');
         sb.append("Item count: " + col.getCollection().size() + '\n');

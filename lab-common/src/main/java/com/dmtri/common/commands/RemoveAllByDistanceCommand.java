@@ -39,10 +39,10 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, String username) throws InvalidRequestException {
+    public Response execute(Request request) throws InvalidRequestException {
         try {
             Double distance = Double.parseDouble(request.getBody().getArg(0));
-            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance) && x.getOwner().equals(username)));
+            int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance) && x.getOwner().equals(request.getAuth().getLogin())));
             return new Response("Removed " + res + " items");
         } catch (NumberFormatException e) {
             throw new InvalidRequestException(new CommandArgumentException("Invalid distance entered.", e));

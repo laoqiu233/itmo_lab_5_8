@@ -32,7 +32,7 @@ public class LoginCommand extends AbstractCommand {
     }
 
     @Override
-    public Response execute(Request request, String username) throws InvalidRequestException {
+    public Response execute(Request request) throws InvalidRequestException {
         if (request.getBody().getArgsLength() != 2) {
             throw new InvalidRequestException("This operation requires exactly two arguments: Login and password");
         }
