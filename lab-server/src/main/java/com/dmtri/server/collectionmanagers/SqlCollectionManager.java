@@ -287,27 +287,4 @@ public class SqlCollectionManager implements CollectionManager {
             lock.unlock();
         }
     }
-
-    @Override
-    public void clear() {
-        try (Statement s = conn.createStatement()) {
-            lock.lock();
-            boolean prev = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-            s.execute("DROP TABLE routes");
-            s.execute(CREATE_TABLE_QUERY);
-            conn.commit();
-            conn.setAutoCommit(prev);
-            collection.clear();
-        } catch (SQLException e) {
-            try {
-                LOGGER.error("Failed to clear table, rolling back...", e);
-                conn.rollback();
-            } catch (SQLException e_) {
-                LOGGER.error("Failed to rollback", e);
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
 }

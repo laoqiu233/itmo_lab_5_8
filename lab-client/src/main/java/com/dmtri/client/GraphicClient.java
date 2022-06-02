@@ -79,12 +79,12 @@ public class GraphicClient extends Application {
         RadioMenuItem mexicanSpanishMenuItem = new RadioMenuItem("Español Mexicano");
         mexicanSpanishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("es-MX")));
         ToggleGroup group = new ToggleGroup();
-        englishMenuItem.setSelected(true);
         englishMenuItem.setToggleGroup(group);
         russianMenuItem.setToggleGroup(group);
         romanianMenuItem.setToggleGroup(group);
         latvianMenuItem.setToggleGroup(group);
         mexicanSpanishMenuItem.setToggleGroup(group);
+        englishMenuItem.setSelected(true);
         languageMenu.getItems().addAll(englishMenuItem, russianMenuItem, romanianMenuItem, latvianMenuItem, mexicanSpanishMenuItem);
 
         routesThread.start();

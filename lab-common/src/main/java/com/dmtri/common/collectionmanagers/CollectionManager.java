@@ -13,5 +13,4 @@ public interface CollectionManager {
     List<Double> getUniqueDistances();
     void remove(long id);
     int removeIf(Predicate<? super Route> predicate);
-    void clear();
 }

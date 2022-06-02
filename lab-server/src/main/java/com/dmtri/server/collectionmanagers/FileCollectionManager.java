@@ -121,16 +121,6 @@ public class FileCollectionManager implements SaveableCollectionManager {
         }
     }
 
-    public void clear() {
-        try {
-            lock.lock();
-            collection.clear();
-            nextId = 1;
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public void save() throws FileNotFoundException {
         try {
             lock.lock();
