@@ -47,7 +47,7 @@ import javafx.stage.Stage;
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
     private static final int SLEEP_TIME = 100;
-    private final LocaleManager localeManager = new LocaleManager(Locale.getDefault());
+    private final LocaleManager localeManager = new LocaleManager(Locale.ENGLISH);
     private Stage mainWindow;
     private ObjectSocketChannelWrapper channel;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
@@ -183,6 +183,7 @@ public class GraphicClient extends Application {
 
     public void disconnect() {
         System.out.println("Disconnecting");
+        routesThread.setWorking(false);
         if (channel != null) {
             try {
                 channel.getSocket().close();
@@ -193,7 +194,6 @@ public class GraphicClient extends Application {
         channel = null;
         setAuth(null);
         sceneRoot.setCenter(connectionView.getView());
-        routesThread.setWorking(false);
     }
 
     public synchronized Response sendMessage(Object msg) {
@@ -261,6 +261,7 @@ public class GraphicClient extends Application {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }

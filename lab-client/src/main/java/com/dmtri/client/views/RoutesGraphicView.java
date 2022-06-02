@@ -96,6 +96,8 @@ public class RoutesGraphicView {
 
         view = new ScrollPane();
         view.setContent(new StackPane(canvas, clickableShapes));
+
+        redrawOnCanvas();
     }
 
     private void setupCoordsText() {

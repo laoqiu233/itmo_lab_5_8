@@ -29,7 +29,6 @@ public class LocaleManager {
     }
 
     public ObservableStringValue getObservableStringByKey(String key) {
-        System.out.println("Trying to get locale for key " + key + " : " + bundle.getString(key));
         // Create observable property only when needed
         if (!observableStrings.containsKey(key)) {
             observableStrings.put(key, new SimpleStringProperty(bundle.getString(key)));
