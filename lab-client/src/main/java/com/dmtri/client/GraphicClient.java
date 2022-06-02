@@ -1,12 +1,8 @@
 package com.dmtri.client;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -44,9 +40,7 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -54,7 +48,7 @@ public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
     private static final int SLEEP_TIME = 100;
     private final LocaleManager localeManager = new LocaleManager(Locale.getDefault());
-    private Stage primaryStage;
+    private Stage mainWindow;
     private ObjectSocketChannelWrapper channel;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
     private ObservableSet<Route> routes = FXCollections.observableSet();
@@ -70,7 +64,7 @@ public class GraphicClient extends Application {
 
     public void start(Stage primaryStage) {
         TerminalColors.doColoring(false);
-        this.primaryStage = primaryStage;
+        mainWindow = primaryStage;
 
         // Create language menu
         languageMenu.textProperty().bind(localeManager.getObservableStringByKey("languageMenuName"));
@@ -137,7 +131,7 @@ public class GraphicClient extends Application {
     public void chooseScriptAndExecute() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.titleProperty().bind(localeManager.getObservableStringByKey("scriptChooserTitle"));
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        File selectedFile = fileChooser.showOpenDialog(mainWindow);
         try (FileInputStream fileInput = new FileInputStream(selectedFile);
             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
@@ -155,7 +149,7 @@ public class GraphicClient extends Application {
             area.setText(baos.toString());
 
             Stage resultWindow = new Stage();
-            resultWindow.setTitle("Script execution result");
+            resultWindow.titleProperty().bind(localeManager.getObservableStringByKey("scriptResultTitle"));
             resultWindow.setScene(new Scene(new BorderPane(area)));
             resultWindow.show();
         } catch (IOException e) {

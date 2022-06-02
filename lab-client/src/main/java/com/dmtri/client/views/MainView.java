@@ -1,5 +1,6 @@
 package com.dmtri.client.views;
 
+import java.text.MessageFormat;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,12 +94,14 @@ public class MainView {
 
     private Node createRouteInspectionBox() {
         inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
-        Button updateButton = new Button("Update");
+        Button updateButton = new Button();
+        updateButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("updateButton"));
         updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
         updateButton.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(updateButton, Priority.ALWAYS);
         updateButton.setOnMouseClicked(this::sendUpdatedRoute);
         Button deleteButton = new Button("Delete");
+        deleteButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("deleteButton"));
         deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
         deleteButton.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(deleteButton, Priority.ALWAYS);
@@ -116,7 +119,8 @@ public class MainView {
     private Node createUserInfoBox() {
         Label usernameLabel = new Label();
         usernameLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> client.getAuth() == null ? "" : "Logged in as: " + client.getAuth().getLogin(),
+            () -> client.getAuth() == null ? "" : MessageFormat.format(client.getLocaleManager().getObservableStringByKey("loggedInAsLabel").get(), client.getAuth().getLogin()),
+            client.getLocaleManager().localeProperty(),
             client.authProperty()
         ));
         Button logoutButton = new Button("Logout");
@@ -126,9 +130,16 @@ public class MainView {
         userInfo.setPadding(new Insets(GAP));
         userInfo.getChildren().addAll(usernameLabel, logoutButton);
 
-        Label testLabel = new Label();
-        userInfo.getChildren().add(testLabel);
-        testLabel.textProperty().bind(Bindings.createStringBinding(() -> ("Selected: " + (tableTab.getSelectedRoute() == null ? "none" : tableTab.getSelectedRoute().getId())), tableTab.selectedRouteProperty()));
+        Label selectedLabel = new Label();
+        userInfo.getChildren().add(selectedLabel);
+        selectedLabel.textProperty().bind(Bindings.createStringBinding(
+            () -> {
+                Object idOrNoneLabel = (tableTab.selectedRouteProperty().get() == null ? client.getLocaleManager().getObservableStringByKey("noneLabel").get() : tableTab.selectedRouteProperty().get().getId());
+                return MessageFormat.format(client.getLocaleManager().getObservableStringByKey("selectedLabel").get(), idOrNoneLabel);
+            },
+            tableTab.selectedRouteProperty(),
+            client.getLocaleManager().localeProperty()
+        ));
         tableTab.selectedRouteProperty().addListener((o, oldVal, newVal) -> {
             System.out.println("Selection changed from " + (oldVal == null ? "null" : oldVal.getId()) + " to " + (newVal == null ? "null" : newVal.getId()));
         });
