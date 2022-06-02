@@ -1,11 +1,14 @@
 package com.dmtri.client.views;
 
+import java.text.MessageFormat;
+
 import com.dmtri.client.GraphicClient;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithAuthCredentials;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
@@ -58,6 +61,7 @@ public class LoginView {
     private void sendLoginRequest(MouseEvent event) {
         event.consume();
         disableButtons();
+        promptMsg.unbind();
         promptMsg.set("");
         Response resp = client.sendMessage(new Request(
             "login",
@@ -69,7 +73,14 @@ public class LoginView {
             if (resp instanceof ResponseWithAuthCredentials) {
                 client.setAuth(((ResponseWithAuthCredentials) resp).getAuthCredentials());
             } else {
-                promptMsg.set(resp.getMessage());
+                if (resp.getLocaleKey() == null) {
+                    promptMsg.set(resp.getMessage());
+                } else {
+                    promptMsg.bind(Bindings.createStringBinding(
+                        () -> MessageFormat.format(client.getLocaleManager().getObservableStringByKey(resp.getLocaleKey()).get(), resp.getParams()),
+                        client.getLocaleManager().localeProperty())
+                    );
+                }
             }
         }
 
@@ -79,6 +90,7 @@ public class LoginView {
     private void sendRegisterRequest(MouseEvent event) {
         event.consume();
         disableButtons();
+        promptMsg.unbind();
         promptMsg.set("");
         Response resp = client.sendMessage(new Request(
             "register",
@@ -90,7 +102,14 @@ public class LoginView {
             if (resp instanceof ResponseWithAuthCredentials) {
                 client.setAuth(((ResponseWithAuthCredentials) resp).getAuthCredentials());
             } else {
-                promptMsg.set(resp.getMessage());
+                if (resp.getLocaleKey() == null) {
+                    promptMsg.set(resp.getMessage());
+                } else {
+                    promptMsg.bind(Bindings.createStringBinding(
+                        () -> MessageFormat.format(client.getLocaleManager().getObservableStringByKey(resp.getLocaleKey()).get(), resp.getParams()),
+                        client.getLocaleManager().localeProperty())
+                    );
+                }
             }
         }
 

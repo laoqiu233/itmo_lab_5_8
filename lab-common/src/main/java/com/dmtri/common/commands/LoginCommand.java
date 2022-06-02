@@ -45,7 +45,7 @@ public class LoginCommand extends AbstractCommand {
         Long currentUserId = users.authenticate(newCredentials);
 
         if (currentUserId == null) {
-            return new Response("Incorrect login or password");
+            return new Response("Incorrect login or password", "incorrectCredentials", new Object[] {});
         }
 
         return new ResponseWithAuthCredentials(newCredentials, "Successfully logged in. Your id is " + currentUserId);

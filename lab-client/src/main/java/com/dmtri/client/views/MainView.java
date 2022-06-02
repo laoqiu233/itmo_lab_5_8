@@ -123,7 +123,8 @@ public class MainView {
             client.getLocaleManager().localeProperty(),
             client.authProperty()
         ));
-        Button logoutButton = new Button("Logout");
+        Button logoutButton = new Button();
+        logoutButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("logoutButton"));
         logoutButton.setOnMouseClicked(e -> client.setAuth(null));
         HBox userInfo = new HBox(GAP);
         userInfo.setAlignment(Pos.CENTER_RIGHT);

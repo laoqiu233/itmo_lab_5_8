@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 
 import com.dmtri.client.GraphicClient;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -53,6 +54,7 @@ public class ConnectionView {
             }
             return change;
         }));
+        connectButton.disableProperty().bind(Bindings.or(addressField.textProperty().isEmpty(), portField.textProperty().isEmpty()));
         connectButton.setOnMouseClicked(e -> client.connect(new InetSocketAddress(addressField.getText(), Integer.parseInt(portField.getText()))));
 
         GridPane connectionLayout = new GridPane();

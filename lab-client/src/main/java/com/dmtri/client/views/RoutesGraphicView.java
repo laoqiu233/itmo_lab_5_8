@@ -107,7 +107,7 @@ public class RoutesGraphicView {
         clickableShapes.setOnMouseMoved(e -> {
             coordsText.setX(e.getX());
             coordsText.setY(e.getY());
-            coordsText.setText("X: " + (e.getX() - canvas.getWidth() / 2) + "\nY: " + (e.getY() - canvas.getHeight() / 2));
+            coordsText.setText("X: " + (e.getX() - canvas.getWidth() / 2) + "\nZ: " + (e.getY() - canvas.getHeight() / 2));
         });
     }
 

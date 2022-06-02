@@ -72,11 +72,20 @@ public class GraphicClient extends Application {
         englishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.ENGLISH));
         RadioMenuItem russianMenuItem = new RadioMenuItem("Русский");
         russianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("ru-RU")));
+        RadioMenuItem romanianMenuItem = new RadioMenuItem("Limba Română");
+        romanianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("ro")));
+        RadioMenuItem latvianMenuItem = new RadioMenuItem("Latviešu Valoda");
+        latvianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("lv")));
+        RadioMenuItem mexicanSpanishMenuItem = new RadioMenuItem("Español Mexicano");
+        mexicanSpanishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("es-MX")));
         ToggleGroup group = new ToggleGroup();
         englishMenuItem.setSelected(true);
         englishMenuItem.setToggleGroup(group);
         russianMenuItem.setToggleGroup(group);
-        languageMenu.getItems().addAll(englishMenuItem, russianMenuItem);
+        romanianMenuItem.setToggleGroup(group);
+        latvianMenuItem.setToggleGroup(group);
+        mexicanSpanishMenuItem.setToggleGroup(group);
+        languageMenu.getItems().addAll(englishMenuItem, russianMenuItem, romanianMenuItem, latvianMenuItem, mexicanSpanishMenuItem);
 
         routesThread.start();
         primaryStage.titleProperty().bind(localeManager.getObservableStringByKey("loginHeader"));
@@ -165,7 +174,7 @@ public class GraphicClient extends Application {
             channel = new ObjectSocketChannelWrapper(socket);
             sceneRoot.setCenter(loginView.getView());
         } catch (UnresolvedAddressException e) {
-            new Alert(AlertType.ERROR, "The address you provided is invalid").showAndWait();
+            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey("invalidAddress").get()).showAndWait();
         } catch (IOException e) {
             new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
             channel = null;
@@ -173,17 +182,17 @@ public class GraphicClient extends Application {
     }
 
     public void disconnect() {
-        if (channel == null) {
-            return;
-        }
-        try {
-            channel.getSocket().close();
-        } catch (IOException e) {
-            new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
+        System.out.println("Disconnecting");
+        if (channel != null) {
+            try {
+                channel.getSocket().close();
+            } catch (IOException e) {
+                new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
+            }
         }
         channel = null;
-        sceneRoot.setCenter(connectionView.getView());
         setAuth(null);
+        sceneRoot.setCenter(connectionView.getView());
         routesThread.setWorking(false);
     }
 
@@ -218,8 +227,8 @@ public class GraphicClient extends Application {
         private volatile boolean workFlag = false;
 
         RoutesThread() {
-            this.setName("routes-fetching-thread");
-            this.setDaemon(true);
+            setName("routes-fetching-thread");
+            setDaemon(true);
         }
 
         public void setWorking(boolean flag) {

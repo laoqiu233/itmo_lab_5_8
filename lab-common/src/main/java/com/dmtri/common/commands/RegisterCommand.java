@@ -45,7 +45,7 @@ public class RegisterCommand extends AbstractCommand {
         Long newUserId = users.register(newCredentials);
 
         if (newUserId == null) {
-            return new Response("This username is already taken");
+            return new Response("This username is already taken", "usernameTaken", new Object[] {});
         }
 
         return new ResponseWithAuthCredentials(newCredentials, "Successfully registered new user. Your id is " + newUserId);
