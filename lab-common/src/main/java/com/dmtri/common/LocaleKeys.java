@@ -72,6 +72,8 @@ public final class LocaleKeys {
     public static final String LOCATION_NAME_NOT_NULL = "locationNameNotNull";
     public static final String COORDINATES_Y_NOT_NULL = "coordinatesYNotNull";
     public static final String INVALID_RESPONSE = "invalidResponse";
+    public static final String ERROR = "error";
+    public static final String NETWORK_ERROR = "networkError";
 
     private LocaleKeys() { }
 }

@@ -34,6 +34,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CommandsMenu extends Menu {
@@ -99,6 +100,8 @@ public class CommandsMenu extends Menu {
         stageBox.setAlignment(Pos.TOP_CENTER);
         stageBox.setPadding(new Insets(GAP));
         Stage routeStage = new Stage();
+        routeStage.initOwner(client.getMainWindow());
+        routeStage.initModality(Modality.WINDOW_MODAL);
         routeStage.titleProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.ADD_COMMAND_TITLE));
         routeStage.setScene(new Scene(stageBox));
         addButton.setOnMouseClicked(e -> {
@@ -109,7 +112,7 @@ public class CommandsMenu extends Menu {
             ));
             routeStage.close();
         });
-        routeStage.show();
+        routeStage.showAndWait();
     }
 
     public void chooseScriptAndExecute() {
@@ -136,11 +139,16 @@ public class CommandsMenu extends Menu {
                 area.setText(baos.toString());
 
                 Stage resultWindow = new Stage();
+                resultWindow.initOwner(client.getMainWindow());
+                resultWindow.initModality(Modality.WINDOW_MODAL);
                 resultWindow.titleProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.SCRIPT_RESULT_TITLE));
                 resultWindow.setScene(new Scene(new BorderPane(area)));
-                resultWindow.show();
+                resultWindow.showAndWait();
             } catch (IOException e) {
-                e.printStackTrace();
+                Alert alert = new Alert(AlertType.ERROR, e.getLocalizedMessage());
+                alert.setTitle(LocaleManager.getObservableStringByKey(LocaleKeys.ERROR).get());
+                alert.setContentText("");
+                alert.showAndWait();
             }
         }
     }

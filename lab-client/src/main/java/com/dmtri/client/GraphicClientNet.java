@@ -36,10 +36,10 @@ public class GraphicClientNet {
             socket.configureBlocking(false);
             channel.set(new ObjectSocketChannelWrapper(socket));
         } catch (UnresolvedAddressException e) {
-            new Alert(AlertType.ERROR, LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_ADDRESS).get()).showAndWait();
+            showError(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_ADDRESS).get());
             channel.set(null);
         } catch (IOException e) {
-            new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
+            showError(e.getLocalizedMessage());
             channel.set(null);
         } finally {
             lock.unlock();
@@ -50,7 +50,7 @@ public class GraphicClientNet {
             lock.lock();
             closeSocket();
         } catch (IOException e) {
-            new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
+            showError(e.getLocalizedMessage());
         } finally {
             channel.set(null);
             lock.unlock();
@@ -68,13 +68,14 @@ public class GraphicClientNet {
         }
     }
 
-    public synchronized Response sendMessage(Object msg) {
+    public Response sendMessage(Object msg) {
         if (channel.get() == null) {
             return null;
         }
 
         try {
             lock.lock();
+            channel.get().clearInBuffer();
             channel.get().sendMessage(msg);
 
             while (!channel.get().checkForMessage()) {
@@ -85,20 +86,26 @@ public class GraphicClientNet {
 
             if (payload instanceof Response) {
                 Response resp = (Response) payload;
-                channel.get().clearInBuffer();
                 return resp;
             }
-            new Alert(AlertType.ERROR, LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get()).showAndWait();
-            channel.get().clearInBuffer();
+            showError(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get());
+            
             return null;
         } catch (IOException | InterruptedException e) {
             Platform.runLater(() -> {
                 disconnect();
-                new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
+                showError(e.getLocalizedMessage());
             });
             return null;
         } finally {
             lock.unlock();
         }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(AlertType.ERROR, message);
+        alert.setTitle(LocaleManager.getObservableStringByKey(LocaleKeys.ERROR).get());
+        alert.setHeaderText(LocaleManager.getObservableStringByKey(LocaleKeys.NETWORK_ERROR).get());
+        alert.showAndWait();
     }
 }
