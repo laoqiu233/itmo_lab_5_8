@@ -3,6 +3,7 @@ package com.dmtri.client.views;
 import java.net.InetSocketAddress;
 
 import com.dmtri.client.GraphicClient;
+import com.dmtri.client.LocaleManager;
 import com.dmtri.common.LocaleKeys;
 
 import javafx.beans.binding.Bindings;
@@ -33,13 +34,13 @@ public class ConnectionView {
     }
 
     private Parent createLayout() {
-        connectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.CONNECT_BUTTON));
+        connectButton.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.CONNECT_BUTTON));
         final Label addressLabel = new Label();
-        addressLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ADDRESS_LABEL));
-        addressField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ADDRESS_PROMPT));
+        addressLabel.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.ADDRESS_LABEL));
+        addressField.promptTextProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.ADDRESS_PROMPT));
         final Label portLabel = new Label();
-        portLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PORT_LABEL));
-        portField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PORT_PROMPT));
+        portLabel.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.PORT_LABEL));
+        portField.promptTextProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.PORT_PROMPT));
         portField.setTextFormatter(new TextFormatter<>(change -> {
             if (!change.getControlNewText().equals("")) {
                 try {
@@ -56,7 +57,7 @@ public class ConnectionView {
             return change;
         }));
         connectButton.disableProperty().bind(Bindings.or(addressField.textProperty().isEmpty(), portField.textProperty().isEmpty()));
-        connectButton.setOnMouseClicked(e -> client.connect(new InetSocketAddress(addressField.getText(), Integer.parseInt(portField.getText()))));
+        connectButton.setOnMouseClicked(e -> client.getNetwork().connect(new InetSocketAddress(addressField.getText(), Integer.parseInt(portField.getText()))));
 
         GridPane connectionLayout = new GridPane();
 

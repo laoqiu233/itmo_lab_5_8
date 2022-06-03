@@ -30,6 +30,7 @@ public final class Client {
                 return;
             }
         } else {
+            TerminalColors.doColoring(false);
             Application.launch(GraphicClient.class);
         }
     }

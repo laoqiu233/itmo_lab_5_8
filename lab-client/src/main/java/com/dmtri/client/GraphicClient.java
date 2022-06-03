@@ -1,12 +1,6 @@
 package com.dmtri.client;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
-import java.nio.channels.UnresolvedAddressException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,7 +20,6 @@ import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithRoutes;
-import com.dmtri.common.userio.BasicUserIO;
 import com.dmtri.common.usermanagers.AuthCredentials;
 import com.dmtri.common.util.TerminalColors;
 
@@ -37,28 +30,23 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
     private static final long SLEEP_TIME = 100;
-    private final LocaleManager localeManager = new LocaleManager(Locale.ENGLISH);
     private final Timer routesTimer = new Timer("routes-fetch-thread", true);
     private final TimerTask routeFetcher = new TimerTask() {
         @Override
         public void run() {
             if (doRouteFetch) {
                 System.out.println("Doing routes fetch");
-                Response resp = sendMessage(new Request(
+                Response resp = network.sendMessage(new Request(
                     "show",
                     new RequestBody(new String[] {}),
                     getAuth()
@@ -74,35 +62,33 @@ public class GraphicClient extends Application {
         }
     };
     private volatile boolean doRouteFetch = false;
+    private final GraphicClientNet network = new GraphicClientNet();
+    private final ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
+    private final ObservableSet<Route> routes = FXCollections.observableSet();
+    private final ConnectionView connectionView = new ConnectionView(this);
+    private final LoginView loginView = new LoginView(this);
+    private final MainView mainView = new MainView(this);
+    private final Menu languageMenu = new Menu("Language");
+    private final Menu commandsMenu = new CommandsMenu(this);
+    private final MenuBar menuBar = new MenuBar(languageMenu);
+    private final BorderPane sceneRoot = new BorderPane();
+    private final Scene scene = new Scene(sceneRoot);
     private Stage mainWindow;
-    private ObjectSocketChannelWrapper channel;
-    private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
-    private ObservableSet<Route> routes = FXCollections.observableSet();
-    private ConnectionView connectionView = new ConnectionView(this);
-    private LoginView loginView = new LoginView(this);
-    private MainView mainView = new MainView(this);
-    private Menu languageMenu = new Menu("Language");
-    private Menu commandsMenu = new CommandsMenu(this);
-    private MenuBar menuBar = new MenuBar(languageMenu);
-    private BorderPane sceneRoot = new BorderPane();
-    private Scene scene = new Scene(sceneRoot);
 
-    public void start(Stage primaryStage) {
-        TerminalColors.doColoring(false);
-        mainWindow = primaryStage;
-
+    @Override 
+    public void init() {
         // Create language menu
-        languageMenu.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.LANGUAGE_MENU_NAME));
+        languageMenu.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.LANGUAGE_MENU_NAME));
         RadioMenuItem englishMenuItem = new RadioMenuItem("English");
-        englishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.ENGLISH));
+        englishMenuItem.setOnAction(e -> LocaleManager.setLocale(Locale.ENGLISH));
         RadioMenuItem russianMenuItem = new RadioMenuItem("Русский");
-        russianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("ru-RU")));
+        russianMenuItem.setOnAction(e -> LocaleManager.setLocale(Locale.forLanguageTag("ru-RU")));
         RadioMenuItem romanianMenuItem = new RadioMenuItem("Limba Română");
-        romanianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("ro")));
+        romanianMenuItem.setOnAction(e -> LocaleManager.setLocale(Locale.forLanguageTag("ro")));
         RadioMenuItem latvianMenuItem = new RadioMenuItem("Latviešu Valoda");
-        latvianMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("lv")));
+        latvianMenuItem.setOnAction(e -> LocaleManager.setLocale(Locale.forLanguageTag("lv")));
         RadioMenuItem mexicanSpanishMenuItem = new RadioMenuItem("Español Mexicano");
-        mexicanSpanishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.forLanguageTag("es-MX")));
+        mexicanSpanishMenuItem.setOnAction(e -> LocaleManager.setLocale(Locale.forLanguageTag("es-MX")));
         ToggleGroup group = new ToggleGroup();
         englishMenuItem.setToggleGroup(group);
         russianMenuItem.setToggleGroup(group);
@@ -111,23 +97,48 @@ public class GraphicClient extends Application {
         mexicanSpanishMenuItem.setToggleGroup(group);
         englishMenuItem.setSelected(true);
         languageMenu.getItems().addAll(englishMenuItem, russianMenuItem, romanianMenuItem, latvianMenuItem, mexicanSpanishMenuItem);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        mainWindow = primaryStage;
         
         routesTimer.schedule(routeFetcher, 0L, SLEEP_TIME);
-        primaryStage.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.LOGIN_HEADER));
+
+        primaryStage.titleProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.LOGIN_HEADER));
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
         sceneRoot.setTop(menuBar);
         sceneRoot.setCenter(connectionView.getView());
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        // Attach listeners for connection and disconnection
+        network.channelProperty().addListener((o, oldVal, newVal) -> {
+            if (newVal == null) {
+                setAuth(null);
+                sceneRoot.setCenter(connectionView.getView());
+            } else {
+                sceneRoot.setCenter(loginView.getView());
+            }
+        });
     }
 
-    public ObjectSocketChannelWrapper getChannel() {
-        return channel;
+    @Override
+    public void stop() {
+        try {
+            network.closeSocket();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public LocaleManager getLocaleManager() {
-        return localeManager;
+    public GraphicClientNet getNetwork() {
+        return network;
+    }
+
+    public Stage getMainWindow() {
+        return mainWindow;
     }
 
     public ObjectProperty<AuthCredentials> authProperty() {
@@ -149,105 +160,14 @@ public class GraphicClient extends Application {
         this.auth.set(auth);
     }
 
-    public Set<Route> getRoutes() {
-        return routes.stream().collect(Collectors.toSet());
-    }
-
-    public void setRoutes(Collection<Route> routes) {
-        this.routes.retainAll(routes);
-        this.routes.addAll(routes);
-    }
-
     public ObservableSet<Route> routesProperty() {
         return routes;
     }
-
-    public void chooseScriptAndExecute() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SCRIPT_CHOOSER_TITLE));
-        File selectedFile = fileChooser.showOpenDialog(mainWindow);
-        if (selectedFile != null) {
-            try (
-                FileInputStream fileInput = new FileInputStream(selectedFile);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()
-            ) {
-                BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
-                scriptIO.setRepeatInput(true);
-
-                ConsoleClient console = new ConsoleClient(
-                    channel.getSocket().getRemoteAddress(),
-                    scriptIO
-                );
-                console.setAuth(getAuth());
-                console.run();
-
-                TextArea area = new TextArea();
-                area.setEditable(false);
-                area.setText(baos.toString());
-
-                Stage resultWindow = new Stage();
-                resultWindow.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SCRIPT_RESULT_TITLE));
-                resultWindow.setScene(new Scene(new BorderPane(area)));
-                resultWindow.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public Set<Route> getRoutes() {
+        return routes.stream().collect(Collectors.toSet());
     }
-
-    public void connect(InetSocketAddress address) {
-        try {
-            SocketChannel socket = SocketChannel.open();
-            socket.connect(address);
-            socket.configureBlocking(false);
-            channel = new ObjectSocketChannelWrapper(socket);
-            sceneRoot.setCenter(loginView.getView());
-        } catch (UnresolvedAddressException e) {
-            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey(LocaleKeys.INVALID_ADDRESS).get()).showAndWait();
-        } catch (IOException e) {
-            new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
-            channel = null;
-        }
-    }
-
-    public void disconnect() {
-        doRouteFetch = false;
-        if (channel != null) {
-            try {
-                channel.getSocket().close();
-            } catch (IOException e) {
-                new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
-            }
-        }
-        channel = null;
-        setAuth(null);
-        sceneRoot.setCenter(connectionView.getView());
-    }
-
-    public synchronized Response sendMessage(Object msg) {
-        try {
-            channel.sendMessage(msg);
-
-            while (!channel.checkForMessage()) {
-                Thread.sleep(SLEEP_TIME);
-            }
-
-            Object payload = channel.getPayload();
-
-            if (payload instanceof Response) {
-                Response resp = (Response) payload;
-                channel.clearInBuffer();
-                return resp;
-            }
-            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get()).show();
-            channel.clearInBuffer();
-            return null;
-        } catch (IOException | InterruptedException e) {
-            Platform.runLater(() -> {
-                new Alert(AlertType.ERROR, e.getLocalizedMessage()).show();
-                disconnect();
-            });
-            return null;
-        }
+    public void setRoutes(Collection<Route> routes) {
+        this.routes.retainAll(routes);
+        this.routes.addAll(routes);
     }
 }

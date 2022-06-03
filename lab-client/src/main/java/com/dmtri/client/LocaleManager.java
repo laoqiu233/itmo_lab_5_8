@@ -15,20 +15,17 @@ import javafx.beans.value.ObservableStringValue;
  * Class to create observable locales
  */
 public class LocaleManager {
-    private ResourceBundle bundle;
-    private ObjectProperty<Locale> localePorperty = new SimpleObjectProperty<>();
-    private Map<String, StringProperty> observableStrings = new HashMap<>();
+    private static ResourceBundle bundle = ResourceBundle.getBundle("Locales", Locale.ENGLISH);
+    private static ObjectProperty<Locale> localePorperty = new SimpleObjectProperty<>(Locale.ENGLISH);
+    private static Map<String, StringProperty> observableStrings = new HashMap<>();
 
-    public LocaleManager(Locale defaultLocale) {
-        localePorperty.set(defaultLocale);
-        bundle = ResourceBundle.getBundle("Locales", defaultLocale);
-    }
+    private LocaleManager() {}
 
-    public ObjectProperty<Locale> localeProperty() {
+    public static ObjectProperty<Locale> localeProperty() {
         return localePorperty;
     }
 
-    public ObservableStringValue getObservableStringByKey(String key) {
+    public static ObservableStringValue getObservableStringByKey(String key) {
         // Create observable property only when needed
         if (!observableStrings.containsKey(key)) {
             observableStrings.put(key, new SimpleStringProperty(bundle.getString(key)));
@@ -37,7 +34,7 @@ public class LocaleManager {
         return observableStrings.get(key);
     }
 
-    public void setLocale(Locale newLocale) {
+    public static void setLocale(Locale newLocale) {
         Locale.setDefault(newLocale);
         bundle = ResourceBundle.getBundle("Locales", newLocale);
         observableStrings.keySet().forEach(x -> observableStrings.get(x).set(bundle.getString(x)));

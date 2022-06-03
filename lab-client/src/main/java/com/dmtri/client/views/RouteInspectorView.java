@@ -3,6 +3,7 @@ package com.dmtri.client.views;
 import java.time.LocalDate;
 
 import com.dmtri.client.GraphicClient;
+import com.dmtri.client.LocaleManager;
 import com.dmtri.client.util.NumberStringConverter;
 import com.dmtri.client.util.StringConverter;
 import com.dmtri.common.LocaleKeys;
@@ -180,7 +181,7 @@ public class RouteInspectorView {
             this.converter = converter;
             this.validator = validator;
             Label fieldLabel = new Label();
-            fieldLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(localeKey));
+            fieldLabel.textProperty().bind(LocaleManager.getObservableStringByKey(localeKey));
             promptLabel.setTextFill(Color.RED);
             valueField = new TextField();
             valueField.editableProperty().bind(routeIsEditableProperty);
@@ -203,14 +204,14 @@ public class RouteInspectorView {
 
             T value = converter.convert(newV);
             if (value == null && !newV.isEmpty()) {
-                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.INVALID_VALUE));
+                promptLabel.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_VALUE));
                 return;
             }
 
             try {
                 validator.validate(value);
             } catch (InvalidFieldException e) {
-                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(e.getLocaleKey()));
+                promptLabel.textProperty().bind(LocaleManager.getObservableStringByKey(e.getLocaleKey()));
                 return;
             }
 

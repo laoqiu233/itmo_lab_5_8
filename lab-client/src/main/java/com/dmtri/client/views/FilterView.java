@@ -31,14 +31,12 @@ public class FilterView {
     private final List<FilterConfigurator> configurators = new LinkedList<>();
     private final ObjectProperty<Predicate<Route>> filterProperty = new SimpleObjectProperty<>();
     private final ChangeListener<Predicate<Route>> filterChangeListener = (o, oldVal, newVal) -> filterProperty.set(newVal);
-    private final LocaleManager localeManager;
     private final Parent view;
 
-    public FilterView(LocaleManager localeManager) {
-        this.localeManager = localeManager;
+    public FilterView() {
         Label headerLabel = new Label();
         headerLabel.setFont(new Font(HEADER_SIZE));
-        headerLabel.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.FILTER_LABEL));
+        headerLabel.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.FILTER_LABEL));
 
         ChoiceBox<FilterConfigurator> filterFieldChoice = createChoiceBox();
 
@@ -97,7 +95,7 @@ public class FilterView {
         filterFieldChoice.getItems().addAll(configurators);
 
         // Refresh locale
-        localeManager.localeProperty().addListener((o, oldV, newV) -> {
+        LocaleManager.localeProperty().addListener((o, oldV, newV) -> {
             FilterConfigurator prevChoice = filterFieldChoice.getValue();
             filterFieldChoice.getItems().clear();
             filterFieldChoice.getItems().addAll(configurators);
@@ -115,7 +113,7 @@ public class FilterView {
         FilterConfigurator(String localeKey) {
             this.localeKey = localeKey;
             Label noFilterLabel = new Label();
-            noFilterLabel.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.NO_FILTER_LABEL));
+            noFilterLabel.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.NO_FILTER_LABEL));
             setView(noFilterLabel);
         }
 
@@ -133,7 +131,7 @@ public class FilterView {
 
         @Override
         public String toString() {
-            return localeManager.getObservableStringByKey(localeKey).get();
+            return LocaleManager.getObservableStringByKey(localeKey).get();
         }
     }
 
@@ -152,7 +150,7 @@ public class FilterView {
             operationChoice.getItems().addAll(Operation.values());
             operationChoice.getSelectionModel().select(0);
             operandField = new TextField();
-            operandField.promptTextProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.OPERAND_LABEL));
+            operandField.promptTextProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.OPERAND_LABEL));
             errorPrompt = new Label();
             errorPrompt.setTextFill(Color.RED);
 
@@ -176,7 +174,7 @@ public class FilterView {
             // If no operand is available then no filter is applied
             if (operand == null) {
                 if (!operandField.getText().isEmpty()) {
-                    errorPrompt.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.INVALID_OPERAND_LABEL));
+                    errorPrompt.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_OPERAND_LABEL));
                 }
                 return x -> true;
             }
@@ -199,7 +197,7 @@ public class FilterView {
         StringFilterConfigurator(String localeKey, Callback<Route, String> valueGetter) {
             super(localeKey);
             searchField = new TextField();
-            searchField.promptTextProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SEARCH_PROMPT_LABEL));
+            searchField.promptTextProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.SEARCH_PROMPT_LABEL));
             searchField.textProperty().addListener(o -> filterProperty().set(x -> valueGetter.call(x).contains(searchField.getCharacters())));
             setView(searchField);
         }

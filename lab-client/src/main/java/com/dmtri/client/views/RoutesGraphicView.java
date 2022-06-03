@@ -45,7 +45,6 @@ public class RoutesGraphicView {
     private static final double TRANSITION_MILLIS = 500;
     private final Image backgroundImage = new Image("/map.png");
     private final ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
-    private final LocaleManager localeManager;
     private final Canvas canvas;
     private final ScrollPane view;
     private final Pane clickableShapes = new Pane();
@@ -71,8 +70,7 @@ public class RoutesGraphicView {
         }
     };
 
-    public RoutesGraphicView(ObservableSet<Route> routeSet, LocaleManager localeManager) {
-        this.localeManager = localeManager;
+    public RoutesGraphicView(ObservableSet<Route> routeSet) {
         canvas = new Canvas(backgroundImage.getWidth(), backgroundImage.getHeight());
         canvas.getGraphicsContext2D().setTextAlign(TextAlignment.CENTER);
         canvas.getGraphicsContext2D().setTextBaseline(VPos.CENTER);
@@ -80,7 +78,7 @@ public class RoutesGraphicView {
         clickableShapes.setMaxSize(canvas.getWidth(), canvas.getHeight());
         routeSet.addListener(listener);
         selectedRouteProperty.addListener((o, oldV, newV) -> redrawOnCanvas());
-        localeManager.localeProperty().addListener((o, oldV, newV) -> redrawOnCanvas());
+        LocaleManager.localeProperty().addListener((o, oldV, newV) -> redrawOnCanvas());
 
         setupCoordsText();
 
@@ -232,16 +230,16 @@ public class RoutesGraphicView {
             gc.strokeText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.strokeText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.strokeText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? localeManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
-                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
+                         + "\n" + LocaleManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? LocaleManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
+                         + "\n" + LocaleManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2
             );
             gc.fillText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.fillText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.fillText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? localeManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
-                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
+                         + "\n" + LocaleManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? LocaleManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
+                         + "\n" + LocaleManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2
             );

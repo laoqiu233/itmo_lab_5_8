@@ -32,13 +32,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 public class RoutesTableView {
-    private final LocaleManager localeManager;
     private TableView<Route> tableView;
     private ObservableList<Route> orderedRouteList = FXCollections.observableList(new LinkedList<>());
     private ObjectProperty<Route> selectedRouteProperty = new SimpleObjectProperty<>(null);
 
-    public RoutesTableView(ObservableSet<Route> routes, LocaleManager localeManager) {
-        this.localeManager = localeManager;
+    public RoutesTableView(ObservableSet<Route> routes) {
         tableView = createTable();
         routes.addListener(new SetChangeListener<Route>() {
             @Override
@@ -158,7 +156,7 @@ public class RoutesTableView {
 
     private <T> TableColumn<Route, T> createColumn(String localeKey, Callback<CellDataFeatures<Route, T>, ObservableValue<T>> valueFactory, Callback<T, String> formatter) {
         TableColumn<Route, T> newColumn = new TableColumn<>();
-        newColumn.textProperty().bind(localeManager.getObservableStringByKey(localeKey));
+        newColumn.textProperty().bind(LocaleManager.getObservableStringByKey(localeKey));
         newColumn.setCellValueFactory(valueFactory);
         newColumn.setCellFactory(tc -> new LocaleFormattedTableCell<>(formatter));
         return newColumn;
@@ -179,7 +177,7 @@ public class RoutesTableView {
                 textProperty().unbind();
                 setText("");
             } else {
-                textProperty().bind(Bindings.createStringBinding(() -> formatter.call(item), localeManager.localeProperty()));
+                textProperty().bind(Bindings.createStringBinding(() -> formatter.call(item), LocaleManager.localeProperty()));
             }
         }
     }
