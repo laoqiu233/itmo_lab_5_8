@@ -89,7 +89,7 @@ public class GraphicClientNet {
                 return resp;
             }
             showError(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get());
-            
+
             return null;
         } catch (IOException | InterruptedException e) {
             Platform.runLater(() -> {
