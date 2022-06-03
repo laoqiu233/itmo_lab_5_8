@@ -17,6 +17,7 @@ import com.dmtri.client.views.CommandsMenu;
 import com.dmtri.client.views.ConnectionView;
 import com.dmtri.client.views.LoginView;
 import com.dmtri.client.views.MainView;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
@@ -67,7 +68,7 @@ public class GraphicClient extends Application {
         mainWindow = primaryStage;
 
         // Create language menu
-        languageMenu.textProperty().bind(localeManager.getObservableStringByKey("languageMenuName"));
+        languageMenu.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.LANGUAGE_MENU_NAME));
         RadioMenuItem englishMenuItem = new RadioMenuItem("English");
         englishMenuItem.setOnAction(e -> localeManager.setLocale(Locale.ENGLISH));
         RadioMenuItem russianMenuItem = new RadioMenuItem("Русский");
@@ -88,7 +89,7 @@ public class GraphicClient extends Application {
         languageMenu.getItems().addAll(englishMenuItem, russianMenuItem, romanianMenuItem, latvianMenuItem, mexicanSpanishMenuItem);
 
         routesThread.start();
-        primaryStage.titleProperty().bind(localeManager.getObservableStringByKey("loginHeader"));
+        primaryStage.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.LOGIN_HEADER));
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
         sceneRoot.setTop(menuBar);
@@ -139,7 +140,7 @@ public class GraphicClient extends Application {
 
     public void chooseScriptAndExecute() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.titleProperty().bind(localeManager.getObservableStringByKey("scriptChooserTitle"));
+        fileChooser.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SCRIPT_CHOOSER_TITLE));
         File selectedFile = fileChooser.showOpenDialog(mainWindow);
         if (selectedFile != null) {
                 try (FileInputStream fileInput = new FileInputStream(selectedFile);
@@ -159,7 +160,7 @@ public class GraphicClient extends Application {
                 area.setText(baos.toString());
 
                 Stage resultWindow = new Stage();
-                resultWindow.titleProperty().bind(localeManager.getObservableStringByKey("scriptResultTitle"));
+                resultWindow.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SCRIPT_RESULT_TITLE));
                 resultWindow.setScene(new Scene(new BorderPane(area)));
                 resultWindow.show();
             } catch (IOException e) {
@@ -176,7 +177,7 @@ public class GraphicClient extends Application {
             channel = new ObjectSocketChannelWrapper(socket);
             sceneRoot.setCenter(loginView.getView());
         } catch (UnresolvedAddressException e) {
-            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey("invalidAddress").get()).showAndWait();
+            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey(LocaleKeys.INVALID_ADDRESS).get()).showAndWait();
         } catch (IOException e) {
             new Alert(AlertType.ERROR, e.getLocalizedMessage()).showAndWait();
             channel = null;
@@ -212,7 +213,7 @@ public class GraphicClient extends Application {
                 channel.clearInBuffer();
                 return resp;
             }
-            new Alert(AlertType.ERROR, "Invalid response").show();
+            new Alert(AlertType.ERROR, localeManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get()).show();
             channel.clearInBuffer();
             return null;
         } catch (IOException | InterruptedException e) {

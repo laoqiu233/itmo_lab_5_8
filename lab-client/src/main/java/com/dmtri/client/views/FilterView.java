@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import com.dmtri.client.LocaleManager;
 import com.dmtri.client.util.NumberStringConverter;
 import com.dmtri.client.util.StringConverter;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.models.Route;
 
 import javafx.beans.property.ObjectProperty;
@@ -37,7 +38,7 @@ public class FilterView {
         this.localeManager = localeManager;
         Label headerLabel = new Label();
         headerLabel.setFont(new Font(HEADER_SIZE));
-        headerLabel.textProperty().bind(localeManager.getObservableStringByKey("filterLabel"));
+        headerLabel.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.FILTER_LABEL));
 
         ChoiceBox<FilterConfigurator> filterFieldChoice = createChoiceBox();
 
@@ -114,7 +115,7 @@ public class FilterView {
         FilterConfigurator(String localeKey) {
             this.localeKey = localeKey;
             Label noFilterLabel = new Label();
-            noFilterLabel.textProperty().bind(localeManager.getObservableStringByKey("noFilterLabel"));
+            noFilterLabel.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.NO_FILTER_LABEL));
             setView(noFilterLabel);
         }
 
@@ -151,7 +152,7 @@ public class FilterView {
             operationChoice.getItems().addAll(Operation.values());
             operationChoice.getSelectionModel().select(0);
             operandField = new TextField();
-            operandField.promptTextProperty().bind(localeManager.getObservableStringByKey("operandLabel"));
+            operandField.promptTextProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.OPERAND_LABEL));
             errorPrompt = new Label();
             errorPrompt.setTextFill(Color.RED);
 
@@ -175,7 +176,7 @@ public class FilterView {
             // If no operand is available then no filter is applied
             if (operand == null) {
                 if (!operandField.getText().isEmpty()) {
-                    errorPrompt.textProperty().bind(localeManager.getObservableStringByKey("invalidOperandLabel"));
+                    errorPrompt.textProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.INVALID_OPERAND_LABEL));
                 }
                 return x -> true;
             }
@@ -198,7 +199,7 @@ public class FilterView {
         StringFilterConfigurator(String localeKey, Callback<Route, String> valueGetter) {
             super(localeKey);
             searchField = new TextField();
-            searchField.promptTextProperty().bind(localeManager.getObservableStringByKey("searchPromptLabel"));
+            searchField.promptTextProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SEARCH_PROMPT_LABEL));
             searchField.textProperty().addListener(o -> filterProperty().set(x -> valueGetter.call(x).contains(searchField.getCharacters())));
             setView(searchField);
         }

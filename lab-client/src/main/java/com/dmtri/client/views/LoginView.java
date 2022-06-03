@@ -3,6 +3,7 @@ package com.dmtri.client.views;
 import java.text.MessageFormat;
 
 import com.dmtri.client.GraphicClient;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
@@ -118,19 +119,19 @@ public class LoginView {
 
     private Node createLayout() {
         final Label headerLabel = new Label();
-        headerLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginHeader"));
+        headerLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGIN_HEADER));
         headerLabel.setFont(Font.font("Montserrat", FontWeight.BOLD, HEADER_FONT_SIZE));
         final Label subheaderLabel = new Label();
-        subheaderLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginSubHeader"));
+        subheaderLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGIN_SUB_HEADER));
 
         loginButton = new Button();
-        loginButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginButton"));
+        loginButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGIN_BUTTON));
         loginButton.setOnMouseClicked(this::sendLoginRequest);
         registerButton = new Button("Register");
-        registerButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("registerButton"));
+        registerButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.REGISTER_BUTTON));
         registerButton.setOnMouseClicked(this::sendRegisterRequest);
         disconnectButton = new Button("Disconnect");
-        disconnectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("disconnectButton"));
+        disconnectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.DISCONNECT_BUTTON));
         disconnectButton.setOnMouseClicked(e -> client.disconnect());
         HBox buttonGroup = new HBox(GAP);
         buttonGroup.getChildren().addAll(loginButton, registerButton, disconnectButton);
@@ -149,13 +150,13 @@ public class LoginView {
 
     private Node createLoginPassGrid() {
         final Label loginLabel = new Label();
-        loginLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("loginLabel"));
+        loginLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGIN_LABEL));
         loginField = new TextField();
-        loginField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("loginPrompt"));
+        loginField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGIN_PROMPT));
         final Label passwordLabel = new Label();
-        passwordLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordLabel"));
+        passwordLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PASSWORD_LABEL));
         passwordField = new PasswordField();
-        passwordField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("passwordPrompt"));
+        passwordField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PASSWORD_PROMPT));
 
         GridPane loginPassGrid = new GridPane();
         loginPassGrid.add(loginLabel, 0, 0);

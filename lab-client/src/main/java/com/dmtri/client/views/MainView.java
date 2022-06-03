@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.dmtri.client.GraphicClient;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.models.Route;
 import com.dmtri.common.network.Request;
 import com.dmtri.common.network.RequestBody;
@@ -60,9 +61,9 @@ public class MainView {
         graphicTab = new RoutesGraphicView(filteredRoutes, client.getLocaleManager());
         tableTab.selectedRouteProperty().bindBidirectional(graphicTab.selectedRouteProperty());
         Tab tab1 = new Tab("Routes (Table)", tableTab.getView());
-        tab1.textProperty().bind(client.getLocaleManager().getObservableStringByKey("routesTable"));
+        tab1.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ROUTES_TABLE));
         Tab tab2 = new Tab("Graph View", graphicTab.getView());
-        tab2.textProperty().bind(client.getLocaleManager().getObservableStringByKey("routesGraph"));
+        tab2.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ROUTES_GRAPH));
         TabPane center = new TabPane(tab1, tab2);
         center.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         root.setCenter(center);
@@ -95,13 +96,13 @@ public class MainView {
     private Node createRouteInspectionBox() {
         inspector = new RouteInspectorView(client, tableTab.selectedRouteProperty());
         Button updateButton = new Button();
-        updateButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("updateButton"));
+        updateButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.UPDATE_BUTTON));
         updateButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
         updateButton.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(updateButton, Priority.ALWAYS);
         updateButton.setOnMouseClicked(this::sendUpdatedRoute);
         Button deleteButton = new Button("Delete");
-        deleteButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("deleteButton"));
+        deleteButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.DELETE_BUTTON));
         deleteButton.disableProperty().bind(Bindings.not(inspector.routeReadyProperty()));
         deleteButton.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(deleteButton, Priority.ALWAYS);
@@ -119,12 +120,12 @@ public class MainView {
     private Node createUserInfoBox() {
         Label usernameLabel = new Label();
         usernameLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> client.getAuth() == null ? "" : MessageFormat.format(client.getLocaleManager().getObservableStringByKey("loggedInAsLabel").get(), client.getAuth().getLogin()),
+            () -> client.getAuth() == null ? "" : MessageFormat.format(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGGED_IN_AS_LABEL).get(), client.getAuth().getLogin()),
             client.getLocaleManager().localeProperty(),
             client.authProperty()
         ));
         Button logoutButton = new Button();
-        logoutButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("logoutButton"));
+        logoutButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.LOGOUT_BUTTON));
         logoutButton.setOnMouseClicked(e -> client.setAuth(null));
         HBox userInfo = new HBox(GAP);
         userInfo.setAlignment(Pos.CENTER_RIGHT);
@@ -135,15 +136,12 @@ public class MainView {
         userInfo.getChildren().add(selectedLabel);
         selectedLabel.textProperty().bind(Bindings.createStringBinding(
             () -> {
-                Object idOrNoneLabel = (tableTab.selectedRouteProperty().get() == null ? client.getLocaleManager().getObservableStringByKey("noneLabel").get() : tableTab.selectedRouteProperty().get().getId());
-                return MessageFormat.format(client.getLocaleManager().getObservableStringByKey("selectedLabel").get(), idOrNoneLabel);
+                Object idOrNoneLabel = (tableTab.selectedRouteProperty().get() == null ? client.getLocaleManager().getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : tableTab.selectedRouteProperty().get().getId());
+                return MessageFormat.format(client.getLocaleManager().getObservableStringByKey(LocaleKeys.SELECTED_LABEL).get(), idOrNoneLabel);
             },
             tableTab.selectedRouteProperty(),
             client.getLocaleManager().localeProperty()
         ));
-        tableTab.selectedRouteProperty().addListener((o, oldVal, newVal) -> {
-            System.out.println("Selection changed from " + (oldVal == null ? "null" : oldVal.getId()) + " to " + (newVal == null ? "null" : newVal.getId()));
-        });
 
         return userInfo;
     }

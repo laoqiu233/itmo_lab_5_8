@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.dmtri.client.GraphicClient;
 import com.dmtri.client.util.NumberStringConverter;
 import com.dmtri.client.util.StringConverter;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.exceptions.InvalidFieldException;
 import com.dmtri.common.models.AbstractValidator;
 import com.dmtri.common.models.Coordinates;
@@ -202,7 +203,7 @@ public class RouteInspectorView {
 
             T value = converter.convert(newV);
             if (value == null && !newV.isEmpty()) {
-                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("invalidValue"));
+                promptLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.INVALID_VALUE));
                 return;
             }
 

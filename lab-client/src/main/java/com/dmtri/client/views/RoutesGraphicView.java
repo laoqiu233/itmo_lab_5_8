@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import com.dmtri.client.LocaleManager;
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.models.Location;
 import com.dmtri.common.models.Route;
 
@@ -231,16 +232,16 @@ public class RoutesGraphicView {
             gc.strokeText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.strokeText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.strokeText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + (route.getDistance() == null ? "null" : NumberFormat.getNumberInstance().format(route.getDistance()))
-                         + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(),
+                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? localeManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
+                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2
             );
             gc.fillText(route.getFrom().getName(), startLocation.getCenterX(), startLocation.getCenterY());
             gc.fillText(route.getTo().getName(), endLocation.getCenterX(), endLocation.getCenterY());
             gc.fillText(route.getName()
-                         + "\n" + localeManager.getObservableStringByKey("distanceLabel").get() + ": " + (route.getDistance() == null ? "null" : NumberFormat.getNumberInstance().format(route.getDistance()))
-                         + "\n" + localeManager.getObservableStringByKey("ownerLabel").get() + ": " + route.getOwner(),
+                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.DISTANCE_LABEL).get() + ": " + (route.getDistance() == null ? localeManager.getObservableStringByKey(LocaleKeys.NONE_LABEL).get() : NumberFormat.getNumberInstance().format(route.getDistance()))
+                         + "\n" + localeManager.getObservableStringByKey(LocaleKeys.OWNER_LABEL).get() + ": " + route.getOwner(),
                          (startLocation.getCenterX() + endLocation.getCenterX()) / 2,
                          (startLocation.getCenterY() + endLocation.getCenterY()) / 2
             );
