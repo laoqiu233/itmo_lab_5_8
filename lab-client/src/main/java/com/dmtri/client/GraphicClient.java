@@ -143,8 +143,10 @@ public class GraphicClient extends Application {
         fileChooser.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.SCRIPT_CHOOSER_TITLE));
         File selectedFile = fileChooser.showOpenDialog(mainWindow);
         if (selectedFile != null) {
-                try (FileInputStream fileInput = new FileInputStream(selectedFile);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (
+                FileInputStream fileInput = new FileInputStream(selectedFile);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()
+            ) {
                 BasicUserIO scriptIO = new BasicUserIO(fileInput, baos);
                 scriptIO.setRepeatInput(true);
 
