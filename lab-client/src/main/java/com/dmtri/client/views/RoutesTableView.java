@@ -41,6 +41,7 @@ public class RoutesTableView {
         this.localeManager = localeManager;
         tableView = createTable();
         routes.addListener(new SetChangeListener<Route>() {
+            @Override
             public void onChanged(Change<? extends Route> change) {
                 if (change.wasAdded()) {
                     // Insertion sort

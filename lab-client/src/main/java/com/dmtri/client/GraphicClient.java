@@ -239,6 +239,7 @@ public class GraphicClient extends Application {
             workFlag = flag;
         }
 
+        @Override
         public void run() {
             try {
                 while (true) {

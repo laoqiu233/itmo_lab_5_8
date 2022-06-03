@@ -42,6 +42,7 @@ public class MainView {
     private RouteInspectorView inspector;
     private ObservableSet<Route> filteredRoutes = FXCollections.observableSet();
     private final InvalidationListener listener = new InvalidationListener() {
+        @Override
         public void invalidated(Observable observable) {
             Set<Route> newFilteredRoutes = client.getRoutes().stream().filter(filterView.getFilter()).collect(Collectors.toSet());
             filteredRoutes.retainAll(newFilteredRoutes);
