@@ -3,6 +3,7 @@ package com.dmtri.client.views;
 import java.net.InetSocketAddress;
 
 import com.dmtri.client.GraphicClient;
+import com.dmtri.common.LocaleKeys;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -32,13 +33,13 @@ public class ConnectionView {
     }
 
     private Parent createLayout() {
-        connectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey("connectButton"));
+        connectButton.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.CONNECT_BUTTON));
         final Label addressLabel = new Label();
-        addressLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("addressLabel"));
-        addressField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("addressPrompt"));
+        addressLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ADDRESS_LABEL));
+        addressField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.ADDRESS_PROMPT));
         final Label portLabel = new Label();
-        portLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey("portLabel"));
-        portField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey("portPrompt"));
+        portLabel.textProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PORT_LABEL));
+        portField.promptTextProperty().bind(client.getLocaleManager().getObservableStringByKey(LocaleKeys.PORT_PROMPT));
         portField.setTextFormatter(new TextFormatter<>(change -> {
             if (!change.getControlNewText().equals("")) {
                 try {

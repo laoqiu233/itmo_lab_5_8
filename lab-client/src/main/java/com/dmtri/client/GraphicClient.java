@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.UnresolvedAddressException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import com.dmtri.client.views.CommandsMenu;
@@ -47,13 +50,34 @@ import javafx.stage.Stage;
 
 public class GraphicClient extends Application {
     private static final int WINDOW_SIZE = 500;
-    private static final int SLEEP_TIME = 100;
+    private static final long SLEEP_TIME = 100;
     private final LocaleManager localeManager = new LocaleManager(Locale.ENGLISH);
+    private final Timer routesTimer = new Timer("routes-fetch-thread", true);
+    private final TimerTask routeFetcher = new TimerTask() {
+        @Override
+        public void run() {
+            if (doRouteFetch) {
+                System.out.println("Doing routes fetch");
+                Response resp = sendMessage(new Request(
+                    "show",
+                    new RequestBody(new String[] {}),
+                    getAuth()
+                ));
+
+                if (resp instanceof ResponseWithRoutes) {
+                    ResponseWithRoutes rwr = (ResponseWithRoutes) resp;
+                    Set<Route> newRoutes = new HashSet<>(Arrays.asList(rwr.getRoutes()));
+
+                    Platform.runLater(() -> setRoutes(newRoutes));
+                }
+            }
+        }
+    };
+    private volatile boolean doRouteFetch = false;
     private Stage mainWindow;
     private ObjectSocketChannelWrapper channel;
     private ObjectProperty<AuthCredentials> auth = new SimpleObjectProperty<>();
     private ObservableSet<Route> routes = FXCollections.observableSet();
-    private RoutesThread routesThread = new RoutesThread();
     private ConnectionView connectionView = new ConnectionView(this);
     private LoginView loginView = new LoginView(this);
     private MainView mainView = new MainView(this);
@@ -87,8 +111,8 @@ public class GraphicClient extends Application {
         mexicanSpanishMenuItem.setToggleGroup(group);
         englishMenuItem.setSelected(true);
         languageMenu.getItems().addAll(englishMenuItem, russianMenuItem, romanianMenuItem, latvianMenuItem, mexicanSpanishMenuItem);
-
-        routesThread.start();
+        
+        routesTimer.schedule(routeFetcher, 0L, SLEEP_TIME);
         primaryStage.titleProperty().bind(localeManager.getObservableStringByKey(LocaleKeys.LOGIN_HEADER));
         primaryStage.setWidth(WINDOW_SIZE);
         primaryStage.setHeight(WINDOW_SIZE);
@@ -114,11 +138,11 @@ public class GraphicClient extends Application {
     }
     public void setAuth(AuthCredentials auth) {
         if (auth == null) {
-            routesThread.setWorking(false);
+            doRouteFetch = false;
             sceneRoot.setCenter(loginView.getView());
             menuBar.getMenus().remove(commandsMenu);
         } else {
-            routesThread.setWorking(true);
+            doRouteFetch = true;
             sceneRoot.setCenter(mainView.getView());
             menuBar.getMenus().add(commandsMenu);
         }
@@ -187,7 +211,7 @@ public class GraphicClient extends Application {
     }
 
     public void disconnect() {
-        routesThread.setWorking(false);
+        doRouteFetch = false;
         if (channel != null) {
             try {
                 channel.getSocket().close();
@@ -224,50 +248,6 @@ public class GraphicClient extends Application {
                 disconnect();
             });
             return null;
-        }
-    }
-
-    private class RoutesThread extends Thread {
-        private volatile boolean workFlag = false;
-
-        RoutesThread() {
-            setName("routes-fetching-thread");
-            setDaemon(true);
-        }
-
-        public void setWorking(boolean flag) {
-            workFlag = flag;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    if (workFlag) {
-                        Response resp = sendMessage(new Request(
-                            "show",
-                            new RequestBody(new String[] {}),
-                            getAuth()
-                        ));
-
-                        if (resp instanceof ResponseWithRoutes) {
-                            ResponseWithRoutes rwr = (ResponseWithRoutes) resp;
-                            Set<Route> newRoutes = new HashSet<>();
-
-                            for (int i = 0; i < rwr.getRoutesCount(); i++) {
-                                newRoutes.add(rwr.getRoute(i));
-                            }
-
-                            Platform.runLater(() -> setRoutes(newRoutes));
-                        }
-
-                        Thread.sleep(SLEEP_TIME);
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
-            }
         }
     }
 }

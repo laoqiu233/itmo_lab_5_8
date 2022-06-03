@@ -22,4 +22,8 @@ public class ResponseWithRoutes extends Response {
     public int getRoutesCount() {
         return routes.length;
     }
+
+    public Route[] getRoutes() {
+        return routes;
+    }
 }
