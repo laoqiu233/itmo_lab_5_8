@@ -128,10 +128,10 @@ public class LoginView {
         loginButton = new Button();
         loginButton.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.LOGIN_BUTTON));
         loginButton.setOnMouseClicked(this::sendLoginRequest);
-        registerButton = new Button("Register");
+        registerButton = new Button();
         registerButton.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.REGISTER_BUTTON));
         registerButton.setOnMouseClicked(this::sendRegisterRequest);
-        disconnectButton = new Button("Disconnect");
+        disconnectButton = new Button();
         disconnectButton.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.DISCONNECT_BUTTON));
         disconnectButton.setOnMouseClicked(e -> client.getNetwork().disconnect());
         HBox buttonGroup = new HBox(GAP);
