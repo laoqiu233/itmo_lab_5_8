@@ -36,6 +36,7 @@ import javafx.util.Duration;
 
 public class RoutesGraphicView {
     private static final int MAX_RGB = 256;
+    private static final double ONE_HALF = 1.5;
     private static final double Y_LO = -50;
     private static final double Y_HI = 50;
     private static final double MIN_RADIUS = 50;
@@ -161,7 +162,7 @@ public class RoutesGraphicView {
             endLocation.setOnMouseClicked(clickHandler);
             lineBetween = new Line(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             lineBetween.setStrokeWidth(
-                (route.getDistance() == null ? 1 : Math.min(route.getDistance(), MIN_RADIUS))
+                (route.getDistance() == null ? 1 : Math.min(route.getDistance(), MIN_RADIUS) / 2)
             );
             lineBetween.setOnMouseClicked(clickHandler);
             shapesFill(getColorByOwnerHashCode());
@@ -209,7 +210,7 @@ public class RoutesGraphicView {
                 gc.strokeOval(startLocation.getCenterX() - startLocation.getRadius(), startLocation.getCenterY() - startLocation.getRadius(), startLocation.getRadius() * 2, startLocation.getRadius() * 2);
                 gc.setLineWidth(endLocation.getRadius() / 2);
                 gc.strokeOval(endLocation.getCenterX() - endLocation.getRadius(), endLocation.getCenterY() - endLocation.getRadius(), endLocation.getRadius() * 2, endLocation.getRadius() * 2);
-                gc.setLineWidth(lineBetween.getStrokeWidth() * 2);
+                gc.setLineWidth(lineBetween.getStrokeWidth() * ONE_HALF);
                 gc.strokeLine(startLocation.getCenterX(), startLocation.getCenterY(), endLocation.getCenterX(), endLocation.getCenterY());
             }
             gc.setFill(getColorByOwnerHashCode());
