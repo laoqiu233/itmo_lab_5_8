@@ -73,5 +73,5 @@ public final class LocaleKeys {
     public static final String COORDINATES_Y_NOT_NULL = "coordinatesYNotNull";
     public static final String INVALID_RESPONSE = "invalidResponse";
 
-    private LocaleKeys() {}
+    private LocaleKeys() { }
 }

@@ -18,7 +18,7 @@ import javafx.scene.control.Alert.AlertType;
  * Utility class with helper methods suited for a graphical client
  */
 public class GraphicClientNet {
-    private final static long SLEEP_TIME = 100;
+    private static final long SLEEP_TIME = 100;
 
     private ObjectProperty<ObjectSocketChannelWrapper> channel = new SimpleObjectProperty<>();
 

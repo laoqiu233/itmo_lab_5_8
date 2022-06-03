@@ -21,7 +21,6 @@ import com.dmtri.common.network.RequestBody;
 import com.dmtri.common.network.Response;
 import com.dmtri.common.network.ResponseWithRoutes;
 import com.dmtri.common.usermanagers.AuthCredentials;
-import com.dmtri.common.util.TerminalColors;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -45,7 +44,6 @@ public class GraphicClient extends Application {
         @Override
         public void run() {
             if (doRouteFetch) {
-                System.out.println("Doing routes fetch");
                 Response resp = network.sendMessage(new Request(
                     "show",
                     new RequestBody(new String[] {}),
@@ -75,7 +73,7 @@ public class GraphicClient extends Application {
     private final Scene scene = new Scene(sceneRoot);
     private Stage mainWindow;
 
-    @Override 
+    @Override
     public void init() {
         // Create language menu
         languageMenu.textProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.LANGUAGE_MENU_NAME));
@@ -102,7 +100,7 @@ public class GraphicClient extends Application {
     @Override
     public void start(Stage primaryStage) {
         mainWindow = primaryStage;
-        
+
         routesTimer.schedule(routeFetcher, 0L, SLEEP_TIME);
 
         primaryStage.titleProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.LOGIN_HEADER));

@@ -14,12 +14,12 @@ import javafx.beans.value.ObservableStringValue;
 /**
  * Class to create observable locales
  */
-public class LocaleManager {
+public final class LocaleManager {
     private static ResourceBundle bundle = ResourceBundle.getBundle("Locales", Locale.ENGLISH);
     private static ObjectProperty<Locale> localePorperty = new SimpleObjectProperty<>(Locale.ENGLISH);
     private static Map<String, StringProperty> observableStrings = new HashMap<>();
 
-    private LocaleManager() {}
+    private LocaleManager() { }
 
     public static ObjectProperty<Locale> localeProperty() {
         return localePorperty;
