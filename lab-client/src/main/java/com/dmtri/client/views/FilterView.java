@@ -17,6 +17,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -78,19 +79,20 @@ public class FilterView {
     }
 
     private ChoiceBox<FilterConfigurator> createChoiceBox() {
-        configurators.add(new FilterConfigurator("noneLabel"));
-        configurators.add(new ComparableFilterConfigurator<Long>("idLabel", x -> x.getId(), new NumberStringConverter<>(Long::parseLong)));
-        configurators.add(new StringFilterConfigurator("nameLabel", x -> x.getName()));
-        configurators.add(new ComparableFilterConfigurator<Double>("distanceLabel", x -> x.getDistance(), new NumberStringConverter<>(Double::parseDouble)));
-        configurators.add(new StringFilterConfigurator("startingLocationNameLabel", x -> x.getFrom().getName()));
-        configurators.add(new ComparableFilterConfigurator<Long>("startingLocationXLabel", x -> x.getFrom().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)));
-        configurators.add(new ComparableFilterConfigurator<Double>("startingLocationYLabel", x -> x.getFrom().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)));
-        configurators.add(new ComparableFilterConfigurator<Long>("startingLocationZLabel", x -> x.getFrom().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)));
-        configurators.add(new StringFilterConfigurator("endingLocationNameLabel", x -> x.getTo().getName()));
-        configurators.add(new ComparableFilterConfigurator<Long>("endingLocationXLabel", x -> x.getTo().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)));
-        configurators.add(new ComparableFilterConfigurator<Double>("endingLocationYLabel", x -> x.getTo().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)));
-        configurators.add(new ComparableFilterConfigurator<Long>("endingLocationZLabel", x -> x.getTo().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)));
-        configurators.add(new StringFilterConfigurator("ownerLabel", x -> x.getOwner()));
+        configurators.add(new FilterConfigurator(LocaleKeys.NONE_LABEL));
+        configurators.add(new ComparableFilterConfigurator<Long>(LocaleKeys.ID_LABEL, x -> x.getId(), new NumberStringConverter<>(Long::parseLong)));
+        configurators.add(new StringFilterConfigurator(LocaleKeys.NAME_LABEL, x -> x.getName()));
+        configurators.add(new ComparableFilterConfigurator<Double>(LocaleKeys.DISTANCE_LABEL, x -> x.getDistance(), new NumberStringConverter<>(Double::parseDouble)));
+        configurators.add(new DateFilterConfigurator(LocaleKeys.CREATION_DATE_LABEL));
+        configurators.add(new StringFilterConfigurator(LocaleKeys.STARTING_LOCATION_NAME_LABEL, x -> x.getFrom().getName()));
+        configurators.add(new ComparableFilterConfigurator<Long>(LocaleKeys.STARTING_LOCATION_X_LABEL, x -> x.getFrom().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)));
+        configurators.add(new ComparableFilterConfigurator<Double>(LocaleKeys.STARTING_LOCATION_Y_LABEL, x -> x.getFrom().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)));
+        configurators.add(new ComparableFilterConfigurator<Long>(LocaleKeys.STARTING_LOCATION_Z_LABEL, x -> x.getFrom().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)));
+        configurators.add(new StringFilterConfigurator(LocaleKeys.ENDING_LOCATION_NAME_LABEL, x -> x.getTo().getName()));
+        configurators.add(new ComparableFilterConfigurator<Long>(LocaleKeys.ENDING_LOCATION_X_LABEL, x -> x.getTo().getCoordinates().getX(), new NumberStringConverter<>(Long::parseLong)));
+        configurators.add(new ComparableFilterConfigurator<Double>(LocaleKeys.ENDING_LOCATION_Y_LABEL, x -> x.getTo().getCoordinates().getY(), new NumberStringConverter<>(Double::parseDouble)));
+        configurators.add(new ComparableFilterConfigurator<Long>(LocaleKeys.ENDING_LOCATION_Z_LABEL, x -> x.getTo().getCoordinates().getZ(), new NumberStringConverter<>(Long::parseLong)));
+        configurators.add(new StringFilterConfigurator(LocaleKeys.OWNER_LABEL, x -> x.getOwner()));
         ChoiceBox<FilterConfigurator> filterFieldChoice = new ChoiceBox<>();
         filterFieldChoice.getItems().addAll(configurators);
 
@@ -200,6 +202,21 @@ public class FilterView {
             searchField.promptTextProperty().bind(LocaleManager.getObservableStringByKey(LocaleKeys.SEARCH_PROMPT_LABEL));
             searchField.textProperty().addListener(o -> filterProperty().set(x -> valueGetter.call(x).contains(searchField.getCharacters())));
             setView(searchField);
+        }
+    }
+
+    private class DateFilterConfigurator extends FilterConfigurator {
+        DateFilterConfigurator(String localeKey) {
+            super(localeKey);
+            DatePicker datePicker = new DatePicker();
+            datePicker.valueProperty().addListener((o, oldV, newV) -> {
+                if (newV == null) {
+                    setFilter(x -> true);
+                } else {
+                    setFilter(x -> x.getCreationDate().equals(newV));
+                }
+            });
+            setView(datePicker);
         }
     }
 
