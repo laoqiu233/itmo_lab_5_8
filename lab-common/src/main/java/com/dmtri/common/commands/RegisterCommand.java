@@ -1,5 +1,6 @@
 package com.dmtri.common.commands;
 
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidRequestException;
 import com.dmtri.common.network.Request;
@@ -34,7 +35,7 @@ public class RegisterCommand extends AbstractCommand {
     @Override
     public Response execute(Request request) throws InvalidRequestException {
         if (request.getBody().getArgsLength() != 2) {
-            throw new InvalidRequestException("This operation requires exactly two arguments: Login and password");
+            throw new InvalidRequestException("This operation requires exactly two arguments: Login and password", LocaleKeys.INVALID_VALUE);
         }
 
         AuthCredentials newCredentials = new AuthCredentials(

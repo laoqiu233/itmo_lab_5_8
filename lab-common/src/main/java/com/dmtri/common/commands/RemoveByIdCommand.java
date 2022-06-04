@@ -2,6 +2,7 @@ package com.dmtri.common.commands;
 
 import java.util.NoSuchElementException;
 
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidRequestException;
@@ -58,9 +59,9 @@ public class RemoveByIdCommand extends AbstractCommand {
             col.remove(toRemove.getId());
             return new Response();
         } catch (NumberFormatException e) {
-            throw new InvalidRequestException(new CommandArgumentException("Failed to convert " + request.getBody().getArg(0) + " to a number", e));
+            throw new InvalidRequestException(new CommandArgumentException("Failed to convert " + request.getBody().getArg(0) + " to a number", e), LocaleKeys.INVALID_VALUE);
         } catch (NoSuchElementException e) {
-            throw new InvalidRequestException(new CommandArgumentException("Can not find element with id " + request.getBody().getArg(0) + " in collection", e));
+            throw new InvalidRequestException(new CommandArgumentException("Can not find element with id " + request.getBody().getArg(0) + " in collection", e), null);
         }
     }
 }

@@ -8,7 +8,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.dmtri.common.LocaleKeys;
+import com.dmtri.common.exceptions.InvalidRequestException;
 import com.dmtri.common.network.Response;
+import com.dmtri.common.network.ResponseWithException;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -28,6 +30,7 @@ public class GraphicClientNet {
     public ObjectProperty<ObjectSocketChannelWrapper> channelProperty() {
         return channel;
     }
+    
     public void connect(InetSocketAddress address) {
         try {
             lock.lock();
@@ -45,6 +48,7 @@ public class GraphicClientNet {
             lock.unlock();
         }
     }
+
     public void disconnect() {
         try {
             lock.lock();
@@ -86,6 +90,14 @@ public class GraphicClientNet {
 
             if (payload instanceof Response) {
                 Response resp = (Response) payload;
+                if (resp instanceof ResponseWithException) {
+                    ResponseWithException rwe = (ResponseWithException) resp;
+                    if (rwe.getException() instanceof InvalidRequestException) {
+                        showError(LocaleManager.getObservableStringByKey(rwe.getException().getLocalizedMessage()).get());
+                    } else {
+                        showError(rwe.getException().getLocalizedMessage());
+                    }
+                }
                 return resp;
             }
             showError(LocaleManager.getObservableStringByKey(LocaleKeys.INVALID_RESPONSE).get());
@@ -95,6 +107,7 @@ public class GraphicClientNet {
             Platform.runLater(() -> {
                 disconnect();
                 showError(e.getLocalizedMessage());
+                e.printStackTrace();
             });
             return null;
         } finally {

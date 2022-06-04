@@ -50,7 +50,7 @@ public class RemoveGreaterCommand extends AbstractCommand {
     @Override
     public Response execute(Request request) throws InvalidRequestException {
         if (request.getBody() == null || !(request.getBody() instanceof RequestBodyWithRoute)) {
-            throw new InvalidRequestException("Request should have a route attached");
+            throw new InvalidRequestException("Request should have a route attached", null);
         }
 
         Route temp = ((RequestBodyWithRoute) request.getBody()).getRoute();

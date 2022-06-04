@@ -1,5 +1,6 @@
 package com.dmtri.common.commands;
 
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidRequestException;
@@ -45,7 +46,7 @@ public class RemoveAllByDistanceCommand extends AbstractCommand {
             int res = col.removeIf(x -> (x.getDistance() != null && x.getDistance().equals(distance) && x.getOwner().equals(request.getAuth().getLogin())));
             return new Response("Removed " + res + " items");
         } catch (NumberFormatException e) {
-            throw new InvalidRequestException(new CommandArgumentException("Invalid distance entered.", e));
+            throw new InvalidRequestException(new CommandArgumentException("Invalid distance entered.", e), LocaleKeys.INVALID_VALUE);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.dmtri.common.commands;
 
+import com.dmtri.common.LocaleKeys;
 import com.dmtri.common.collectionmanagers.CollectionManager;
 import com.dmtri.common.exceptions.CommandArgumentException;
 import com.dmtri.common.exceptions.InvalidFieldException;
@@ -43,7 +44,7 @@ public class AddCommand extends AbstractCommand {
     @Override
     public Response execute(Request request) throws InvalidRequestException {
         if (request.getBody() == null || !(request.getBody() instanceof RequestBodyWithRoute)) {
-            throw new InvalidRequestException("Request should have a route attached");
+            throw new InvalidRequestException("Request should have a route attached", LocaleKeys.INVALID_VALUE);
         }
 
         RequestBodyWithRoute body = (RequestBodyWithRoute) request.getBody();
